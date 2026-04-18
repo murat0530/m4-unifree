@@ -5,6 +5,7 @@ import 'duyuru_screen.dart';
 import 'kasa_screen.dart';
 import 'bilgilendirme_screen.dart';
 import 'hakedis_screen.dart';
+import 'mola_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -107,6 +108,16 @@ class HomeScreen extends StatelessWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const HakedisScreen()),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _MenuButton(
+                      icon: Icons.coffee,
+                      label: 'MOLA TAKİP',
+                      color: const Color(0xFF37474F),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MolaScreen()),
                       ),
                     ),
                   ],
