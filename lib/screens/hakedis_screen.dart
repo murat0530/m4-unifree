@@ -79,21 +79,29 @@ class _HakedisScreenState extends State<HakedisScreen> {
   // Kişileri kolon çiftlerinden çıkar (isim, not çiftleri)
   List<Map<String, dynamic>> _parseKisiler() {
     if (_rows.length < 4) return [];
-    final nameRow = _rows[3]; // MURAT | C | PINAR | A ...
-    final kisiler = <Map<String, dynamic>>[];
+    // İsim satırını bul: sayı olmayan, tek harfli not içeren satır
+    List<String>? nameRow;
+    for (final row in _rows) {
+      final nonEmpty = row.where((c) => c.isNotEmpty).toList();
+      final hasGrade = nonEmpty.any((c) => c == 'A' || c == 'B' || c == 'C');
+      final hasName = nonEmpty.any((c) =>
+          c.length > 1 && !RegExp(r'^[\d.,₺/\-]+$').hasMatch(c) && !c.contains('Date'));
+      if (hasGrade && hasName) {
+        nameRow = row;
+        break;
+      }
+    }
+    if (nameRow == null) return [];
 
-    for (int i = 1; i < nameRow.length - 1; i += 2) {
-      final isim = nameRow[i];
-      final not = i + 1 < nameRow.length ? nameRow[i + 1] : '';
-      if (isim.isNotEmpty &&
-          isim != '' &&
-          !isim.contains('Date') &&
-          RegExp(r'^[A-ZÇĞİÖŞÜa-zçğışöüü ]+$').hasMatch(isim)) {
-        kisiler.add({
-          'isim': isim,
-          'not': not,
-          'colIndex': i,
-        });
+    final kisiler = <Map<String, dynamic>>[];
+    for (int i = 0; i < nameRow.length; i++) {
+      final val = nameRow[i];
+      // Not harfi (A, B, C) ise bir önceki değer isimdir
+      if ((val == 'A' || val == 'B' || val == 'C') && i > 0) {
+        final isim = nameRow[i - 1];
+        if (isim.isNotEmpty && !RegExp(r'^[\d.,₺/\-]+$').hasMatch(isim)) {
+          kisiler.add({'isim': isim, 'not': val, 'colIndex': i - 1});
+        }
       }
     }
     return kisiler;
