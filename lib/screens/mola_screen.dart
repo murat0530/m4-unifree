@@ -21,11 +21,12 @@ class _MolaScreenState extends State<MolaScreen> {
   List<_MolaGrup> _gruplar = [];
   bool _loading = true;
   final Set<int> _bildirimGonderildi = {};
+  String _bildirimIzni = 'default';
 
   @override
   void initState() {
     super.initState();
-    _isteBildirimIzni();
+    _bildirimIzniniKontrolEt();
     _loadGruplar();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() => _now = DateTime.now());
@@ -39,9 +40,16 @@ class _MolaScreenState extends State<MolaScreen> {
     super.dispose();
   }
 
+  void _bildirimIzniniKontrolEt() {
+    try {
+      setState(() => _bildirimIzni = html.Notification.permission);
+    } catch (_) {}
+  }
+
   Future<void> _isteBildirimIzni() async {
     try {
-      await html.Notification.requestPermission();
+      final izin = await html.Notification.requestPermission();
+      setState(() => _bildirimIzni = izin);
     } catch (_) {}
   }
 
@@ -233,6 +241,33 @@ class _MolaScreenState extends State<MolaScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
+                // Bildirim izin banner
+                if (_bildirimIzni != 'granted')
+                  GestureDetector(
+                    onTap: _isteBildirimIzni,
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4A148C),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.purpleAccent),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.notifications_active, color: Colors.purpleAccent),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              '🔔 Mola bildirimlerini almak için buraya dokun',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward_ios, color: Colors.purpleAccent, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
                 // Saat ve vardiya
                 Container(
                   padding: const EdgeInsets.all(20),
