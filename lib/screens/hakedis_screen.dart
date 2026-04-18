@@ -6,71 +6,22 @@ const _sheetId = '1vgnCY7mGFnylVLmqPFg3vuuxyHOlPqK-QCvtgtlVYMY';
 
 class HakedisScreen extends StatefulWidget {
   const HakedisScreen({super.key});
-
   @override
   State<HakedisScreen> createState() => _HakedisScreenState();
 }
 
 class _HakedisScreenState extends State<HakedisScreen> {
-  List<_KisiData> _grup1 = [];
-  List<_KisiData> _grup2 = [];
+  List<_Kisi> _grup1 = [];
+  List<_Kisi> _grup2 = [];
   bool _loading = true;
   String? _error;
   String _tarih = '';
+  String _gun = '';
 
   @override
   void initState() {
     super.initState();
     _load();
-  }
-
-  String _dateStr(String v) {
-    final m = RegExp(r'Date\((\d+),(\d+),(\d+)\)').firstMatch(v);
-    if (m != null) {
-      return '${m.group(3)}.${(int.parse(m.group(2)!) + 1).toString().padLeft(2, '0')}.${m.group(1)}';
-    }
-    return v;
-  }
-
-  List<String> _parseRow(dynamic row, int colCount) {
-    final cells = <String>[];
-    for (int i = 0; i < colCount; i++) {
-      final c = (row['c'] as List).length > i ? (row['c'] as List)[i] : null;
-      if (c != null && c['v'] != null) {
-        final v = c['v'].toString();
-        cells.add(v.startsWith('Date(') ? _dateStr(v) : v);
-      } else {
-        cells.add('');
-      }
-    }
-    return cells;
-  }
-
-  List<_KisiData> _buildGrup(List<List<String>> rows, int nameRowIdx) {
-    if (nameRowIdx >= rows.length) return [];
-    final nameRow = rows[nameRowIdx];
-    final fis = nameRowIdx > 0 ? rows[nameRowIdx - 2] : <String>[];
-    final ispos = nameRowIdx > 0 ? rows[nameRowIdx - 1] : <String>[];
-    final incentive = nameRowIdx + 1 < rows.length ? rows[nameRowIdx + 1] : <String>[];
-    final istpos = nameRowIdx + 2 < rows.length ? rows[nameRowIdx + 2] : <String>[];
-
-    final kisiler = <_KisiData>[];
-    for (int i = 1; i < nameRow.length - 1; i += 2) {
-      final isim = nameRow[i];
-      final not = i + 1 < nameRow.length ? nameRow[i + 1] : '';
-      if (isim.isEmpty || isim == '-') continue;
-      if (not != 'A' && not != 'B' && not != 'C') continue;
-
-      kisiler.add(_KisiData(
-        isim: isim,
-        not: not,
-        fisSayisi: i < fis.length ? fis[i] : '',
-        isposNo: i < ispos.length ? ispos[i] : '',
-        incentive: i < incentive.length ? incentive[i] : '',
-        istposNo: i < istpos.length ? istpos[i] : '',
-      ));
-    }
-    return kisiler;
   }
 
   Future<void> _load() async {
@@ -86,40 +37,80 @@ class _HakedisScreenState extends State<HakedisScreen> {
       final tableRows = data['table']['rows'] as List;
       final colCount = (data['table']['cols'] as List).length;
 
-      final rows = tableRows.map((r) => _parseRow(r, colCount)).toList();
-
-      // Tarihi bul
-      for (final row in rows.take(3)) {
-        for (final cell in row) {
-          if (RegExp(r'^\d{2}\.\d{2}\.\d{4}$').hasMatch(cell)) {
-            _tarih = cell;
-            break;
+      // Tüm hücreleri düz liste olarak al
+      List<List<String>> rows = tableRows.map((r) {
+        final row = r['c'] as List;
+        return List.generate(colCount, (i) {
+          if (i >= row.length || row[i] == null || row[i]['v'] == null) return '';
+          final v = row[i]['v'].toString();
+          if (v.startsWith('Date(')) {
+            final m = RegExp(r'Date\((\d+),(\d+),(\d+)\)').firstMatch(v);
+            if (m != null) {
+              return '${m.group(3)}.${(int.parse(m.group(2)!) + 1).toString().padLeft(2, '0')}.${m.group(1)}';
+            }
           }
+          return v;
+        });
+      }).toList();
+
+      // Tarih ve gün
+      for (final r in rows.take(5)) {
+        for (final c in r) {
+          if (RegExp(r'^\d{2}\.\d{2}\.\d{4}$').hasMatch(c)) _tarih = c;
         }
-        if (_tarih.isNotEmpty) break;
       }
 
-      // Grup 1: satır 3 (index 3) isim satırı
-      // Grup 2: satır 11 (index 11) isim satırı
-      final grup1 = _buildGrup(rows, 3);
-      final grup2 = _buildGrup(rows, 11);
+      // Grup 1: satır indeksleri 1=fiş, 2=ispos, 3=isim+not, 4=incentive, 5=istpos, 7=vmi
+      _grup1 = _parseGrup(rows, fisIdx: 1, isposIdx: 2, nameIdx: 3, incentiveIdx: 4, istposIdx: 5, vmiIdx: 7);
+      // Grup 2: satır indeksleri 9=fiş, 10=ispos, 11=isim+not, 12=incentive, 13=istpos
+      _grup2 = _parseGrup(rows, fisIdx: 9, isposIdx: 10, nameIdx: 11, incentiveIdx: 12, istposIdx: 13, vmiIdx: -1);
 
-      setState(() {
-        _grup1 = grup1;
-        _grup2 = grup2;
-        _loading = false;
-      });
+      setState(() { _loading = false; });
     } catch (e) {
       setState(() { _error = 'Veri yüklenemedi'; _loading = false; });
     }
   }
 
+  List<_Kisi> _parseGrup(List<List<String>> rows, {
+    required int fisIdx, required int isposIdx, required int nameIdx,
+    required int incentiveIdx, required int istposIdx, required int vmiIdx,
+  }) {
+    if (nameIdx >= rows.length) return [];
+    final nameRow = rows[nameIdx];
+    final result = <_Kisi>[];
+
+    for (int i = 1; i < nameRow.length - 1; i += 2) {
+      final isim = nameRow[i].trim();
+      final not = (i + 1 < nameRow.length) ? nameRow[i + 1].trim() : '';
+      if (isim.isEmpty || isim == '-') continue;
+      if (not != 'A' && not != 'B' && not != 'C') continue;
+
+      String cell(int rowIdx, int col) {
+        if (rowIdx < 0 || rowIdx >= rows.length || col >= rows[rowIdx].length) return '';
+        return rows[rowIdx][col].trim();
+      }
+
+      result.add(_Kisi(
+        isim: isim,
+        not: not,
+        fis: cell(fisIdx, i),
+        ispos: cell(isposIdx, i),
+        incentive: cell(incentiveIdx, i),
+        istpos: cell(istposIdx, i),
+        vmi: vmiIdx >= 0 ? cell(vmiIdx, i) : '',
+      ));
+    }
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFE8F0F8),
       appBar: AppBar(
-        title: const Text('Kasa Önü Hakedişi & VMI'),
-        backgroundColor: const Color(0xFF7C2D12),
+        title: const Text('Oturma & Mola Planı'),
+        backgroundColor: const Color(0xFF1A73E8),
+        foregroundColor: Colors.white,
         actions: [
           IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
         ],
@@ -127,209 +118,178 @@ class _HakedisScreenState extends State<HakedisScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
-              ? _ErrorView(message: _error!, onRetry: _load)
+              ? Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                  const SizedBox(height: 12),
+                  Text(_error!),
+                  const SizedBox(height: 16),
+                  ElevatedButton(onPressed: _load, child: const Text('Tekrar Dene')),
+                ]))
               : RefreshIndicator(
                   onRefresh: _load,
-                  child: ListView(
+                  child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
-                    children: [
-                      if (_tarih.isNotEmpty) _TarihBanner(tarih: _tarih),
-                      const SizedBox(height: 16),
-                      if (_grup1.isNotEmpty) ...[
-                        _GrupBaslik(title: 'Güvenli Çıkış — 1. Grup'),
-                        const SizedBox(height: 8),
-                        ..._grup1.map((k) => _KisiKart(kisi: k)),
-                        const SizedBox(height: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Tarih
+                        if (_tarih.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(
+                              _tarih,
+                              style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold,
+                                color: Color(0xFF1A1A1A),
+                              ),
+                            ),
+                          ),
+                        // GÜVENLİ ÇIKIŞ başlığı
+                        const Text(
+                          'GÜVENLİ ÇIKIŞ',
+                          style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A73E8),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Grup 1
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _grup1.map((k) => _KisiKutu(kisi: k)).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Grup 2
+                        if (_grup2.isNotEmpty) ...[
+                          const Divider(),
+                          const SizedBox(height: 8),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: _grup2.map((k) => _KisiKutu(kisi: k)).toList(),
+                            ),
+                          ),
+                        ],
                       ],
-                      if (_grup2.isNotEmpty) ...[
-                        _GrupBaslik(title: '2. Grup'),
-                        const SizedBox(height: 8),
-                        ..._grup2.map((k) => _KisiKart(kisi: k)),
-                      ],
-                    ],
+                    ),
                   ),
                 ),
     );
   }
 }
 
-class _KisiData {
-  final String isim, not, fisSayisi, isposNo, incentive, istposNo;
-  const _KisiData({
-    required this.isim,
-    required this.not,
-    required this.fisSayisi,
-    required this.isposNo,
-    required this.incentive,
-    required this.istposNo,
+class _Kisi {
+  final String isim, not, fis, ispos, incentive, istpos, vmi;
+  const _Kisi({
+    required this.isim, required this.not, required this.fis,
+    required this.ispos, required this.incentive, required this.istpos,
+    required this.vmi,
   });
 }
 
-class _TarihBanner extends StatelessWidget {
-  final String tarih;
-  const _TarihBanner({required this.tarih});
+class _KisiKutu extends StatelessWidget {
+  final _Kisi kisi;
+  const _KisiKutu({required this.kisi});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF7C2D12),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.calendar_today, color: Colors.white70, size: 18),
-          const SizedBox(width: 8),
-          Text(
-            tarih,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GrupBaslik extends StatelessWidget {
-  final String title;
-  const _GrupBaslik({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
-    );
-  }
-}
-
-class _KisiKart extends StatelessWidget {
-  final _KisiData kisi;
-  const _KisiKart({required this.kisi});
-
-  Color get _notRengi {
+  Color get _bgColor {
     switch (kisi.not) {
-      case 'A': return Colors.green;
-      case 'B': return Colors.amber;
-      case 'C': return Colors.orange;
-      default: return Colors.grey;
+      case 'A': return const Color(0xFF34A853); // yeşil
+      case 'B': return const Color(0xFFFFB300); // sarı
+      case 'C': return const Color(0xFFEA4335); // kırmızı
+      default:  return Colors.grey;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFF1A1A1A),
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: _notRengi.withOpacity(0.4)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Üst: İsim + Not
-            Row(
+    return Container(
+      width: 110,
+      margin: const EdgeInsets.only(right: 10),
+      child: Column(
+        children: [
+          // Fiş sayısı (üstte)
+          if (kisi.fis.isNotEmpty)
+            Text(
+              kisi.fis,
+              style: const TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87,
+              ),
+            ),
+          const SizedBox(height: 4),
+          // Ana kutu
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black54, width: 1.5),
+            ),
+            child: Column(
               children: [
-                Expanded(
+                // İspos
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  color: Colors.white,
+                  child: Text(
+                    kisi.ispos,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                // İsim (renkli arka plan)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  color: _bgColor,
                   child: Text(
                     kisi.isim,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white,
                     ),
                   ),
                 ),
+                // İncentive
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _notRengi.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: _notRengi),
-                  ),
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  color: Colors.white,
                   child: Text(
-                    kisi.not,
-                    style: TextStyle(color: _notRengi, fontWeight: FontWeight.bold, fontSize: 14),
+                    kisi.incentive,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 11, color: Colors.black87),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            const Divider(color: Colors.white12, height: 1),
-            const SizedBox(height: 10),
-            // Alt: Detaylar
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              children: [
-                if (kisi.fisSayisi.isNotEmpty)
-                  _InfoChip(icon: Icons.receipt_long, label: 'Fiş', value: kisi.fisSayisi),
-                if (kisi.incentive.isNotEmpty)
-                  _InfoChip(icon: Icons.star, label: 'İncentive', value: kisi.incentive),
-                if (kisi.istposNo.isNotEmpty)
-                  _InfoChip(icon: Icons.point_of_sale, label: 'İstpos', value: kisi.istposNo),
-                if (kisi.isposNo.isNotEmpty)
-                  _InfoChip(icon: Icons.numbers, label: 'İspos', value: kisi.isposNo),
-              ],
+          ),
+          const SizedBox(height: 4),
+          // İstpos
+          Text(
+            kisi.istpos,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 11, color: Colors.black54),
+          ),
+          // VMI
+          if (kisi.vmi.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              color: kisi.not == 'A'
+                  ? const Color(0xFFB7E1CD)
+                  : kisi.not == 'B'
+                      ? const Color(0xFFFFE599)
+                      : const Color(0xFFF4CCCC),
+              child: Text(
+                kisi.vmi,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label, value;
-  const _InfoChip({required this.icon, required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white10,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: Colors.white54),
-          const SizedBox(width: 5),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(color: Colors.white38, fontSize: 10)),
-              Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorView({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, color: Colors.redAccent, size: 48),
-          const SizedBox(height: 12),
-          Text(message, style: const TextStyle(color: Colors.white70)),
-          const SizedBox(height: 16),
-          ElevatedButton(onPressed: onRetry, child: const Text('Tekrar Dene')),
         ],
       ),
     );
