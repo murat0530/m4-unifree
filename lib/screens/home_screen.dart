@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'login_screen.dart';
 import 'duyuru_screen.dart';
 import 'kasa_screen.dart';
 import 'bilgilendirme_screen.dart';
+import 'hakedis_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -104,11 +104,9 @@ class HomeScreen extends StatelessWidget {
                       icon: Icons.monetization_on,
                       label: 'KASA ÖNÜ HAKEDİŞ & VMI',
                       color: const Color(0xFF7C2D12),
-                      onTap: () => launchUrl(
-                        Uri.parse(
-                          'https://docs.google.com/spreadsheets/d/1vgnCY7mGFnylVLmqPFg3vuuxyHOlPqK-QCvtgtlVYMY/edit',
-                        ),
-                        mode: LaunchMode.externalApplication,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HakedisScreen()),
                       ),
                     ),
                   ],
