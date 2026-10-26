@@ -1,0 +1,173 @@
+{
+  "diller": [
+    { "kod": "en", "ad": "English" },
+    { "kod": "de", "ad": "Deutsch" },
+    { "kod": "ru", "ad": "Русский" },
+    { "kod": "ar", "ad": "العربية", "rtl": true },
+    { "kod": "fr", "ad": "Français" },
+    { "kod": "es", "ad": "Español" },
+    { "kod": "zh", "ad": "中文" }
+  ],
+  "ifadeler": [
+    {
+      "tr": "Merhaba, hoş geldiniz!",
+      "en": "Hello, welcome!",
+      "de": "Hallo, herzlich willkommen!",
+      "ru": "Здравствуйте, добро пожаловать!",
+      "ar": "مرحباً، أهلاً وسهلاً!",
+      "fr": "Bonjour, bienvenue !",
+      "es": "¡Hola, bienvenido!",
+      "zh": "您好，欢迎光临！"
+    },
+    {
+      "tr": "Biniş kartınızı görebilir miyim, lütfen?",
+      "en": "May I see your boarding pass, please?",
+      "de": "Darf ich bitte Ihre Bordkarte sehen?",
+      "ru": "Покажите, пожалуйста, ваш посадочный талон.",
+      "ar": "هل يمكنني رؤية بطاقة الصعود من فضلك؟",
+      "fr": "Puis-je voir votre carte d'embarquement, s'il vous plaît ?",
+      "es": "¿Me permite ver su tarjeta de embarque, por favor?",
+      "zh": "请出示您的登机牌。"
+    },
+    {
+      "tr": "Pasaportunuzu görebilir miyim, lütfen?",
+      "en": "May I see your passport, please?",
+      "de": "Darf ich bitte Ihren Reisepass sehen?",
+      "ru": "Покажите, пожалуйста, ваш паспорт.",
+      "ar": "هل يمكنني رؤية جواز سفرك من فضلك؟",
+      "fr": "Puis-je voir votre passeport, s'il vous plaît ?",
+      "es": "¿Me permite ver su pasaporte, por favor?",
+      "zh": "请出示您的护照。"
+    },
+    {
+      "tr": "Nakit mi, kartla mı ödemek istersiniz?",
+      "en": "Would you like to pay by cash or card?",
+      "de": "Möchten Sie bar oder mit Karte bezahlen?",
+      "ru": "Вы будете платить наличными или картой?",
+      "ar": "هل تود الدفع نقداً أم بالبطاقة؟",
+      "fr": "Souhaitez-vous payer en espèces ou par carte ?",
+      "es": "¿Desea pagar en efectivo o con tarjeta?",
+      "zh": "您想用现金还是刷卡支付？"
+    },
+    {
+      "tr": "Hangi para birimiyle ödemek istersiniz?",
+      "en": "Which currency would you like to pay in?",
+      "de": "In welcher Währung möchten Sie bezahlen?",
+      "ru": "В какой валюте вы хотите заплатить?",
+      "ar": "بأي عملة تود الدفع؟",
+      "fr": "Dans quelle devise souhaitez-vous payer ?",
+      "es": "¿En qué moneda desea pagar?",
+      "zh": "您想用哪种货币支付？"
+    },
+    {
+      "tr": "Para üstünüzü hangi para biriminde istersiniz?",
+      "en": "Which currency would you like your change in?",
+      "de": "In welcher Währung möchten Sie Ihr Wechselgeld?",
+      "ru": "В какой валюте дать вам сдачу?",
+      "ar": "بأي عملة تريد الباقي؟",
+      "fr": "Dans quelle devise souhaitez-vous votre monnaie ?",
+      "es": "¿En qué moneda desea el cambio?",
+      "zh": "找零您想要哪种货币？"
+    },
+    {
+      "tr": "Kartınızı yaklaştırın veya takın, lütfen.",
+      "en": "Please tap or insert your card.",
+      "de": "Bitte halten Sie Ihre Karte an das Gerät oder stecken Sie sie ein.",
+      "ru": "Приложите или вставьте карту, пожалуйста.",
+      "ar": "يرجى تمرير البطاقة أو إدخالها.",
+      "fr": "Veuillez approcher ou insérer votre carte.",
+      "es": "Acerque o inserte su tarjeta, por favor.",
+      "zh": "请将卡片靠近或插入读卡器。"
+    },
+    {
+      "tr": "Lütfen şifrenizi girin.",
+      "en": "Please enter your PIN.",
+      "de": "Bitte geben Sie Ihre PIN ein.",
+      "ru": "Введите, пожалуйста, ПИН-код.",
+      "ar": "يرجى إدخال الرقم السري.",
+      "fr": "Veuillez saisir votre code.",
+      "es": "Introduzca su PIN, por favor.",
+      "zh": "请输入密码。"
+    },
+    {
+      "tr": "Üzgünüm, kartınız onaylanmadı. Başka bir kart deneyebilir misiniz?",
+      "en": "Sorry, your card was declined. Could you try another card?",
+      "de": "Leider wurde Ihre Karte abgelehnt. Können Sie eine andere Karte versuchen?",
+      "ru": "К сожалению, карта отклонена. Можете попробовать другую карту?",
+      "ar": "عذراً، تم رفض البطاقة. هل يمكنك تجربة بطاقة أخرى؟",
+      "fr": "Désolé, votre carte a été refusée. Pouvez-vous essayer une autre carte ?",
+      "es": "Lo siento, su tarjeta ha sido rechazada. ¿Puede probar con otra?",
+      "zh": "抱歉，您的卡被拒绝了。能换一张卡试试吗？"
+    },
+    {
+      "tr": "Bu üründe kampanya var.",
+      "en": "There is a special offer on this product.",
+      "de": "Für dieses Produkt gibt es ein Sonderangebot.",
+      "ru": "На этот товар действует акция.",
+      "ar": "يوجد عرض خاص على هذا المنتج.",
+      "fr": "Ce produit est en promotion.",
+      "es": "Este producto tiene una oferta especial.",
+      "zh": "这件商品正在促销。"
+    },
+    {
+      "tr": "Üzgünüm, bu ürün stokta yok.",
+      "en": "Sorry, this product is out of stock.",
+      "de": "Leider ist dieses Produkt nicht vorrätig.",
+      "ru": "К сожалению, этого товара нет в наличии.",
+      "ar": "عذراً، هذا المنتج غير متوفر حالياً.",
+      "fr": "Désolé, ce produit est en rupture de stock.",
+      "es": "Lo siento, este producto está agotado.",
+      "zh": "抱歉，这件商品缺货。"
+    },
+    {
+      "tr": "Poşet ister misiniz?",
+      "en": "Would you like a bag?",
+      "de": "Möchten Sie eine Tüte?",
+      "ru": "Вам нужен пакет?",
+      "ar": "هل تريد كيساً؟",
+      "fr": "Voulez-vous un sac ?",
+      "es": "¿Quiere una bolsa?",
+      "zh": "您需要袋子吗？"
+    },
+    {
+      "tr": "Lütfen bu poşeti varış noktanıza kadar açmayın.",
+      "en": "Please do not open this bag until you reach your final destination.",
+      "de": "Bitte öffnen Sie diese Tüte erst an Ihrem Endziel.",
+      "ru": "Пожалуйста, не открывайте этот пакет до прибытия в конечный пункт.",
+      "ar": "يرجى عدم فتح هذا الكيس حتى تصل إلى وجهتك النهائية.",
+      "fr": "Veuillez ne pas ouvrir ce sac avant votre destination finale.",
+      "es": "Por favor, no abra esta bolsa hasta llegar a su destino final.",
+      "zh": "请在抵达最终目的地之前不要打开这个袋子。"
+    },
+    {
+      "tr": "Lütfen fişinizi saklayın.",
+      "en": "Please keep your receipt.",
+      "de": "Bitte bewahren Sie Ihren Kassenbon auf.",
+      "ru": "Пожалуйста, сохраните чек.",
+      "ar": "يرجى الاحتفاظ بالإيصال.",
+      "fr": "Veuillez conserver votre ticket de caisse.",
+      "es": "Por favor, guarde su recibo.",
+      "zh": "请保留好您的收据。"
+    },
+    {
+      "tr": "Bir dakika lütfen, hemen yardım çağırıyorum.",
+      "en": "One moment, please. I'll call someone to help right away.",
+      "de": "Einen Moment bitte, ich hole sofort Hilfe.",
+      "ru": "Минутку, пожалуйста, я сейчас позову помощь.",
+      "ar": "لحظة من فضلك، سأطلب المساعدة حالاً.",
+      "fr": "Un instant, s'il vous plaît, j'appelle quelqu'un tout de suite.",
+      "es": "Un momento, por favor, enseguida llamo a alguien.",
+      "zh": "请稍等，我马上叫人来帮忙。"
+    },
+    {
+      "tr": "Teşekkür ederiz, iyi yolculuklar!",
+      "en": "Thank you, have a nice flight!",
+      "de": "Vielen Dank und einen guten Flug!",
+      "ru": "Спасибо, приятного полёта!",
+      "ar": "شكراً لك، رحلة سعيدة!",
+      "fr": "Merci, bon vol !",
+      "es": "¡Gracias, buen vuelo!",
+      "zh": "谢谢，祝您旅途愉快！"
+    }
+  ]
+}

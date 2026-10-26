@@ -1,0 +1,30 @@
+{
+  "_not": "ÖRNEK içerik. Kendi mağazanızın gerçek kurallarıyla değiştirin. 'kart': true olanlar Kasa Kartı çıktısına da girer.",
+  "guncelleme": "2026-10-26",
+  "kurallar": [
+    {
+      "baslik": "ÖRNEK: İade nasıl yapılır?",
+      "kategori": "İade",
+      "metin": "1. Fişi kontrol et.\n2. Ürünün açılmamış olduğuna bak.\n3. Süpervizöre haber ver.\n(Bu metni gerçek prosedürle değiştirin.)",
+      "kart": false
+    },
+    {
+      "baslik": "ÖRNEK: Satış limitleri",
+      "kategori": "Limit",
+      "metin": "Ürün grubu başına satış limitlerini buraya yazın.\nÖrn. Ürün A: kişi başı en fazla X adet.",
+      "kart": true
+    },
+    {
+      "baslik": "ÖRNEK: Yazıcı fiş basmıyor",
+      "kategori": "Arıza",
+      "metin": "1. Kâğıdı kontrol et.\n2. Yazıcıyı kapat-aç.\n3. Düzelmezse teknik destek: (numara yazın)",
+      "kart": true
+    },
+    {
+      "baslik": "ÖRNEK: Acil durum numaraları",
+      "kategori": "Acil",
+      "metin": "Süpervizör: (numara)\nGüvenlik: (numara)\nTeknik destek: (numara)",
+      "kart": true
+    }
+  ]
+}

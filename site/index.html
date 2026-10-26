@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="description" content="Kasiyerler için hızlı döviz, para üstü, indirim, kural ve ifade aracı.">
+  <title>M4 Kasa</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="M4 Kasa">
+  <link rel="stylesheet" href="app.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="top">
+    <h1>M4 Kasa</h1>
+    <button id="rateBar" class="rate-bar" type="button" aria-label="Kurları düzenle"></button>
+    <button id="openSettings" class="icon-btn" type="button" aria-label="Ayarlar">⚙</button>
+  </header>
+
+  <main>
+    <!-- DÖVİZ -->
+    <section id="tab-doviz" class="tab" hidden>
+      <label class="lbl" for="saleAmt">Satış tutarı</label>
+      <div class="row">
+        <input id="saleAmt" class="num big-input" inputmode="decimal" autocomplete="off" placeholder="0,00">
+        <select id="saleCur" class="cur-select" aria-label="Satış para birimi"></select>
+      </div>
+
+      <div class="lbl">Müşterinin ödemesi</div>
+      <div id="payments"></div>
+      <button id="addPay" class="ghost-btn" type="button">+ Başka para birimiyle ödeme ekle</button>
+
+      <div id="result" class="result" aria-live="polite"></div>
+
+      <div class="actions">
+        <button id="showCustomer" class="btn" type="button">Müşteriye göster</button>
+        <button id="clearSale" class="btn secondary" type="button">Temizle</button>
+      </div>
+    </section>
+
+    <!-- İNDİRİM -->
+    <section id="tab-indirim" class="tab" hidden>
+      <div class="lbl">Kampanya</div>
+      <div id="campaignChips" class="chips"></div>
+      <div class="row wrap">
+        <select id="discMode" aria-label="İndirim türü">
+          <option value="yuzde">% indirim</option>
+          <option value="nAlMOde">N al M öde</option>
+          <option value="ikinciye">İkinci ürüne %</option>
+        </select>
+        <span id="paramN" class="param"><input id="discN" class="num small" inputmode="numeric" value="3" aria-label="N"> al</span>
+        <span id="paramM" class="param"><input id="discM" class="num small" inputmode="numeric" value="2" aria-label="M"> öde</span>
+        <span id="paramP" class="param">% <input id="discP" class="num small" inputmode="decimal" value="20" aria-label="Yüzde"></span>
+      </div>
+
+      <div class="row">
+        <div class="lbl grow">Ürün fiyatları</div>
+        <select id="discCur" class="cur-select" aria-label="Fiyat para birimi"></select>
+      </div>
+      <div id="prices"></div>
+      <button id="addPrice" class="ghost-btn" type="button">+ Ürün ekle</button>
+
+      <div id="discResult" class="result" aria-live="polite"></div>
+      <div class="actions">
+        <button id="toDoviz" class="btn" type="button">Ödemeye aktar</button>
+        <button id="clearDisc" class="btn secondary" type="button">Temizle</button>
+      </div>
+    </section>
+
+    <!-- KURALLAR -->
+    <section id="tab-kurallar" class="tab" hidden>
+      <input id="ruleSearch" class="search" type="search" placeholder="Ara: iade, limit, yazıcı…" autocomplete="off">
+      <div id="ruleCats" class="chips"></div>
+      <div id="rules"></div>
+    </section>
+
+    <!-- İFADELER -->
+    <section id="tab-ifadeler" class="tab" hidden>
+      <div id="langChips" class="chips"></div>
+      <div id="phrases" class="phrases"></div>
+    </section>
+  </main>
+
+  <nav class="tabs" aria-label="Bölümler">
+    <a href="#doviz" data-tab="doviz"><span aria-hidden="true">💶</span>Döviz</a>
+    <a href="#indirim" data-tab="indirim"><span aria-hidden="true">🏷️</span>İndirim</a>
+    <a href="#kurallar" data-tab="kurallar"><span aria-hidden="true">📋</span>Kurallar</a>
+    <a href="#ifadeler" data-tab="ifadeler"><span aria-hidden="true">🗣️</span>İfadeler</a>
+  </nav>
+
+  <!-- Müşteriye göster: tam ekran -->
+  <div id="showOverlay" class="overlay show" hidden>
+    <div id="showBody" class="show-body"></div>
+    <p class="hint">Kapatmak için dokunun</p>
+  </div>
+
+  <!-- Ayarlar -->
+  <div id="settingsOverlay" class="overlay sheet" hidden>
+    <div class="sheet-body" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="row">
+        <h2 id="settingsTitle" class="grow">Kurlar</h2>
+        <button id="closeSettings" class="icon-btn" type="button" aria-label="Kapat">✕</button>
+      </div>
+      <p class="muted">1 birim kaç TL? Mağazanın günlük kurunu girin. Kurlar yalnızca bu telefonda saklanır.</p>
+      <div id="rateInputs"></div>
+      <p id="rateError" class="error" hidden></p>
+      <button id="saveRates" class="btn" type="button">Kaydet</button>
+
+      <h2>Kasa kartı</h2>
+      <p class="muted">Kurları ve "kartta göster" işaretli kuralları tek sayfalık çıktı olarak yazdırır.</p>
+      <button id="printCard" class="btn secondary" type="button">Kasa kartını yazdır</button>
+    </div>
+  </div>
+
+  <!-- Yalnızca yazdırırken görünür -->
+  <div id="printArea" class="print-only"></div>
+</body>
+</html>

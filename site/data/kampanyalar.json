@@ -1,0 +1,8 @@
+{
+  "_not": "ÖRNEK içerik. tip: 'yuzde' (oran), 'nAlMOde' (n, m), 'ikinciye' (oran).",
+  "kampanyalar": [
+    { "ad": "ÖRNEK: 3 al 2 öde", "tip": "nAlMOde", "n": 3, "m": 2 },
+    { "ad": "ÖRNEK: İkinci ürüne %50", "tip": "ikinciye", "oran": 50 },
+    { "ad": "ÖRNEK: %20 indirim", "tip": "yuzde", "oran": 20 }
+  ]
+}
