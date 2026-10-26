@@ -1,6 +1,6 @@
 // Çevrimdışı ve anında açılış: önce önbellekten ver, arka planda güncelle.
 // Uygulama dosyaları değiştiğinde VERSION'ı artırın.
-const VERSION = 'm4kasa-v8';
+const VERSION = 'm4kasa-v9';
 const SHELL = [
   './',
   'index.html',

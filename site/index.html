@@ -20,12 +20,28 @@
   <header class="top">
     <h1>M4 Kasa</h1>
     <button id="rateBar" class="rate-bar" type="button" aria-label="Kurları düzenle"></button>
-    <button id="openSettings" class="icon-btn" type="button" aria-label="Ayarlar">⚙</button>
+    <button id="openSettings" class="icon-btn" type="button" aria-label="Kasa kartı">⚙</button>
   </header>
 
   <main>
     <!-- DÖVİZ: "500 $ kaç ₺?" -->
     <section id="tab-doviz" class="tab" hidden>
+      <div id="ratesCard" class="rates">
+        <div class="rates-head">
+          <span class="rates-title">Kurlar</span>
+          <span id="rateStatus" class="rate-status"></span>
+        </div>
+        <div class="rate-main">
+          <label for="rate-TRY">1 € =</label>
+          <input id="rate-TRY" class="num" inputmode="decimal" autocomplete="off" placeholder="0,00">
+          <span class="rate-unit">₺</span>
+        </div>
+        <div class="rate-par-lbl">1 € kaç döviz (parite):</div>
+        <div id="parityInputs" class="rate-grid"></div>
+        <p id="rateWarn" class="rate-warn" hidden></p>
+        <button id="confirmRates" class="ghost-btn" type="button" hidden>✓ Bugünün kurları doğru</button>
+      </div>
+
       <label class="lbl" for="fxAmt">Alınan tutar</label>
       <div class="row">
         <input id="fxAmt" class="num big-input" inputmode="decimal" autocomplete="off" placeholder="500" aria-label="Tutar">
@@ -126,15 +142,9 @@
   <div id="settingsOverlay" class="overlay sheet" hidden>
     <div class="sheet-body" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
       <div class="row">
-        <h2 id="settingsTitle" class="grow">Kurlar</h2>
+        <h2 id="settingsTitle" class="grow">Kasa kartı</h2>
         <button id="closeSettings" class="icon-btn" type="button" aria-label="Kapat">✕</button>
       </div>
-      <p class="muted">Ana kur euro: 1 € kaç TL? Diğer dövizler euroya göre (parite) girilir: 1 € kaç $, kaç ¥… Kurlar yalnızca bu telefonda saklanır.</p>
-      <div id="rateInputs"></div>
-      <p id="rateError" class="error" hidden></p>
-      <button id="saveRates" class="btn" type="button">Kaydet</button>
-
-      <h2>Kasa kartı</h2>
       <p class="muted">Kurları ve "kartta göster" işaretli kuralları tek sayfalık çıktı olarak yazdırır.</p>
       <button id="printCard" class="btn secondary" type="button">Kasa kartını yazdır</button>
     </div>

@@ -112,6 +112,29 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 .pay-row { display: flex; gap: 8px; margin-bottom: 8px; }
 .pay-row input { flex: 1; font-size: 20px; }
 
+/* Kurlar (Döviz sekmesinin üstünde) */
+.rates {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 10px 12px 12px; margin-bottom: 4px;
+}
+.rates.stale { border-color: var(--warn); }
+.rates-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.rates-title { font-weight: 700; }
+.rate-status { font-size: 13px; color: var(--muted); text-align: end; }
+.rates.stale .rate-status { color: var(--warn); font-weight: 600; }
+.rate-main { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.rate-main label { flex: none; font-weight: 600; }
+.rate-main input { flex: 1; font-size: 22px; font-weight: 600; height: 48px; }
+.rate-unit { flex: none; font-weight: 600; min-width: 1.5em; }
+.rate-par-lbl { color: var(--muted); font-size: 13px; margin: 10px 0 6px; }
+.rate-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.rate-cell { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.rate-cell input { flex: 1; width: 0; height: 42px; padding: 0 8px; font-size: 17px; }
+.rate-cell .rate-unit { font-size: 14px; }
+.rates input.bad { outline: 2px solid var(--warn); outline-offset: -1px; }
+.rate-warn { color: var(--warn); font-size: 14px; margin: 8px 0 0; }
+#confirmRates { margin-top: 10px; min-height: 40px; }
+
 /* Çevirici: "500 $ kaç ₺?" */
 .fx-ask { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .fx-ask > span { color: var(--muted); font-size: 18px; flex: none; }
@@ -215,12 +238,7 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 }
 .sheet-body h2 { font-size: 18px; margin: 12px 0 4px; }
 .sheet-body .btn { width: 100%; margin-top: 8px; }
-.rate-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
-.rate-row label { width: 56px; flex: none; font-weight: 600; }
-.rate-unit { width: 64px; flex: none; font-weight: 600; }
-.rate-row input { flex: 1; font-size: 20px; }
 .muted { color: var(--muted); font-size: 14px; margin: 4px 0 8px; }
-.error { color: var(--warn); font-size: 14px; }
 
 /* Yazdırma: Kasa kartı */
 .print-only { display: none; }

@@ -96,67 +96,84 @@ function renderRateBar() {
   }
   bar.textContent = parts.join(' · ') + when;
 }
-function rateRow(id, unit, value) {
-  return el('div', { class: 'rate-row' }, [
-    el('label', { for: id, text: '1 € =' }),
+// Kurlar Döviz sekmesinin üstünde: yazdıkça uygulanır, bugün güncellenmediyse uyarır
+const isToday = (t) => t && new Date(t).toDateString() === new Date().toDateString();
+function renderRateInputs() {
+  const val = (v) => (v ? String(v).replace('.', ',') : '');
+  $('rate-TRY').value = val(state.eurTry);
+  $('parityInputs').replaceChildren(...PARITY.map((c) => el('div', { class: 'rate-cell' }, [
     el('input', {
-      id, class: 'num', inputmode: 'decimal', autocomplete: 'off', placeholder: '0,0000',
-      value: value ? String(value).replace('.', ',') : '',
+      id: 'rate-' + c, class: 'num', inputmode: 'decimal', autocomplete: 'off',
+      'aria-label': `1 € kaç ${c}`, value: val(state.parity[c]),
     }),
-    el('span', { class: 'rate-unit', text: unit }),
-  ]);
+    el('span', { class: 'rate-unit', text: CURRENCIES[c].symbol === c ? c : CURRENCIES[c].symbol }),
+  ])));
+  for (const c of PARITY) $('rate-' + c).addEventListener('input', applyRates);
 }
-function openSettings() {
-  $('rateInputs').replaceChildren(
-    rateRow('rate-TRY', '₺', state.eurTry),
-    ...PARITY.map((c) => rateRow('rate-' + c, curLabel(c), state.parity[c])),
-  );
-  $('rateError').hidden = true;
-  $('settingsOverlay').hidden = false;
+function renderRateStatus() {
+  const card = $('ratesCard');
+  const fresh = state.eurTry > 0 && isToday(state.ratesAt);
+  card.classList.toggle('stale', !fresh);
+  $('confirmRates').hidden = fresh || !(state.eurTry > 0);
+  if (!(state.eurTry > 0)) {
+    $('rateStatus').textContent = '⚠ Euro kurunu girin';
+  } else if (!fresh) {
+    const d = state.ratesAt ? new Date(state.ratesAt).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' }) : '?';
+    $('rateStatus').textContent = `⚠ Bugün güncellenmedi (son: ${d})`;
+  } else {
+    $('rateStatus').textContent = '✓ Bugün ' + new Date(state.ratesAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  }
 }
-let rateWarnedFor = null;
-function rateError(msg) {
-  $('rateError').textContent = msg;
-  $('rateError').hidden = false;
-}
-function saveRates() {
-  const eurRaw = $('rate-TRY').value;
-  const eurTry = parseRate(eurRaw);
-  if (eurTry == null) return rateError('Euro kuru gerekli. Örnek: 50,25');
+function applyRates() {
+  const read = (id) => {
+    const input = $(id);
+    const raw = input.value.trim();
+    const v = raw ? parseRate(raw) : null;
+    input.classList.toggle('bad', !!raw && v == null);
+    return v;
+  };
+  const eurTry = read('rate-TRY');
   const parity = {};
   for (const c of PARITY) {
-    const raw = $('rate-' + c).value;
-    if (!raw.trim()) continue;
-    const v = parseRate(raw);
-    if (v == null) return rateError(`${c} paritesi geçersiz. Örnek: 1,17`);
-    parity[c] = v;
+    const v = read('rate-' + c);
+    if (v != null) parity[c] = v;
   }
-  // Şüpheli değerler: euro kuru çok düşük ya da parite 0,5-2 aralığı dışında. İkinci "Kaydet" onaylar.
+  // Şüpheli değerleri göster (kaydetmeyi engellemez; hesap adımları da ekranda)
   const odd = [];
-  if (eurTry < 5) odd.push(`1 € = ${fmtRate(eurTry)} ₺ çok düşük`);
+  if (eurTry != null && eurTry < 5) odd.push(`1 € = ${fmtRate(eurTry)} ₺ çok düşük`);
   for (const [c, v] of Object.entries(parity)) {
     const [lo, hi] = PARITY_RANGE[c];
     if (v < lo || v > hi) odd.push(`1 € = ${fmtRate(v)} ${c} alışılmadık (beklenen ${fmtRate(lo)}–${fmtRate(hi)})`);
   }
-  const key = JSON.stringify({ eurTry, parity });
-  if (odd.length && rateWarnedFor !== key) {
-    rateWarnedFor = key;
-    return rateError(`Kontrol edin: ${odd.join('; ')}. Doğruysa tekrar Kaydet'e dokunun.`);
+  $('rateWarn').textContent = odd.length ? 'Kontrol edin: ' + odd.join('; ') : '';
+  $('rateWarn').hidden = !odd.length;
+
+  if (JSON.stringify({ e: eurTry, p: parity }) !== JSON.stringify({ e: state.eurTry, p: state.parity })) {
+    state.eurTry = eurTry;
+    state.parity = parity;
+    state.ratesAt = Date.now();
+    save();
   }
-  rateWarnedFor = null;
-  state.eurTry = eurTry;
-  state.parity = parity;
-  state.ratesAt = Date.now();
-  save();
-  $('settingsOverlay').hidden = true;
+  renderRateStatus();
   renderRateBar();
   renderFx();
 }
-$('rateBar').addEventListener('click', openSettings);
-$('openSettings').addEventListener('click', openSettings);
+$('rate-TRY').addEventListener('input', applyRates);
+$('confirmRates').addEventListener('click', () => {
+  state.ratesAt = Date.now();
+  save();
+  renderRateStatus();
+  renderRateBar();
+});
+// Üstteki kur çubuğu: Döviz sekmesine gidip euro kuruna odaklanır
+$('rateBar').addEventListener('click', () => {
+  location.hash = 'doviz';
+  showTab('doviz');
+  $('rate-TRY').focus();
+});
+$('openSettings').addEventListener('click', () => { $('settingsOverlay').hidden = false; });
 $('closeSettings').addEventListener('click', () => { $('settingsOverlay').hidden = true; });
 $('settingsOverlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.hidden = true; });
-$('saveRates').addEventListener('click', saveRates);
 
 // --- Döviz çevirici: "500 $ kaç ₺?" (euro üzerinden) ---
 let lastFx = null; // "Müşteriye göster" için
@@ -507,6 +524,8 @@ document.addEventListener('keydown', (e) => {
 renderFx();
 addPriceRow();
 renderIndirim();
+renderRateInputs();
+renderRateStatus();
 renderRateBar();
 renderCodeList();
 showTab(location.hash.slice(1) || state.tab);

@@ -11,7 +11,8 @@ Kasiyerler için hızlı, hafif bir yardımcı uygulama. Telefonda "lazım olunc
 | ▥ **Barkod** | Yazılan kodu ekranda barkod olarak çizer (8/13 haneli rakam → EAN-8/EAN-13, diğerleri → Code 128); kasadaki okuyucuyla ekrandan okutulur. Sık kodlar telefona kaydedilir, ortak kodlar `barkodlar.json`'dan gelir |
 | 📋 **Kurallar** | Aranabilir kural / limit / arıza / acil durum kartları |
 | 🗣️ **İfadeler** | 16 kasa cümlesi, 7 dilde (EN, DE, RU, AR, FR, ES, ZH); dokununca müşteriye büyük gösterilir |
-| ⚙ **Ayarlar** | Günlük kurlar, euro bazlı: `1 € = ? ₺` ana kur, diğer dövizler pariteyle (`1 € = 1,17 $`, `1 € = 8,3 ¥`). Yalnızca o telefonda saklanır, yazdırılabilir **Kasa kartı** |
+| 💱 **Kurlar** | Döviz sekmesinin en üstünde, euro bazlı: `1 € = ? ₺` ana kur, diğer dövizler pariteyle (`1 € = 1,17 $`, `1 € = 8,3 ¥`). Yazdıkça uygulanır; bugün güncellenmediyse sarı uyarı ve "Bugünün kurları doğru" onayı çıkar. Yalnızca o telefonda saklanır |
+| ⚙ **Kasa kartı** | Kurları ve seçili kuralları tek sayfa yazdırır |
 
 Uygulama simgesine basılı tutunca (Android) doğrudan sekmeye giden kısayollar çıkar. Bağlantılar da doğrudan açılabilir: `…/#doviz`, `…/#kurallar` (kasaya QR olarak yapıştırılabilir).
 
