@@ -78,7 +78,8 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 .num { font-variant-numeric: tabular-nums; text-align: right; }
 .big-input { flex: 1; font-size: 26px; font-weight: 600; height: 60px; }
 .small { width: 64px; text-align: center; }
-.cur-select { width: 108px; font-weight: 600; }.del-btn {
+.cur-select { width: 108px; font-weight: 600; }
+.del-btn {
   width: 48px; flex: none; border-radius: var(--radius);
   background: var(--surface); border: 1px solid var(--line); color: var(--muted); font-size: 18px;
 }
