@@ -131,3 +131,25 @@ export function secondItemOff(prices, percent) {
   for (let i = 1; i < sorted.length; i += 2) discount += Math.round((sorted[i] * percent) / 100);
   return { gross, discount, total: gross - discount };
 }
+
+// --- Para üstünü bölme ---
+
+// Elde bozuk para olmayabilir: her para biriminin en küçük banknotu
+export const SMALLEST_NOTE = { TRY: 500, EUR: 500, USD: 100, GBP: 500 };
+
+export function notesOnly(cents, cur) {
+  const n = SMALLEST_NOTE[cur];
+  return Math.floor(cents / n) * n;
+}
+
+// Para üstünü iki para birimine böler: önce firstCur'dan firstAmount (null ise verilebilecek
+// en fazla banknot), kalanı secondCur'dan (aşağı yuvarlanır, fazla verilmez).
+// changeTry: TL kuruş cinsinden toplam para üstü (settle().tryDiff)
+export function splitChange(changeTry, firstCur, firstAmount, secondCur, rates) {
+  if (firstCur === secondCur) throw new Error('İki farklı para birimi seçin');
+  const maxFirst = fromTry(changeTry, firstCur, rates, 'down');
+  const first = firstAmount == null ? notesOnly(maxFirst, firstCur) : firstAmount;
+  if (first > maxFirst) throw new Error(`${firstCur} olarak en fazla ${formatAmount(maxFirst, firstCur)} verilebilir`);
+  const rest = Math.max(0, changeTry - toTry(first, firstCur, rates));
+  return { first, second: fromTry(rest, secondCur, rates, 'down'), maxFirst };
+}

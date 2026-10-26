@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   parseAmount, parseRate, formatAmount, settle, breakdown,
-  percentOff, buyNPayM, secondItemOff,
+  percentOff, buyNPayM, secondItemOff, splitChange, notesOnly,
 } from '../site/calc.js';
 
 test('parseAmount: Türkçe ve İngilizce yazım', () => {
@@ -99,4 +99,29 @@ test('secondItemOff', () => {
   const r = secondItemOff([4000, 2000, 3000], 50);
   // sıralı: 4000, 3000, 2000 -> 3000'e %50
   assert.deepEqual(r, { gross: 9000, discount: 1500, total: 7500 });
+});
+
+test('notesOnly: bozuk para atılır', () => {
+  assert.equal(notesOnly(36250, 'EUR'), 36000);
+  assert.equal(notesOnly(1799, 'USD'), 1700);
+  assert.equal(notesOnly(400, 'EUR'), 0);
+});
+
+test('splitChange: otomatik, önce € banknot sonra ₺', () => {
+  // 18.000 TL para üstü, 1 € = 50: 360 € -> banknotla 360 € tam, kalan 0 ₺
+  assert.deepEqual(splitChange(1800000, 'EUR', null, 'TRY', { EUR: 50 }), { first: 36000, second: 0, maxFirst: 36000 });
+  // 18.120 TL: 362,40 € -> 360 € banknot + 120 ₺
+  assert.deepEqual(splitChange(1812000, 'EUR', null, 'TRY', { EUR: 50 }), { first: 36000, second: 12000, maxFirst: 36240 });
+});
+
+test('splitChange: elle tutar, kalanı başka dövizde', () => {
+  // 18.000 TL, 100 € verilir (5.000 TL), kalan 13.000 TL = 302,32 $ (1 $ = 43)
+  const r = splitChange(1800000, 'EUR', 10000, 'USD', { EUR: 50, USD: 43 });
+  assert.equal(r.first, 10000);
+  assert.equal(r.second, 30232);
+});
+
+test('splitChange: fazla tutar ve aynı birim reddedilir', () => {
+  assert.throws(() => splitChange(1800000, 'EUR', 40000, 'TRY', { EUR: 50 }), /en fazla 360,00/);
+  assert.throws(() => splitChange(1800000, 'TRY', null, 'TRY', {}), /farklı/);
 });

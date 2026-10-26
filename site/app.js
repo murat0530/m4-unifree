@@ -1,5 +1,5 @@
 import {
-  CURRENCIES, parseAmount, parseRate, formatAmount, settle, breakdown, toTry, fromTry,
+  CURRENCIES, parseAmount, parseRate, formatAmount, settle, breakdown, toTry, fromTry, splitChange,
   percentOff, buyNPayM, secondItemOff,
 } from './calc.js';
 import { autoEncode } from './barcode.js';
@@ -12,7 +12,7 @@ const TABS = ['doviz', 'indirim', 'barkod', 'kurallar', 'ifadeler'];
 // --- Yerel kayıt (yalnızca bu cihazda; erişilemezse sessizce varsayılana döner) ---
 const STORE_KEY = 'm4kasa';
 const state = Object.assign(
-  { codes: [], rates: {}, ratesAt: null, saleCur: 'EUR', changeCur: 'TRY', tab: 'doviz', lang: 'en', discCur: 'EUR' },
+  { codes: [], changeMode: 'single', mixA: 'EUR', mixB: 'TRY', rates: {}, ratesAt: null, saleCur: 'EUR', changeCur: 'TRY', tab: 'doviz', lang: 'en', discCur: 'EUR' },
   load(),
 );
 function load() {
@@ -221,17 +221,11 @@ function renderDoviz() {
     children.push(altsRow(r.perCurrency, mainCur));
   } else {
     box.classList.add('change');
-    if (!(state.changeCur in r.perCurrency)) state.changeCur = 'TRY';
-    const c = state.changeCur;
+    const ch = computeChange(r);
     children.push(el('div', { class: 'head', text: 'PARA ÜSTÜ' }));
-    children.push(el('div', { class: 'main', text: formatAmount(r.perCurrency[c], c) }));
-    children.push(altsRow(r.perCurrency, c, true));
-    const b = breakdown(r.perCurrency[c], c);
-    if (b.parts.length) {
-      children.push(el('div', { class: 'breakdown' }, b.parts.map((p) =>
-        el('span', { class: 'denom', text: `${p.count} × ${formatAmount(p.denom, c)}` }))));
-    }
-    if (b.rest > 0) children.push(el('div', { class: 'sub', text: `Küsurat: ${formatAmount(b.rest, c)} (bozuk para yok)` }));
+    const shown = ch.error ? [] : visibleParts(ch.parts);
+    children.push(el('div', { class: 'main', text: shown.length ? shown.map((x) => formatAmount(x.amount, x.currency)).join(' + ') : '—' }));
+    children.push(altsRow(r.perCurrency, shown.length === 1 ? shown[0].currency : null));
   }
   if (invalid) children.push(el('div', { class: 'sub warn-text', text: 'Geçersiz bir ödeme tutarı yok sayıldı.' }));
   const used = [...new Set([saleObj.currency, ...payments.map((p) => p.currency)])].filter((c) => c !== 'TRY');
@@ -242,21 +236,89 @@ function renderDoviz() {
     }));
   }
   box.replaceChildren(...children);
+  renderChangeBox(r && payments.length && r.status === 'change' ? r : null);
 }
-// Diğer para birimlerindeki karşılıklar; para üstünde dokunulan birim seçilir.
-function altsRow(per, current, selectable = false) {
+
+// Para üstünün nasıl verileceği: tek para birimi ya da karışık (önce X, kalanı Y)
+function changeCurrencies(r) { return Object.keys(r.perCurrency); }
+// Sıfır olan kısımları gösterme (hepsi sıfırsa ilkini göster)
+function visibleParts(parts) {
+  const nz = parts.filter((x) => x.amount > 0);
+  return nz.length ? nz : parts.slice(0, 1);
+}
+function computeChange(r) {
+  const curs = changeCurrencies(r);
+  if (state.changeMode === 'mixed' && curs.length > 1) {
+    if (!curs.includes(state.mixA)) state.mixA = curs.find((c) => c !== 'TRY') || curs[0];
+    if (!curs.includes(state.mixB) || state.mixB === state.mixA) state.mixB = curs.find((c) => c !== state.mixA);
+    const typed = $('mixAmt').value.trim();
+    const amount = typed ? parseAmount(typed) : null;
+    if (typed && amount == null) return { error: 'Tutar anlaşılamadı. Örnek: 100 veya 100,50' };
+    try {
+      const sp = splitChange(r.tryDiff, state.mixA, amount, state.mixB, state.rates);
+      return { parts: [{ currency: state.mixA, amount: sp.first }, { currency: state.mixB, amount: sp.second }] };
+    } catch (e) {
+      return { error: e.message };
+    }
+  }
+  if (!curs.includes(state.changeCur)) state.changeCur = 'TRY';
+  return { parts: [{ currency: state.changeCur, amount: r.perCurrency[state.changeCur] }] };
+}
+function renderChangeBox(r) {
+  $('changeBox').hidden = !r;
+  if (!r) return;
+  const curs = changeCurrencies(r);
+  const mixed = state.changeMode === 'mixed' && curs.length > 1;
+  const modes = curs.map((c) => ({ key: c, label: `${CURRENCIES[c].symbol} ${c}`, on: !mixed && state.changeCur === c }));
+  if (curs.length > 1) modes.push({ key: 'mixed', label: 'Karışık', on: mixed });
+  $('changeModes').replaceChildren(...modes.map((m) => el('button', {
+    class: 'chip' + (m.on ? ' on' : ''), type: 'button', text: m.label, 'aria-pressed': String(m.on),
+    onclick: () => {
+      if (m.key === 'mixed') state.changeMode = 'mixed';
+      else { state.changeMode = 'single'; state.changeCur = m.key; }
+      save();
+      renderDoviz();
+    },
+  })));
+  const ch = computeChange(r);
+  $('mixRow').hidden = !mixed;
+  if (mixed) {
+    curOptions($('mixA'), state.mixA, curs);
+    curOptions($('mixB'), state.mixB, curs.filter((c) => c !== state.mixA));
+    $('mixAmt').placeholder = `Otomatik: ${formatAmount(notesOnlyAuto(r), state.mixA)}`;
+  }
+  if (ch.error) {
+    $('changeOut').replaceChildren(el('div', { class: 'warn-text', text: ch.error }));
+    return;
+  }
+  $('changeOut').replaceChildren(...visibleParts(ch.parts).map((x) => {
+    const b = breakdown(x.amount, x.currency);
+    return el('div', { class: 'change-part' }, [
+      el('div', { class: 'amt', text: formatAmount(x.amount, x.currency) }),
+      b.parts.length ? el('div', { class: 'breakdown' }, b.parts.map((p) =>
+        el('span', { class: 'denom', text: `${p.count} × ${formatAmount(p.denom, x.currency)}` }))) : null,
+      b.rest > 0 ? el('div', { class: 'sub', text: `Küsurat: ${formatAmount(b.rest, x.currency)} (bozuk para yok)` }) : null,
+    ].filter(Boolean));
+  }));
+}
+// Karışık modda boş bırakılınca önerilen tutar (verilebilecek en fazla banknot)
+function notesOnlyAuto(r) {
+  try { return splitChange(r.tryDiff, state.mixA, null, state.mixB, state.rates).first; } catch { return 0; }
+}
+$('mixAmt').addEventListener('input', renderDoviz);
+$('mixA').addEventListener('change', (e) => { state.mixA = e.target.value; $('mixAmt').value = ''; save(); renderDoviz(); });
+$('mixB').addEventListener('change', (e) => { state.mixB = e.target.value; save(); renderDoviz(); });
+
+// Diğer para birimlerindeki karşılıklar (bilgi amaçlı)
+function altsRow(per, current) {
   return el('div', { class: 'alts' }, Object.entries(per)
-    .filter(([c]) => c !== current || selectable)
-    .map(([c, v]) => el(selectable ? 'button' : 'span', {
-      class: 'alt' + (c === current ? ' on' : ''),
-      type: selectable ? 'button' : undefined,
-      text: formatAmount(v, c),
-      onclick: selectable ? () => { state.changeCur = c; save(); renderDoviz(); } : undefined,
-    })));
+    .filter(([c]) => c !== current)
+    .map(([c, v]) => el('span', { class: 'alt', text: formatAmount(v, c) })));
 }
 
 function resetDoviz() {
   $('saleAmt').value = '';
+  $('mixAmt').value = '';
   $('payments').replaceChildren();
   addPaymentRow();
   renderDoviz();
@@ -292,7 +354,12 @@ $('showCustomer').addEventListener('click', () => {
   const nodes = [el('div', { class: 'lab', text: 'TOTAL · TOPLAM' }), el('div', { class: 'money', text: formatAmount(sale.amount, sale.currency) })];
   if (payments.length && r.status === 'change') {
     nodes.push(el('div', { class: 'lab', text: 'CHANGE · PARA ÜSTÜ' }));
-    nodes.push(el('div', { class: 'money', text: formatAmount(r.perCurrency[state.changeCur], state.changeCur) }));
+    const ch = computeChange(r);
+    if (!ch.error) {
+      for (const x of visibleParts(ch.parts)) {
+        nodes.push(el('div', { class: 'money', text: formatAmount(x.amount, x.currency) }));
+      }
+    }
   } else if (payments.length && r.status === 'remaining') {
     const c = state.saleCur in r.perCurrency ? state.saleCur : 'TRY';
     nodes.push(el('div', { class: 'lab', text: 'REMAINING · KALAN' }));
