@@ -65,6 +65,14 @@ test('convert: geri çevirince en fazla 1 kuruş fark', () => {
   }
 });
 
+test('convert: yuan, Kanada doları, riyal', () => {
+  const r = { eurTry: 50, parity: { CNY: 8.3, CAD: 1.6, SAR: 4.4 } };
+  assert.equal(convert(50000, 'TRY', 'CNY', r), 8300); // 500 ₺ = 10 € = 83 ¥
+  assert.equal(convert(50000, 'TRY', 'CAD', r), 1600);
+  assert.equal(convert(10000, 'SAR', 'TRY', r), 113636); // 100 SAR = 22,7273 € = 1.136,36 ₺
+  assert.equal(convert(8300, 'CNY', 'SAR', r), 4400);
+});
+
 test('convertSteps', () => {
   assert.deepEqual(convertSteps('USD', 'TRY', rates), ['÷ 1,17', '× 50']);
   assert.deepEqual(convertSteps('EUR', 'TRY', rates), ['× 50']);

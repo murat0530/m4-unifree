@@ -6,12 +6,12 @@ Kasiyerler için hızlı, hafif bir yardımcı uygulama. Telefonda "lazım olunc
 
 | Sekme | Ne yapar |
 |---|---|
-| 💶 **Döviz** | Çevirici: tutarı ve para birimini yaz, ₺ / € / $ / £ karşılıkları hesap adımlarıyla birlikte anında çıkar (euro üzerinden: `500 $ ÷ 1,17 × 50`). "Müşteriye göster" tam ekranı |
+| 💶 **Döviz** | Çevirici: tutarı ve para birimini yaz, ₺ / € / $ / £ / ¥ (yuan) / C$ (Kanada doları) / SAR (Suudi riyali) karşılıkları hesap adımlarıyla birlikte anında çıkar (euro üzerinden: `500 $ ÷ 1,17 × 50`). "Müşteriye göster" tam ekranı |
 | 🏷️ **İndirim** | % indirim, N al M öde, ikinci ürüne % hesapları; sonucu tek dokunuşla çeviriciye aktarma |
 | ▥ **Barkod** | Yazılan kodu ekranda barkod olarak çizer (8/13 haneli rakam → EAN-8/EAN-13, diğerleri → Code 128); kasadaki okuyucuyla ekrandan okutulur. Sık kodlar telefona kaydedilir, ortak kodlar `barkodlar.json`'dan gelir |
 | 📋 **Kurallar** | Aranabilir kural / limit / arıza / acil durum kartları |
 | 🗣️ **İfadeler** | 16 kasa cümlesi, 7 dilde (EN, DE, RU, AR, FR, ES, ZH); dokununca müşteriye büyük gösterilir |
-| ⚙ **Ayarlar** | Günlük kurlar, euro bazlı: `1 € = ? ₺` ana kur, dolar ve sterlin pariteyle (`1 € = 1,17 $`). Yalnızca o telefonda saklanır, yazdırılabilir **Kasa kartı** |
+| ⚙ **Ayarlar** | Günlük kurlar, euro bazlı: `1 € = ? ₺` ana kur, diğer dövizler pariteyle (`1 € = 1,17 $`, `1 € = 8,3 ¥`). Yalnızca o telefonda saklanır, yazdırılabilir **Kasa kartı** |
 
 Uygulama simgesine basılı tutunca (Android) doğrudan sekmeye giden kısayollar çıkar. Bağlantılar da doğrudan açılabilir: `…/#doviz`, `…/#kurallar` (kasaya QR olarak yapıştırılabilir).
 

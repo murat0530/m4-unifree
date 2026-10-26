@@ -6,7 +6,9 @@ import { autoEncode } from './barcode.js';
 
 const $ = (id) => document.getElementById(id);
 const CODES = Object.keys(CURRENCIES);
-const PARITY = ['USD', 'GBP']; // euroya göre girilen dövizler
+const PARITY = ['USD', 'GBP', 'CNY', 'CAD', 'SAR']; // euroya göre girilen dövizler
+// Paritenin makul aralığı (1 € = ? birim); dışındaysa kaydetmeden önce sorulur
+const PARITY_RANGE = { USD: [0.7, 1.6], GBP: [0.6, 1.2], CNY: [5, 12], CAD: [1, 2.5], SAR: [2.5, 6.5] };
 const TABS = ['doviz', 'indirim', 'barkod', 'kurallar', 'ifadeler'];
 
 // --- Yerel kayıt (yalnızca bu cihazda; erişilemezse sessizce varsayılana döner) ---
@@ -47,7 +49,10 @@ function el(tag, props = {}, children = []) {
   for (const c of [].concat(children)) if (c != null) n.append(c);
   return n;
 }
-const curLabel = (c) => `${CURRENCIES[c].symbol} ${c === 'TRY' ? 'TL' : c}`;
+const curLabel = (c) => {
+  const code = c === 'TRY' ? 'TL' : c;
+  return CURRENCIES[c].symbol === code ? code : `${CURRENCIES[c].symbol} ${code}`;
+};
 function curOptions(select, selected, codes = CODES) {
   select.replaceChildren(...codes.map((c) => el('option', { value: c, text: curLabel(c) })));
   select.value = selected;
@@ -104,7 +109,7 @@ function rateRow(id, unit, value) {
 function openSettings() {
   $('rateInputs').replaceChildren(
     rateRow('rate-TRY', '₺', state.eurTry),
-    ...PARITY.map((c) => rateRow('rate-' + c, `${CURRENCIES[c].symbol} ${c}`, state.parity[c])),
+    ...PARITY.map((c) => rateRow('rate-' + c, curLabel(c), state.parity[c])),
   );
   $('rateError').hidden = true;
   $('settingsOverlay').hidden = false;
@@ -130,7 +135,8 @@ function saveRates() {
   const odd = [];
   if (eurTry < 5) odd.push(`1 € = ${fmtRate(eurTry)} ₺ çok düşük`);
   for (const [c, v] of Object.entries(parity)) {
-    if (v < 0.5 || v > 2) odd.push(`1 € = ${fmtRate(v)} ${CURRENCIES[c].symbol} alışılmadık (parite, örn. 1,17)`);
+    const [lo, hi] = PARITY_RANGE[c];
+    if (v < lo || v > hi) odd.push(`1 € = ${fmtRate(v)} ${c} alışılmadık (beklenen ${fmtRate(lo)}–${fmtRate(hi)})`);
   }
   const key = JSON.stringify({ eurTry, parity });
   if (odd.length && rateWarnedFor !== key) {

@@ -6,6 +6,9 @@ export const CURRENCIES = {
   EUR: { symbol: '€', name: 'Euro' },
   USD: { symbol: '$', name: 'ABD doları' },
   GBP: { symbol: '£', name: 'Sterlin' },
+  CNY: { symbol: '¥', name: 'Çin yuanı' },
+  CAD: { symbol: 'C$', name: 'Kanada doları' },
+  SAR: { symbol: 'SAR', name: 'Suudi riyali' },
 };
 
 // "1.234,56" / "1234.56" / "12,5" -> 123456 / 123456 / 1250 (cent). Geçersizse null.
@@ -49,7 +52,7 @@ export function formatAmount(cents, currency) {
   return `${sign}${whole},${frac}${sym}`;
 }
 
-// Kur yapısı (euro bazlı): { eurTry: 50, parity: { USD: 1.17, GBP: 0.86 } }
+// Kur yapısı (euro bazlı): { eurTry: 50, parity: { USD: 1.17, GBP: 0.86, CNY: 8.3, … } }
 //   1 € = eurTry ₺,  1 € = parity[X] X
 // perEur: 1 euro kaç birim eder (EUR = 1, TRY = eurTry, diğerleri parite)
 export function perEur(cur, rates) {
