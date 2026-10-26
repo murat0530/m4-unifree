@@ -24,12 +24,16 @@
   </header>
 
   <main>
-    <!-- DÖVİZ: çevirici -->
+    <!-- DÖVİZ: "500 $ kaç ₺?" -->
     <section id="tab-doviz" class="tab" hidden>
-      <label class="lbl" for="fxAmt">Çevrilecek tutar</label>
       <div class="row">
-        <input id="fxAmt" class="num big-input" inputmode="decimal" autocomplete="off" placeholder="0,00">
-        <select id="fxCur" class="cur-select" aria-label="Çevrilecek para birimi"></select>
+        <input id="fxAmt" class="num big-input" inputmode="decimal" autocomplete="off" placeholder="500" aria-label="Tutar">
+        <select id="fxCur" class="cur-select" aria-label="Elindeki para birimi"></select>
+      </div>
+      <div class="fx-ask">
+        <span>kaç</span>
+        <div id="fxToChips" class="chips" role="group" aria-label="Hangi para birimine"></div>
+        <button id="fxSwap" class="icon-btn swap" type="button" aria-label="Para birimlerini değiştir">⇅</button>
       </div>
       <div id="fxOut" class="fx-out" aria-live="polite"></div>
       <div class="actions">

@@ -78,7 +78,7 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 .num { font-variant-numeric: tabular-nums; text-align: right; }
 .big-input { flex: 1; font-size: 26px; font-weight: 600; height: 60px; }
 .small { width: 64px; text-align: center; }
-.cur-select { width: 92px; font-weight: 600; }.del-btn {
+.cur-select { width: 108px; font-weight: 600; }.del-btn {
   width: 48px; flex: none; border-radius: var(--radius);
   background: var(--surface); border: 1px solid var(--line); color: var(--muted); font-size: 18px;
 }
@@ -111,16 +111,21 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 .pay-row { display: flex; gap: 8px; margin-bottom: 8px; }
 .pay-row input { flex: 1; font-size: 20px; }
 
-/* Çevirici */
-.fx-out { display: grid; gap: 10px; margin-top: 16px; }
-.fx-out:empty { display: none; }
-.fx-row {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 12px 16px; font-variant-numeric: tabular-nums;
+/* Çevirici: "500 $ kaç ₺?" */
+.fx-ask { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.fx-ask > span { color: var(--muted); font-size: 18px; flex: none; }
+.fx-ask .chips { flex: 1; min-width: 0; padding-bottom: 0; }
+.swap { flex: none; background: var(--surface); border: 1px solid var(--line); }
+.fx-out { margin-top: 16px; }
+.fx-answer {
+  background: var(--surface); border: 1px solid var(--accent); border-radius: var(--radius);
+  padding: 14px 16px; font-variant-numeric: tabular-nums;
 }
-.fx-row .amt { font-size: 30px; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
-.fx-row .how { color: var(--muted); font-size: 14px; margin-top: 2px; }
-.fx-row.try { border-color: var(--accent); }
+.fx-answer .q { color: var(--muted); font-size: 15px; }
+.fx-answer .amt { font-size: clamp(32px, 11vw, 44px); font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; }
+.fx-answer .how { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.fx-others { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+.fx-others span { background: var(--surface-2); border-radius: 999px; padding: 6px 12px; font-size: 15px; }
 
 /* Çipler */
 .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
