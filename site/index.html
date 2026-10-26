@@ -24,40 +24,17 @@
   </header>
 
   <main>
-    <!-- DÖVİZ -->
+    <!-- DÖVİZ: çevirici -->
     <section id="tab-doviz" class="tab" hidden>
-      <label class="lbl" for="saleAmt">Satış tutarı</label>
+      <label class="lbl" for="fxAmt">Çevrilecek tutar</label>
       <div class="row">
-        <input id="saleAmt" class="num big-input" inputmode="decimal" autocomplete="off" placeholder="0,00">
-        <select id="saleCur" class="cur-select" aria-label="Satış para birimi"></select>
+        <input id="fxAmt" class="num big-input" inputmode="decimal" autocomplete="off" placeholder="0,00">
+        <select id="fxCur" class="cur-select" aria-label="Çevrilecek para birimi"></select>
       </div>
-
-      <div class="lbl">Müşterinin ödemesi</div>
-      <div id="payments"></div>
-      <button id="addPay" class="ghost-btn" type="button">+ Başka para birimiyle ödeme ekle</button>
-
-      <div id="result" class="result" aria-live="polite"></div>
-
-      <div id="changeBox" class="change-box" hidden>
-        <div class="lbl">Para üstünü nasıl vereceksin?</div>
-        <div id="changeModes" class="chips"></div>
-        <div id="mixRow" class="mix" hidden>
-          <div class="row">
-            <span class="mix-lbl">Önce</span>
-            <input id="mixAmt" class="num grow" inputmode="decimal" autocomplete="off" aria-label="İlk para biriminden verilecek tutar">
-            <select id="mixA" class="cur-select" aria-label="İlk para birimi"></select>
-          </div>
-          <div class="row">
-            <span class="mix-lbl">Kalanı</span>
-            <select id="mixB" class="cur-select grow" aria-label="Kalanın para birimi"></select>
-          </div>
-        </div>
-        <div id="changeOut" class="change-out"></div>
-      </div>
-
+      <div id="fxOut" class="fx-out" aria-live="polite"></div>
       <div class="actions">
         <button id="showCustomer" class="btn" type="button">Müşteriye göster</button>
-        <button id="clearSale" class="btn secondary" type="button">Temizle</button>
+        <button id="clearFx" class="btn secondary" type="button">Temizle</button>
       </div>
     </section>
 
@@ -85,7 +62,7 @@
 
       <div id="discResult" class="result" aria-live="polite"></div>
       <div class="actions">
-        <button id="toDoviz" class="btn" type="button">Ödemeye aktar</button>
+        <button id="toDoviz" class="btn" type="button">Çeviriciye aktar</button>
         <button id="clearDisc" class="btn secondary" type="button">Temizle</button>
       </div>
     </section>
@@ -147,7 +124,7 @@
         <h2 id="settingsTitle" class="grow">Kurlar</h2>
         <button id="closeSettings" class="icon-btn" type="button" aria-label="Kapat">✕</button>
       </div>
-      <p class="muted">1 birim kaç TL? Mağazanın günlük kurunu girin. Kurlar yalnızca bu telefonda saklanır.</p>
+      <p class="muted">Ana kur euro: 1 € kaç TL? Dolar ve sterlin euroya göre (parite) girilir. Kurlar yalnızca bu telefonda saklanır.</p>
       <div id="rateInputs"></div>
       <p id="rateError" class="error" hidden></p>
       <button id="saveRates" class="btn" type="button">Kaydet</button>

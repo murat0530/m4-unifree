@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  parseAmount, parseRate, formatAmount, settle, breakdown,
-  percentOff, buyNPayM, secondItemOff, splitChange, notesOnly,
+  parseAmount, parseRate, formatAmount, perEur, convert, convertSteps,
+  percentOff, buyNPayM, secondItemOff,
 } from '../site/calc.js';
 
 test('parseAmount: Türkçe ve İngilizce yazım', () => {
@@ -15,6 +15,10 @@ test('parseAmount: Türkçe ve İngilizce yazım', () => {
   assert.equal(parseAmount(''), null);
   assert.equal(parseAmount('abc'), null);
   assert.equal(parseAmount('1,234'), null); // belirsiz: 3 ondalık hane kabul edilmez
+  assert.equal(parseAmount('1.000'), 100000); // nokta binlik ayırıcı
+  assert.equal(parseAmount('12.500.000'), 1250000000);
+  assert.equal(parseAmount('12.50'), 1250); // 2 hane: ondalık
+  assert.equal(parseAmount('1.0000'), null);
   assert.equal(parseAmount('-5'), null);
 });
 
@@ -31,56 +35,41 @@ test('formatAmount', () => {
   assert.equal(formatAmount(-1250, 'TRY'), '-12,50 ₺');
 });
 
-const rates = { EUR: 40, USD: 35, GBP: 46 };
+const rates = { eurTry: 50, parity: { USD: 1.17, GBP: 0.86 } };
 
-test('settle: tek para birimi, para üstü', () => {
-  const r = settle({ amount: 8500, currency: 'EUR' }, [{ amount: 10000, currency: 'EUR' }], rates);
-  assert.equal(r.status, 'change');
-  assert.equal(r.perCurrency.EUR, 1500);
-  assert.equal(r.perCurrency.TRY, 60000);
+test('perEur', () => {
+  assert.equal(perEur('EUR', rates), 1);
+  assert.equal(perEur('TRY', rates), 50);
+  assert.equal(perEur('USD', rates), 1.17);
+  assert.throws(() => perEur('TRY', { parity: {} }), /Euro kuru/);
+  assert.throws(() => perEur('GBP', { eurTry: 50, parity: {} }), /GBP paritesi/);
 });
 
-test('settle: karışık ödeme, kalan yukarı yuvarlanır', () => {
-  // 100 € = 4000 TL; 50 € (2000) + 20 $ (700) = 2700 TL; kalan 1300 TL
-  const r = settle({ amount: 10000, currency: 'EUR' },
-    [{ amount: 5000, currency: 'EUR' }, { amount: 2000, currency: 'USD' }], rates);
-  assert.equal(r.status, 'remaining');
-  assert.equal(r.perCurrency.TRY, 130000);
-  assert.equal(r.perCurrency.EUR, 3250);
-  assert.equal(r.perCurrency.USD, 3715); // 37,1428.. -> 37,15 (yukarı)
+test('convert: 500 $ euro üzerinden', () => {
+  assert.equal(convert(50000, 'USD', 'EUR', rates), 42735); // 500 / 1,17 = 427,35
+  assert.equal(convert(50000, 'USD', 'TRY', rates), 2136752); // 427,3504 × 50 = 21.367,52
+  assert.equal(convert(50000, 'USD', 'GBP', rates), 36752); // 427,3504 × 0,86 = 367,52
 });
 
-test('settle: para üstü aşağı yuvarlanır (fazla verilmez)', () => {
-  // 10 $ öder, 300 TL'lik ürün: 350-300 = 50 TL üstü; EUR olarak 1,25; GBP 1,0869.. -> 1,08
-  const r = settle({ amount: 30000, currency: 'TRY' }, [{ amount: 1000, currency: 'USD' }], rates);
-  assert.equal(r.status, 'change');
-  assert.equal(r.perCurrency.GBP, 108);
-  assert.equal(r.perCurrency.EUR, 125);
+test('convert: euro ve lira', () => {
+  assert.equal(convert(10000, 'EUR', 'TRY', rates), 500000);
+  assert.equal(convert(500000, 'TRY', 'EUR', rates), 10000);
+  assert.equal(convert(500000, 'TRY', 'USD', rates), 11700);
+  assert.equal(convert(12345, 'EUR', 'EUR', rates), 12345);
 });
 
-test('settle: tam ödeme', () => {
-  const r = settle({ amount: 4000, currency: 'TRY' }, [{ amount: 100, currency: 'EUR' }], rates);
-  assert.equal(r.status, 'exact');
+test('convert: geri çevirince en fazla 1 kuruş fark', () => {
+  for (const c of [1, 99, 12345, 50000, 9999999]) {
+    const back = convert(convert(c, 'USD', 'TRY', rates), 'TRY', 'USD', rates);
+    assert.ok(Math.abs(back - c) <= 1, `${c} -> ${back}`);
+  }
 });
 
-test('settle: kuru girilmemiş birim hesaplamaya katılmaz, ödemede hata verir', () => {
-  const r = settle({ amount: 1000, currency: 'TRY' }, [{ amount: 2000, currency: 'TRY' }], { EUR: 40 });
-  assert.equal(r.perCurrency.USD, undefined);
-  assert.throws(() => settle({ amount: 1000, currency: 'USD' }, [], { EUR: 40 }));
-});
-
-test('settle: kayan nokta kuru', () => {
-  const r = settle({ amount: 1000, currency: 'EUR' }, [{ amount: 1000, currency: 'EUR' }], { EUR: 38.1234 });
-  assert.equal(r.status, 'exact');
-});
-
-test('breakdown', () => {
-  assert.deepEqual(breakdown(1750, 'EUR'), {
-    parts: [{ denom: 1000, count: 1 }, { denom: 500, count: 1 }, { denom: 200, count: 1 }, { denom: 50, count: 1 }],
-    rest: 0,
-  });
-  // TL'de 1 kuruş yok: 3 kuruş küsurat kalır
-  assert.equal(breakdown(1003, 'TRY').rest, 3);
+test('convertSteps', () => {
+  assert.deepEqual(convertSteps('USD', 'TRY', rates), ['÷ 1,17', '× 50']);
+  assert.deepEqual(convertSteps('EUR', 'TRY', rates), ['× 50']);
+  assert.deepEqual(convertSteps('TRY', 'EUR', rates), ['÷ 50']);
+  assert.deepEqual(convertSteps('USD', 'GBP', rates), ['÷ 1,17', '× 0,86']);
 });
 
 test('percentOff', () => {
@@ -99,29 +88,4 @@ test('secondItemOff', () => {
   const r = secondItemOff([4000, 2000, 3000], 50);
   // sıralı: 4000, 3000, 2000 -> 3000'e %50
   assert.deepEqual(r, { gross: 9000, discount: 1500, total: 7500 });
-});
-
-test('notesOnly: bozuk para atılır', () => {
-  assert.equal(notesOnly(36250, 'EUR'), 36000);
-  assert.equal(notesOnly(1799, 'USD'), 1700);
-  assert.equal(notesOnly(400, 'EUR'), 0);
-});
-
-test('splitChange: otomatik, önce € banknot sonra ₺', () => {
-  // 18.000 TL para üstü, 1 € = 50: 360 € -> banknotla 360 € tam, kalan 0 ₺
-  assert.deepEqual(splitChange(1800000, 'EUR', null, 'TRY', { EUR: 50 }), { first: 36000, second: 0, maxFirst: 36000 });
-  // 18.120 TL: 362,40 € -> 360 € banknot + 120 ₺
-  assert.deepEqual(splitChange(1812000, 'EUR', null, 'TRY', { EUR: 50 }), { first: 36000, second: 12000, maxFirst: 36240 });
-});
-
-test('splitChange: elle tutar, kalanı başka dövizde', () => {
-  // 18.000 TL, 100 € verilir (5.000 TL), kalan 13.000 TL = 302,32 $ (1 $ = 43)
-  const r = splitChange(1800000, 'EUR', 10000, 'USD', { EUR: 50, USD: 43 });
-  assert.equal(r.first, 10000);
-  assert.equal(r.second, 30232);
-});
-
-test('splitChange: fazla tutar ve aynı birim reddedilir', () => {
-  assert.throws(() => splitChange(1800000, 'EUR', 40000, 'TRY', { EUR: 50 }), /en fazla 360,00/);
-  assert.throws(() => splitChange(1800000, 'TRY', null, 'TRY', {}), /farklı/);
 });

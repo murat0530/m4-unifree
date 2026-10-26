@@ -2,10 +2,10 @@
 // Para tutarları kuruş/cent cinsinden tamsayı olarak tutulur; kayan nokta hatası olmasın.
 
 export const CURRENCIES = {
-  TRY: { symbol: '₺', name: 'Türk lirası', denoms: [20000, 10000, 5000, 2000, 1000, 500, 100, 50, 25, 10, 5] },
-  EUR: { symbol: '€', name: 'Euro', denoms: [50000, 20000, 10000, 5000, 2000, 1000, 500, 200, 100, 50, 20, 10, 5, 2, 1] },
-  USD: { symbol: '$', name: 'ABD doları', denoms: [10000, 5000, 2000, 1000, 500, 200, 100, 25, 10, 5, 1] },
-  GBP: { symbol: '£', name: 'Sterlin', denoms: [5000, 2000, 1000, 500, 200, 100, 50, 20, 10, 5, 2, 1] },
+  TRY: { symbol: '₺', name: 'Türk lirası' },
+  EUR: { symbol: '€', name: 'Euro' },
+  USD: { symbol: '$', name: 'ABD doları' },
+  GBP: { symbol: '£', name: 'Sterlin' },
 };
 
 // "1.234,56" / "1234.56" / "12,5" -> 123456 / 123456 / 1250 (cent). Geçersizse null.
@@ -22,6 +22,9 @@ export function parseAmount(text) {
     s = s.split(thou).join('').replace(dec, '.');
   } else if (lastComma > -1) {
     s = s.replace(',', '.');
+  } else if (/^\d{1,3}(\.\d{3})+$/.test(s)) {
+    // Yalnızca nokta ve hep 3'lü gruplar: Türkçe binlik ayırıcı ("1.000", "12.500.000")
+    s = s.split('.').join('');
   }
   if (!/^\d+(\.\d{0,2})?$/.test(s)) return null;
   const [whole, frac = ''] = s.split('.');
@@ -46,60 +49,28 @@ export function formatAmount(cents, currency) {
   return `${sign}${whole},${frac}${sym}`;
 }
 
-// rates: { EUR: 38.5, USD: 35.2, ... } (TRY her zaman 1)
-function rateOf(rates, cur) {
-  if (cur === 'TRY') return 1;
-  const r = rates[cur];
-  if (!(r > 0)) throw new Error(`${cur} kuru girilmemiş`);
-  return r;
+// Kur yapısı (euro bazlı): { eurTry: 50, parity: { USD: 1.17, GBP: 0.86 } }
+//   1 € = eurTry ₺,  1 € = parity[X] X
+// perEur: 1 euro kaç birim eder (EUR = 1, TRY = eurTry, diğerleri parite)
+export function perEur(cur, rates) {
+  const v = cur === 'EUR' ? 1 : cur === 'TRY' ? rates.eurTry : rates.parity?.[cur];
+  if (!(v > 0)) throw new Error(cur === 'TRY' ? 'Euro kuru girilmemiş' : `${cur} paritesi girilmemiş`);
+  return v;
 }
 
-// Tutarı TL kuruşa çevirir (tam değer, yuvarlamasız).
-export function toTry(cents, cur, rates) {
-  return cents * rateOf(rates, cur);
+// Tutarı (kuruş/cent) bir para biriminden diğerine euro üzerinden çevirir, en yakın kuruşa yuvarlar.
+export function convert(cents, from, to, rates) {
+  const v = (cents / perEur(from, rates)) * perEur(to, rates);
+  return Math.round(v + 1e-9);
 }
 
-// TL kuruştan hedef para birimine. mode: 'up' (müşterinin ödeyeceği) | 'down' (verilecek para üstü)
-export function fromTry(tryCents, cur, rates, mode) {
-  const v = tryCents / rateOf(rates, cur);
-  const eps = 1e-6; // 12.000000001 gibi kayan nokta artıklarını yutar
-  return mode === 'up' ? Math.ceil(v - eps) : Math.floor(v + eps);
-}
-
-// Satış: { amount, currency }, ödemeler: [{ amount, currency }]
-// Döner: { status: 'remaining' | 'change' | 'exact', tryDiff, perCurrency: { CUR: cents } }
-// remaining: müşterinin her para biriminde ödemesi gereken kalan (yukarı yuvarlanır)
-// change: her para biriminde verilecek para üstü (aşağı yuvarlanır, fazla verilmez)
-export function settle(sale, payments, rates, currencies = Object.keys(CURRENCIES)) {
-  const due = toTry(sale.amount, sale.currency, rates);
-  const paid = payments.reduce((sum, p) => sum + toTry(p.amount, p.currency, rates), 0);
-  const diff = paid - due;
-  const perCurrency = {};
-  // Yarım kuruştan küçük farkları tam ödeme say.
-  if (Math.abs(diff) < 0.5) {
-    for (const c of currencies) perCurrency[c] = 0;
-    return { status: 'exact', tryDiff: 0, perCurrency };
-  }
-  const status = diff < 0 ? 'remaining' : 'change';
-  for (const c of currencies) {
-    if (c !== 'TRY' && !(rates[c] > 0)) continue;
-    perCurrency[c] = fromTry(Math.abs(diff), c, rates, status === 'remaining' ? 'up' : 'down');
-  }
-  return { status, tryDiff: diff, perCurrency };
-}
-
-// Para üstünü küpürlere böler (açgözlü). Kalan küsurat 'rest' olarak döner.
-export function breakdown(cents, currency) {
-  const out = [];
-  let rest = cents;
-  for (const d of CURRENCIES[currency].denoms) {
-    const n = Math.floor(rest / d);
-    if (n > 0) {
-      out.push({ denom: d, count: n });
-      rest -= n * d;
-    }
-  }
-  return { parts: out, rest };
+// Ekranda gösterilecek hesap adımları: ["÷ 1,17", "× 50"]
+export function convertSteps(from, to, rates) {
+  const fmt = (n) => n.toLocaleString('tr-TR', { maximumFractionDigits: 4 });
+  const steps = [];
+  if (from !== 'EUR') steps.push(`÷ ${fmt(perEur(from, rates))}`);
+  if (to !== 'EUR') steps.push(`× ${fmt(perEur(to, rates))}`);
+  return steps;
 }
 
 // --- İndirim / kampanya ---
@@ -132,24 +103,3 @@ export function secondItemOff(prices, percent) {
   return { gross, discount, total: gross - discount };
 }
 
-// --- Para üstünü bölme ---
-
-// Elde bozuk para olmayabilir: her para biriminin en küçük banknotu
-export const SMALLEST_NOTE = { TRY: 500, EUR: 500, USD: 100, GBP: 500 };
-
-export function notesOnly(cents, cur) {
-  const n = SMALLEST_NOTE[cur];
-  return Math.floor(cents / n) * n;
-}
-
-// Para üstünü iki para birimine böler: önce firstCur'dan firstAmount (null ise verilebilecek
-// en fazla banknot), kalanı secondCur'dan (aşağı yuvarlanır, fazla verilmez).
-// changeTry: TL kuruş cinsinden toplam para üstü (settle().tryDiff)
-export function splitChange(changeTry, firstCur, firstAmount, secondCur, rates) {
-  if (firstCur === secondCur) throw new Error('İki farklı para birimi seçin');
-  const maxFirst = fromTry(changeTry, firstCur, rates, 'down');
-  const first = firstAmount == null ? notesOnly(maxFirst, firstCur) : firstAmount;
-  if (first > maxFirst) throw new Error(`${firstCur} olarak en fazla ${formatAmount(maxFirst, firstCur)} verilebilir`);
-  const rest = Math.max(0, changeTry - toTry(first, firstCur, rates));
-  return { first, second: fromTry(rest, secondCur, rates, 'down'), maxFirst };
-}
