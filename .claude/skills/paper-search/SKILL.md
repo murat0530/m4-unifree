@@ -32,6 +32,21 @@ eutils.ncbi.nlm.nih.gov, www.ebi.ac.uk, api.semanticscholar.org, api.unpaywall.o
 Optional API keys go in `~/.config/paper-search-mcp/.env` (e.g. `PAPER_SEARCH_MCP_UNPAYWALL_EMAIL`,
 `PAPER_SEARCH_MCP_SEMANTIC_SCHOLAR_API_KEY`). Never invent keys; ask the user if one is needed.
 
+### API keys and rate limits
+
+Without keys, OpenAlex and Semantic Scholar often return HTTP 429: OpenAlex gives keyless requests a
+small free daily budget shared by everyone on the same IP (resets at midnight UTC), and Semantic
+Scholar shares one anonymous pool. On cloud machines with shared egress IPs this budget is usually gone.
+Check before searching:
+```bash
+python3 <skill_dir>/scripts/cite_rank.py status
+```
+The CLI reads these environment variables automatically (prefix optional):
+`PAPER_SEARCH_MCP_OPENALEX_API_KEY` and `PAPER_SEARCH_MCP_SEMANTIC_SCHOLAR_API_KEY`. Both keys are
+free, but the user must sign up themselves (openalex.org; semanticscholar.org/product/api). Tell them
+to add keys to their environment settings or `.env`, never to paste keys into the chat. Do not try to
+bypass rate limits (rotating IPs, proxies, many emails); use the keyless fallbacks below instead.
+
 ### Search
 ```bash
 paper-search search "<query>" -n <max_per_source> -s <sources> -y <year>
@@ -116,7 +131,8 @@ return the globally most-cited papers. To approximate "most cited on topic X":
    ```bash
    paper-search search "<english query>" -s openalex,semantic,crossref --sort citations -n 40
    ```
-   Set `PAPER_SEARCH_MCP_OPENALEX_EMAIL` (ask the user for an email, or use theirs if known) to reduce OpenAlex 429s.
+   If `cite_rank.py status` shows 429 for these sources, use the keyless fallbacks below instead.
+   (An OpenAlex email no longer avoids 429s: the keyless budget is per IP.)
 2. Drop off-topic hits: keep only papers whose title/abstract is actually about the topic.
 3. Deduplicate by DOI/title, then rank by citations and show the top N.
 
@@ -124,9 +140,30 @@ Do not use Crossref server-side sort (`tool search_crossref ... --sort is-refere
 plain keyword query: Crossref matches words loosely and returns famous unrelated papers. Use it only
 with narrowing filters (e.g. `--filter from-pub-date:2020-01-01,type:journal-article`) and still check relevance.
 
-On HTTP 429 (rate limit) from OpenAlex/Semantic Scholar: wait ~30s and retry once with fewer sources,
-or suggest a free Semantic Scholar API key. Citation counts differ by database; label each count's source,
-and say clearly that this is an approximation, not an official ranking (Scopus/WoS are authoritative).
+### Keyless fallbacks (use when `status` shows 429 for OpenAlex / Semantic Scholar)
+
+`scripts/cite_rank.py` uses only the Python standard library and needs no keys. `<skill_dir>` is this
+skill's base directory (e.g. `.claude/skills/paper-search` in a project).
+
+- **Biomedical / health topics: Europe PMC, sorted server-side by citations.** This returns the
+  genuinely most-cited matches, not a re-ordered top-N:
+  ```bash
+  python3 <skill_dir>/scripts/cite_rank.py epmc 'TITLE:"weight gain" AND (TITLE:underweight OR TITLE:"constitutional thinness") AND NOT (TITLE:pregnan* OR TITLE:anorexi*)' -n 25
+  ```
+  Use Europe PMC query syntax (`TITLE:`, `ABSTRACT:`, `AND`/`OR`/`NOT`, quotes, `*`) to keep results on topic.
+- **Any topic: fill in missing citation counts.** PubMed/Europe PMC/arXiv results from
+  `paper-search search` have no or zero citation counts. Pipe them through `enrich`, which dedupes,
+  adds counts from iCite (NIH, by PMID), OpenCitations or Crossref (by DOI), and sorts:
+  ```bash
+  paper-search search "<query>" -s crossref,pubmed,europepmc -n 40 2>/dev/null \
+    | python3 <skill_dir>/scripts/cite_rank.py enrich --top 20
+  ```
+  Each paper gets a `citation_source` field. `enrich` makes one request per DOI not found in iCite
+  (capped by `--max-doi-lookups`, default 60), so large pools take ~30 s.
+
+Citation counts differ by database (Crossref > OpenCitations; iCite counts only PubMed-indexed citers);
+label each count's source, and say clearly that this is an approximation, not an official ranking
+(Scopus/WoS are authoritative).
 
 ## Workflow
 
