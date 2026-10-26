@@ -12,7 +12,7 @@ const TABS = ['doviz', 'indirim', 'barkod', 'kurallar', 'ifadeler'];
 // --- Yerel kayıt (yalnızca bu cihazda; erişilemezse sessizce varsayılana döner) ---
 const STORE_KEY = 'm4kasa';
 const state = Object.assign(
-  { codes: [], eurTry: null, parity: {}, ratesAt: null, fxCur: 'USD', fxTo: 'TRY', tab: 'doviz', lang: 'en', discCur: 'EUR' },
+  { codes: [], eurTry: null, parity: {}, ratesAt: null, fxCur: 'TRY', fxTo: 'USD', tab: 'doviz', lang: 'en', discCur: 'EUR' },
   load(),
 );
 // Eski sürümden kalan "1 birim = n TL" kurlarını euro bazına çevir
@@ -23,6 +23,8 @@ if (state.rates && !state.eurTry && state.rates.EUR > 0) {
   }
 }
 for (const k of ['rates', 'saleCur', 'changeCur', 'changeMode', 'mixA', 'mixB']) delete state[k];
+// Çevirici varsayılanı "TL kaç $?" oldu: önceki sürümden kalan yönü bir kez sıfırla
+if (state.fxV !== 2) { state.fxCur = 'TRY'; state.fxTo = 'USD'; state.fxV = 2; }
 function load() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
 }
@@ -45,9 +47,9 @@ function el(tag, props = {}, children = []) {
   for (const c of [].concat(children)) if (c != null) n.append(c);
   return n;
 }
+const curLabel = (c) => `${CURRENCIES[c].symbol} ${c === 'TRY' ? 'TL' : c}`;
 function curOptions(select, selected, codes = CODES) {
-  select.replaceChildren(...codes.map((c) =>
-    el('option', { value: c, text: `${CURRENCIES[c].symbol} ${c}` })));
+  select.replaceChildren(...codes.map((c) => el('option', { value: c, text: curLabel(c) })));
   select.value = selected;
 }
 async function loadJson(path) {
@@ -156,7 +158,7 @@ function renderToChips() {
   if (state.fxTo === state.fxCur) state.fxTo = state.fxCur === 'TRY' ? 'EUR' : 'TRY';
   $('fxToChips').replaceChildren(...CODES.filter((c) => c !== state.fxCur).map((c) => el('button', {
     class: 'chip' + (c === state.fxTo ? ' on' : ''), type: 'button', 'aria-pressed': String(c === state.fxTo),
-    text: `${CURRENCIES[c].symbol} ${c === 'TRY' ? 'TL' : c}`,
+    text: curLabel(c),
     onclick: () => { state.fxTo = c; save(); renderFx(); },
   })));
 }
