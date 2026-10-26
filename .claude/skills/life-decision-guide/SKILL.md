@@ -1,9 +1,11 @@
 ---
 name: life-decision-guide
-description: 用《高性价比人生指南》(github.com/eternity4719/HowToLiveBetter) 的正文回答具体的人生决策：该不该做、值不值、怎么选、出事了先做什么、能领哪笔钱、这么干犯不犯法。先把相关条目查出来再答，按成本（钱/时间/毅力）、收益量级和证据等级 A/B/C 排序，每条都注明出自第几节第几条。触发词：该不该、值不值、要不要、划不划算、怎么选、帮我决定、这样犯法吗、能领什么、先做什么、性价比。
+description: 用《高性价比人生指南》(github.com/eternity4719/HowToLiveBetter) 的正文回答具体的人生决策：该不该做、值不值、怎么选、出事了先做什么、能领哪笔钱、这么干犯不犯法。先把相关条目查出来再答，按成本（钱/时间/毅力）、收益量级和证据等级 A/B/C 排序，每条都注明出自第几节第几条。触发词：该不该、值不值、要不要、划不划算、怎么选、帮我决定、这样犯法吗、能领什么、先做什么、性价比。Türkçe tetikleyiciler: değer mi, yapmalı mıyım, mantıklı mı, hangisini seçeyim, karar ver, yasal mı, suç mu, hangi yardımı alabilirim, önce ne yapmalıyım, fiyat/performans. Cevaplar her zaman Türkçe.
 ---
 
 # 人生决策：按《高性价比人生指南》查了再答
+
+> **Dil kuralı (bu projeye özel, her şeyin önünde gelir):** Kullanıcıya verilen cevabın tamamı **Türkçe** yazılır — soru hangi dilde sorulursa sorulsun. Kitap Çince; maddeleri Çince okuyup Türkçeye çevirerek aktar. Kaynak gösterirken bölüm/madde numarasını Türkçe yaz ve madde başlığının Çince aslını parantez içinde bırak, ör. «8. bölüm 17. madde (借条和担保 — senet ve kefalet)». Rakamları, kanıt düzeyini (A/B/C) ve kaynak linklerini değiştirmeden aktar. Aşağıdaki «简体中文» kuralı bu projede geçersizdir; yerine Türkçe kullan.
 
 ## 这个 skill 干什么
 
@@ -105,7 +107,7 @@ sed -n '/^### 16\. /,/^### 17\. /p' book/08-别把自己搭进去.md  # 按条�
 - **「法律支持你」的事必须连过程成本一起说**。只说结果不说过程，等于把胜诉率当成收益。要交代要不要打官司、大概多久（一审普通程序 6 个月起、可延长，简易程序 3 个月）、律师费谁掏（律师费不在诉讼费用里，败诉方负担不包括它）。
 - **数字照抄条目**，一个不改。条目里写了置信区间、人群、年份就一并留着；HR、RR、OR 这类写法旁边就地翻成「低约 28%」，原值不删。条目里没有的数字、症状、机制解读一律不加。
 - **口语化**：按没受过专业训练的成年人能一遍读懂来写。专业名词当场用日常话解释一句，法条落到「会摊上什么后果、该怎么做」。来源栏照原样给，方便核对。
-- **语气克制**，不说教，不用感叹号，简体中文。用户不按建议做是他自己的事，不追着劝。
+- **语气克制**，不说教，不用感叹号，用土耳其语（Türkçe）回答。用户不按建议做是他自己的事，不追着劝。
 - **政策会变**：第 7、19、21、24、31、32 节里那些金额、时限、名单，正文写了截至日期，答复里把日期带上并提醒用户自查官方渠道。
 - 有「争议」标注的条目，把反方证据也说一句；标了「TODO 待核实」的，别当结论用。
 - 不引知乎、公众号、搜狐这类二手转述，只给条目「来源」栏里已有的链接。
