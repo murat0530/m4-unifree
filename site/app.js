@@ -2,16 +2,17 @@ import {
   CURRENCIES, parseAmount, parseRate, formatAmount, settle, breakdown,
   percentOff, buyNPayM, secondItemOff,
 } from './calc.js';
+import { autoEncode } from './barcode.js';
 
 const $ = (id) => document.getElementById(id);
 const CODES = Object.keys(CURRENCIES);
 const FOREIGN = CODES.filter((c) => c !== 'TRY');
-const TABS = ['doviz', 'indirim', 'kurallar', 'ifadeler'];
+const TABS = ['doviz', 'indirim', 'barkod', 'kurallar', 'ifadeler'];
 
 // --- Yerel kayıt (yalnızca bu cihazda; erişilemezse sessizce varsayılana döner) ---
 const STORE_KEY = 'm4kasa';
 const state = Object.assign(
-  { rates: {}, ratesAt: null, saleCur: 'EUR', changeCur: 'TRY', tab: 'doviz', lang: 'en', discCur: 'EUR' },
+  { codes: [], rates: {}, ratesAt: null, saleCur: 'EUR', changeCur: 'TRY', tab: 'doviz', lang: 'en', discCur: 'EUR' },
   load(),
 );
 function load() {
@@ -240,7 +241,11 @@ function showOverlay(nodes, dir = 'auto') {
   body.replaceChildren(...nodes);
   $('showOverlay').hidden = false;
 }
-$('showOverlay').addEventListener('click', () => { $('showOverlay').hidden = true; });
+$('showOverlay').addEventListener('click', () => {
+  $('showOverlay').hidden = true;
+  wakeLock?.release().catch(() => {});
+  wakeLock = null;
+});
 $('showCustomer').addEventListener('click', () => {
   if (!lastSettle) return;
   const { sale, payments, result: r } = lastSettle;
@@ -348,6 +353,106 @@ $('toDoviz').addEventListener('click', () => {
   location.hash = 'doviz';
 });
 
+// --- Barkod ---
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const QUIET = 12; // her iki yanda boş modül (okuyucunun kenarı bulması için)
+// Modül genişliği tam piksel olsun diye genişlik, sığan en büyük tam sayıya göre seçilir
+function barcodeSvg(modules, maxWidth, height) {
+  const total = modules.length + QUIET * 2;
+  const unit = Math.max(1, Math.floor(maxWidth / total));
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${total} 1`);
+  svg.setAttribute('width', total * unit);
+  svg.setAttribute('height', height);
+  svg.setAttribute('preserveAspectRatio', 'none');
+  svg.setAttribute('shape-rendering', 'crispEdges');
+  svg.setAttribute('role', 'img');
+  const bg = document.createElementNS(SVG_NS, 'rect');
+  bg.setAttribute('width', total); bg.setAttribute('height', 1); bg.setAttribute('fill', '#fff');
+  svg.append(bg);
+  for (let i = 0; i < modules.length;) {
+    if (modules[i] !== '1') { i++; continue; }
+    let j = i;
+    while (modules[j] === '1') j++;
+    const r = document.createElementNS(SVG_NS, 'rect');
+    r.setAttribute('x', QUIET + i); r.setAttribute('width', j - i);
+    r.setAttribute('height', 1); r.setAttribute('fill', '#000');
+    svg.append(r);
+    i = j;
+  }
+  return svg;
+}
+let currentCode = null;
+function renderBarcode() {
+  const out = $('codeOut');
+  const raw = $('codeInput').value.trim();
+  currentCode = null;
+  out.className = 'code-out';
+  if (!raw) { out.replaceChildren(); return; }
+  try {
+    currentCode = autoEncode(raw);
+  } catch (e) {
+    out.classList.add('error');
+    out.replaceChildren(el('div', { text: e.message }));
+    return;
+  }
+  const svg = barcodeSvg(currentCode.modules, out.clientWidth || 340, 120);
+  svg.setAttribute('aria-label', `${currentCode.type} barkod: ${currentCode.text}`);
+  out.replaceChildren(svg,
+    el('div', { class: 'code-text', text: currentCode.text }),
+    el('div', { class: 'code-type', text: currentCode.type }));
+}
+let wakeLock = null;
+function showBarcodeFull(code, name) {
+  let enc;
+  try { enc = autoEncode(code); } catch { return; }
+  const w = Math.min(window.innerWidth, window.innerHeight * 1.6) - 32;
+  const svg = barcodeSvg(enc.modules, w, Math.round(Math.min(220, window.innerHeight * 0.3)));
+  showOverlay([
+    name ? el('div', { class: 'lab', text: name }) : null,
+    svg,
+    el('div', { class: 'code-text', text: enc.text }),
+  ].filter(Boolean), 'ltr');
+  // Okutulurken ekran kararmasın (destekleyen tarayıcılarda)
+  navigator.wakeLock?.request('screen').then((l) => { wakeLock = l; }).catch(() => {});
+}
+function codeItem(c, onDelete) {
+  return el('div', { class: 'code-item' }, [
+    el('button', {
+      class: 'open', type: 'button',
+      onclick: () => showBarcodeFull(c.code, c.name),
+    }, [el('b', { text: c.name || c.code }), el('span', { text: c.code })]),
+    onDelete ? el('button', { class: 'del-btn', type: 'button', 'aria-label': 'Kodu sil', text: '✕', onclick: onDelete }) : null,
+  ].filter(Boolean));
+}
+function renderCodeList() {
+  const codes = Array.isArray(state.codes) ? state.codes : [];
+  $('codeList').replaceChildren(...(codes.length
+    ? codes.map((c, i) => codeItem(c, () => { state.codes.splice(i, 1); save(); renderCodeList(); }))
+    : [el('div', { class: 'empty', text: 'Henüz kayıtlı kod yok. Bir kod yazıp "Kaydet"e dokunun.' })]));
+}
+let sharedCodes = [];
+function renderSharedCodes() {
+  $('sharedCodesWrap').hidden = !sharedCodes.length;
+  $('sharedCodes').replaceChildren(...sharedCodes.map((c) => codeItem(c)));
+}
+$('codeInput').addEventListener('input', renderBarcode);
+$('codeFull').addEventListener('click', () => { if (currentCode) showBarcodeFull(currentCode.text); });
+$('codeSave').addEventListener('click', () => {
+  if (!currentCode) return;
+  $('codeSaveRow').hidden = false;
+  $('codeName').focus();
+});
+$('codeSaveOk').addEventListener('click', () => {
+  if (!currentCode) return;
+  if (!Array.isArray(state.codes)) state.codes = [];
+  state.codes.unshift({ name: $('codeName').value.trim(), code: currentCode.text });
+  save();
+  $('codeName').value = '';
+  $('codeSaveRow').hidden = true;
+  renderCodeList();
+});
+
 // --- Kurallar ---
 let rules = [];
 let ruleCat = 'Tümü';
@@ -421,13 +526,17 @@ resetDoviz();
 addPriceRow();
 renderIndirim();
 renderRateBar();
+renderCodeList();
 showTab(location.hash.slice(1) || state.tab);
 
 Promise.all([
   loadJson('data/kurallar.json'),
   loadJson('data/kampanyalar.json'),
   loadJson('data/ifadeler.json'),
-]).then(([k, c, i]) => {
+  loadJson('data/barkodlar.json'),
+]).then(([k, c, i, b]) => {
+  sharedCodes = Array.isArray(b?.barkodlar) ? b.barkodlar.filter((x) => x && typeof x.code === 'string') : [];
+  renderSharedCodes();
   rules = Array.isArray(k?.kurallar) ? k.kurallar : [];
   campaigns = Array.isArray(c?.kampanyalar) ? c.kampanyalar : [];
   phraseData = Array.isArray(i?.ifadeler) && Array.isArray(i?.diller) ? i : null;

@@ -73,6 +73,28 @@
       </div>
     </section>
 
+    <!-- BARKOD -->
+    <section id="tab-barkod" class="tab" hidden>
+      <label class="lbl" for="codeInput">Barkoda çevrilecek kod</label>
+      <input id="codeInput" class="code-input" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Ör. 8690000000005 veya ABC-123">
+      <div id="codeOut" class="code-out" aria-live="polite"></div>
+      <div class="actions">
+        <button id="codeFull" class="btn" type="button">Tam ekran</button>
+        <button id="codeSave" class="btn secondary" type="button">Kaydet</button>
+      </div>
+      <div id="codeSaveRow" class="row save-row" hidden>
+        <input id="codeName" class="grow" autocomplete="off" placeholder="Ad (ör. Poşet, Kampanya kuponu)" aria-label="Kod adı">
+        <button id="codeSaveOk" class="btn grow-0" type="button">Ekle</button>
+      </div>
+      <div id="sharedCodesWrap" hidden>
+        <div class="lbl">Ortak kodlar</div>
+        <div id="sharedCodes"></div>
+      </div>
+      <div class="lbl">Bu telefonda kayıtlı</div>
+      <div id="codeList"></div>
+      <p class="muted">İpucu: ekran parlaklığını artırın. Kameralı okuyucular ekrandan okur; eski lazer okuyucular ekrandan okuyamayabilir.</p>
+    </section>
+
     <!-- KURALLAR -->
     <section id="tab-kurallar" class="tab" hidden>
       <input id="ruleSearch" class="search" type="search" placeholder="Ara: iade, limit, yazıcı…" autocomplete="off">
@@ -90,6 +112,7 @@
   <nav class="tabs" aria-label="Bölümler">
     <a href="#doviz" data-tab="doviz"><span aria-hidden="true">💶</span>Döviz</a>
     <a href="#indirim" data-tab="indirim"><span aria-hidden="true">🏷️</span>İndirim</a>
+    <a href="#barkod" data-tab="barkod"><span aria-hidden="true">▥</span>Barkod</a>
     <a href="#kurallar" data-tab="kurallar"><span aria-hidden="true">📋</span>Kurallar</a>
     <a href="#ifadeler" data-tab="ifadeler"><span aria-hidden="true">🗣️</span>İfadeler</a>
   </nav>

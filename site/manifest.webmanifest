@@ -16,6 +16,7 @@
   "shortcuts": [
     { "name": "Döviz", "url": "./#doviz", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
     { "name": "İndirim", "url": "./#indirim", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Barkod", "url": "./#barkod", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
     { "name": "Kurallar", "url": "./#kurallar", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
     { "name": "İfadeler", "url": "./#ifadeler", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]

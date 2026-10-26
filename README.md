@@ -8,6 +8,7 @@ Kasiyerler için hızlı, hafif bir yardımcı uygulama. Telefonda "lazım olunc
 |---|---|
 | 💶 **Döviz** | Satış tutarı + karışık para birimiyle ödeme → kalan tutar veya para üstü (her para biriminde), para üstünün küpür dağılımı, "Müşteriye göster" tam ekranı |
 | 🏷️ **İndirim** | % indirim, N al M öde, ikinci ürüne % hesapları; sonucu tek dokunuşla Döviz'e aktarma |
+| ▥ **Barkod** | Yazılan kodu ekranda barkod olarak çizer (8/13 haneli rakam → EAN-8/EAN-13, diğerleri → Code 128); kasadaki okuyucuyla ekrandan okutulur. Sık kodlar telefona kaydedilir, ortak kodlar `barkodlar.json`'dan gelir |
 | 📋 **Kurallar** | Aranabilir kural / limit / arıza / acil durum kartları |
 | 🗣️ **İfadeler** | 16 kasa cümlesi, 7 dilde (EN, DE, RU, AR, FR, ES, ZH); dokununca müşteriye büyük gösterilir |
 | ⚙ **Ayarlar** | Günlük kurlar (yalnızca o telefonda saklanır), yazdırılabilir **Kasa kartı** |
@@ -21,6 +22,7 @@ Uygulama simgesine basılı tutunca (Android) doğrudan sekmeye giden kısayolla
 - `kurallar.json` — `baslik`, `kategori`, `metin` (`\n` = yeni satır), `kart` (`true` ise Kasa kartı çıktısına girer)
 - `kampanyalar.json` — `tip`: `yuzde` (+`oran`), `nAlMOde` (+`n`, `m`), `ikinciye` (+`oran`)
 - `ifadeler.json` — her cümle için `tr` ve dil kodları
+- `barkodlar.json` — herkesin göreceği ortak kodlar: `{ "name": "Poşet", "code": "…" }`
 
 > Şu anki kural ve kampanyalar **ÖRNEK**tir; gerçek içerikle değiştirin.
 

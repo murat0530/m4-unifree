@@ -132,6 +132,28 @@ input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1
 }
 .chip.on { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 
+/* Barkod */
+.code-input { width: 100%; font-size: 22px; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .04em; }
+.code-out:empty { display: none; }
+.code-out {
+  margin-top: 12px; padding: 16px 0 10px; border-radius: var(--radius);
+  background: #fff; color: #000; text-align: center;
+}
+.code-out svg, .show-body svg { display: block; margin: 0 auto; }
+.code-out .code-text { font: 600 18px ui-monospace, Menlo, Consolas, monospace; letter-spacing: .12em; margin-top: 6px; }
+.code-out .code-type { font-size: 12px; color: #666; }
+.code-out.error { background: var(--surface); color: var(--warn); padding: 12px 16px; text-align: start; }
+.save-row { margin-top: 8px; }
+.grow-0 { flex: none; }
+.code-item { display: flex; gap: 8px; margin-bottom: 8px; }
+.code-item .open {
+  flex: 1; min-width: 0; text-align: start; font: inherit; color: var(--text);
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 14px;
+}
+.code-item .open b { display: block; }
+.code-item .open span { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+.show-body .code-text { font: 700 clamp(18px, 5vw, 28px) ui-monospace, Menlo, Consolas, monospace; letter-spacing: .12em; margin-top: 10px; }
+
 /* Kurallar */
 .card {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);

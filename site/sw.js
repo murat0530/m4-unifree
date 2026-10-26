@@ -1,16 +1,18 @@
 // Çevrimdışı ve anında açılış: önce önbellekten ver, arka planda güncelle.
 // Uygulama dosyaları değiştiğinde VERSION'ı artırın.
-const VERSION = 'm4kasa-v1';
+const VERSION = 'm4kasa-v2';
 const SHELL = [
   './',
   'index.html',
   'app.css',
   'app.js',
   'calc.js',
+  'barcode.js',
   'manifest.webmanifest',
   'data/kurallar.json',
   'data/kampanyalar.json',
   'data/ifadeler.json',
+  'data/barkodlar.json',
   'icons/icon-192.png',
 ];
 

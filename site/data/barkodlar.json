@@ -1,0 +1,4 @@
+{
+  "_not": "Tüm kasiyerlerin göreceği ortak kodlar. Örnek: { \"name\": \"Poşet\", \"code\": \"1234567890128\" }. Boş bırakılırsa bölüm görünmez.",
+  "barkodlar": []
+}
