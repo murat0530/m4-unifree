@@ -1,5 +1,5 @@
 import {
-  CURRENCIES, parseAmount, parseRate, formatAmount, settle, breakdown,
+  CURRENCIES, parseAmount, parseRate, formatAmount, settle, breakdown, toTry, fromTry,
   percentOff, buyNPayM, secondItemOff,
 } from './calc.js';
 import { autoEncode } from './barcode.js';
@@ -92,6 +92,7 @@ function openSettings() {
   $('rateError').hidden = true;
   $('settingsOverlay').hidden = false;
 }
+let rateWarnedFor = null;
 function saveRates() {
   const next = {};
   for (const c of FOREIGN) {
@@ -105,6 +106,18 @@ function saveRates() {
     }
     next[c] = v;
   }
+  // Şüpheli kur: 1'in altında ya da diğerlerinden 2 kattan fazla farklı. İkinci "Kaydet" onaylar.
+  const vals = Object.values(next);
+  const odd = vals.length && (Math.min(...vals) < 1 || Math.max(...vals) / Math.min(...vals) > 2);
+  const key = JSON.stringify(next);
+  if (odd && rateWarnedFor !== key) {
+    rateWarnedFor = key;
+    const list = Object.entries(next).map(([c, v]) => `1 ${CURRENCIES[c].symbol} = ${String(v).replace('.', ',')} ₺`).join(', ');
+    $('rateError').textContent = `Kurlar birbirinden çok farklı görünüyor (${list}). Her kur "1 birim kaç TL" olmalı. Doğruysa tekrar Kaydet'e dokunun.`;
+    $('rateError').hidden = false;
+    return;
+  }
+  rateWarnedFor = null;
   state.rates = next;
   state.ratesAt = Date.now();
   save();
@@ -125,15 +138,17 @@ function addPaymentRow(cur = state.saleCur, amount = '') {
   const select = el('select', { class: 'cur-select', 'aria-label': 'Ödeme para birimi' });
   curOptions(select, cur);
   const row = el('div', { class: 'pay-row' }, [input, select]);
+  const hint = el('div', { class: 'pay-hint' });
+  const wrap = el('div', { class: 'pay' }, [row, hint]);
   if ($('payments').children.length > 0) {
     row.append(el('button', {
       class: 'del-btn', type: 'button', 'aria-label': 'Ödemeyi sil', text: '✕',
-      onclick: () => { row.remove(); renderDoviz(); },
+      onclick: () => { wrap.remove(); renderDoviz(); },
     }));
   }
   input.addEventListener('input', renderDoviz);
   select.addEventListener('change', renderDoviz);
-  $('payments').append(row);
+  $('payments').append(wrap);
   return input;
 }
 
@@ -150,12 +165,30 @@ function renderDoviz() {
   }
   const payments = [];
   let invalid = false;
-  for (const row of $('payments').children) {
-    const [input, select] = row.querySelectorAll('input, select');
+  for (const wrap of $('payments').children) {
+    const [input, select] = wrap.querySelectorAll('input, select');
+    const hint = wrap.querySelector('.pay-hint');
+    hint.textContent = '';
+    hint.classList.remove('warn-text');
     if (!input.value.trim()) continue;
     const a = parseAmount(input.value);
-    if (a == null) { invalid = true; continue; }
+    if (a == null) {
+      invalid = true;
+      hint.textContent = 'Tutar anlaşılamadı. Örnek: 1000 veya 1.000,50';
+      hint.classList.add('warn-text');
+      continue;
+    }
     payments.push({ amount: a, currency: select.value });
+    // Her ödemenin satış para birimindeki karşılığı: yanlış birim/kur hemen göze çarpsın
+    if (select.value !== state.saleCur) {
+      try {
+        const v = fromTry(toTry(a, select.value, state.rates), state.saleCur, state.rates, 'down');
+        hint.textContent = `${formatAmount(a, select.value)} = ${formatAmount(v, state.saleCur)}`;
+      } catch {
+        hint.textContent = `${select.value} kuru girilmemiş`;
+        hint.classList.add('warn-text');
+      }
+    }
   }
   const saleObj = { amount: sale, currency: state.saleCur };
 
@@ -201,6 +234,13 @@ function renderDoviz() {
     if (b.rest > 0) children.push(el('div', { class: 'sub', text: `Küsurat: ${formatAmount(b.rest, c)} (bozuk para yok)` }));
   }
   if (invalid) children.push(el('div', { class: 'sub warn-text', text: 'Geçersiz bir ödeme tutarı yok sayıldı.' }));
+  const used = [...new Set([saleObj.currency, ...payments.map((p) => p.currency)])].filter((c) => c !== 'TRY');
+  if (used.length) {
+    children.push(el('div', {
+      class: 'sub',
+      text: 'Kur: ' + used.map((c) => `1 ${CURRENCIES[c].symbol} = ${state.rates[c].toLocaleString('tr-TR', { maximumFractionDigits: 4 })} ₺`).join(' · '),
+    }));
+  }
   box.replaceChildren(...children);
 }
 // Diğer para birimlerindeki karşılıklar; para üstünde dokunulan birim seçilir.
