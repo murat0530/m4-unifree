@@ -14,6 +14,7 @@
 #  TEMİZ SU (soğuk / sıcak kullanım suyu)
 #  Yöntem: DIN 1988-300 (TS EN 806-3 ile uyumlu, detaylı yöntem)
 #  Pik debi: Vs = a·(ΣVR)^b − c   (0,2 ≤ ΣVR ≤ 500 l/s)
+#    ΣVR < 0,2 l/s ise Vs = ΣVR ; her durumda Vs ≥ en büyük tekil VR
 # ---------------------------------------------------------------------
 temiz_su:
   # VR: hesap debisi [l/s], pmin: minimum akış basıncı [bar]
@@ -35,6 +36,7 @@ temiz_su:
   # DIN 1988-300 Tablo 2 — pik debi sabitleri
   pik_debi_sabitleri:
     konut:    {a: 1.48, b: 0.19, c: 0.94, ad: "Konut"}
+    huzurevi: {a: 1.40, b: 0.14, c: 0.92, ad: "Huzurevi / bakımevi"}
     otel:     {a: 0.70, b: 0.48, c: 0.13, ad: "Otel"}
     hastane:  {a: 0.75, b: 0.44, c: 0.18, ad: "Hastane (yataklı bölüm)"}
     okul:     {a: 0.91, b: 0.31, c: 0.38, ad: "Okul"}
@@ -126,15 +128,26 @@ atik_su:
     yer_suzgeci_DN70:     {ad: "Yer süzgeci DN70",          DU: 1.5}
     yer_suzgeci_DN100:    {ad: "Yer süzgeci DN100",         DU: 2.0}
 
-  # Tablo 5 — Havalandırmalı yatay bağlantı hatları, Sistem I: DN → Qmax [l/s]
+  # Tablo 7 — Havalandırmalı bağlantı hatları, Sistem I: DN → Qmax [l/s]
+  #   DN80: WC bağlanamaz; DN90: en fazla 2 WC ve toplam yön değişimi ≤ 90°
   yatay_havalandirmali: {50: 0.75, 60: 1.50, 70: 2.25, 80: 3.00, 90: 3.40, 100: 3.75}
-  # Tablo 6 — Havalandırmasız yatay bağlantı hatları, Sistem I (standart nüshanızla doğrulayın)
+  # Tablo 8 — Havalandırmalı bağlantı hattı sınırları, Sistem I (dirsek sayısı sınırsız)
+  havalandirmali_sinirlar:
+    max_uzunluk_m: 10.0
+    max_dirsek: null
+    max_dusey_dusus_m: 3.0
+    min_egim_yuzde: 0.5
+  # Tablo 4 — Havalandırmasız bağlantı hatları, Sistem I: DN → Qmax [l/s]
+  #   DN80: WC bağlanamaz; DN90: en fazla 2 WC ve toplam yön değişimi ≤ 90°
   yatay_havalandirmasiz: {40: 0.50, 50: 0.80, 60: 1.00, 70: 1.50, 80: 2.00, 90: 2.25, 100: 2.50}
+  # Tablo 5 — Havalandırmasız bağlantı hattı sınırları, Sistem I (bağlantı dirseği hariç)
   havalandirmasiz_sinirlar:
     max_uzunluk_m: 4.0
     max_dirsek: 3
     max_dusey_dusus_m: 1.0
     min_egim_yuzde: 1.0
+  # Tablo 4/7 dipnotları: bu DN'lerde WC kısıtı (0 = WC yasak)
+  wc_sinir_DN: {80: 0, 90: 2}
 
   # Tablo 11 — Birincil havalandırmalı kolon: DN → [köşeli giriş, yuvarlatılmış/45° giriş] Qmax [l/s]
   kolon_birincil:
@@ -146,16 +159,22 @@ atik_su:
     125: [5.8, 7.6]
     150: [9.5, 12.4]
     200: [16.0, 21.0]
-  # Tablo 12 — İkincil havalandırmalı kolon (standart nüshanızla doğrulayın)
+  # Tablo 12 — İkincil havalandırmalı kolon (ikincil havalandırma DN: 50/50/50/50/50/70/80/100)
   kolon_ikincil:
+    60: [0.7, 0.9]
+    70: [2.0, 2.6]
+    80: [2.6, 3.4]
+    90: [3.5, 4.6]
     100: [5.6, 7.3]
     125: [7.6, 10.0]
     150: [12.4, 18.3]
     200: [21.0, 27.3]
 
-  # WC bağlanan hat/kolon minimum DN. EN 12056-2 DN80/90'a koşullu izin
-  # verir; Türkiye uygulamasında DN100 yerleşik pratiktir.
+  # WC bağlanan KOLON minimum DN — Tablo 11/12 dipnotu (Sistem I): DN100.
+  # Bağlantı hatlarında standart DN90'a (≤2 WC) izin verir; Türkiye
+  # uygulamasında WC bağlantısı da DN100 yapılır → aşağıdaki değer.
   wc_min_DN: 100
+  wc_min_DN_baglanti: 100
 
   # Kollektör (yatay toplama) hidrolik hesap — Prandtl-Colebrook, Ek B
   kollektor:
@@ -166,8 +185,9 @@ atik_su:
     min_egim_yuzde: 1.0
     min_hiz_ms: 0.5             # kendini temizleme (uyarı)
     max_hiz_ms: 3.0             # (uyarı)
-  min_egim_baglanti_yuzde: 1.0
 
+  # Tablo 1 — DN için minimum iç çap [mm]; gerçek iç çap bunun altına düşmemeli
+  min_ic_cap: {30: 26, 40: 34, 50: 44, 56: 49, 60: 56, 70: 68, 80: 75, 90: 79, 100: 96, 125: 113, 150: 146, 200: 184, 225: 207, 250: 230, 300: 290}
   # DN → gerçek iç çap [mm] (PVC/PP tipik; boru serinize göre güncelleyin)
   ic_caplar: {40: 36, 50: 46, 60: 56, 70: 71, 80: 75, 90: 84, 100: 103, 125: 118, 150: 152, 200: 190, 250: 237, 300: 285}
 
