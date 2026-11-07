@@ -1,0 +1,240 @@
+# =====================================================================
+#  TESİSAT HESAP KURALLARI — VARSAYILAN KÜTÜPHANE
+# =====================================================================
+#  Bu dosyadaki tüm değerler proje dosyasındaki `kurallar_ek:` bölümüyle
+#  (veya --kurallar parametresiyle verilen bir dosyayla) ezilebilir.
+#
+#  ÖNEMLİ: Değerler ilgili standartların yaygın kullanılan tablolarından
+#  derlenmiştir. Resmî proje onayından önce, elinizdeki lisanslı standart
+#  nüshası ve yerel yönetmelik/idare şartnamesi ile karşılaştırın.
+#  Her değerin yanında kaynağı belirtilmiştir.
+# =====================================================================
+
+# ---------------------------------------------------------------------
+#  TEMİZ SU (soğuk / sıcak kullanım suyu)
+#  Yöntem: DIN 1988-300 (TS EN 806-3 ile uyumlu, detaylı yöntem)
+#  Pik debi: Vs = a·(ΣVR)^b − c   (0,2 ≤ ΣVR ≤ 500 l/s)
+# ---------------------------------------------------------------------
+temiz_su:
+  # VR: hesap debisi [l/s], pmin: minimum akış basıncı [bar]
+  # Kaynak: DIN 1988-300 Tablo A.1 / üretici değerleri (tipik)
+  armaturler:
+    lavabo:              {ad: "Lavabo bataryası",            VR_soguk: 0.07, VR_sicak: 0.07, pmin_bar: 1.0}
+    evye:                {ad: "Evye bataryası",              VR_soguk: 0.07, VR_sicak: 0.07, pmin_bar: 1.0}
+    dus:                 {ad: "Duş bataryası",               VR_soguk: 0.15, VR_sicak: 0.15, pmin_bar: 1.0}
+    kuvet:               {ad: "Küvet bataryası",             VR_soguk: 0.15, VR_sicak: 0.15, pmin_bar: 1.0}
+    bide:                {ad: "Bide bataryası",              VR_soguk: 0.07, VR_sicak: 0.07, pmin_bar: 1.0}
+    klozet_rezervuar:    {ad: "Klozet (rezervuarlı)",        VR_soguk: 0.13, VR_sicak: 0.0,  pmin_bar: 0.5}
+    klozet_basincli_DN20: {ad: "Klozet (basınçlı yıkama DN20)", VR_soguk: 1.0, VR_sicak: 0.0,  pmin_bar: 1.2}
+    pisuvar_basincli:    {ad: "Pisuvar (basınçlı yıkama)",   VR_soguk: 0.30, VR_sicak: 0.0,  pmin_bar: 1.0}
+    bulasik_makinesi:    {ad: "Bulaşık makinesi",            VR_soguk: 0.07, VR_sicak: 0.0,  pmin_bar: 1.0}
+    camasir_makinesi:    {ad: "Çamaşır makinesi",            VR_soguk: 0.15, VR_sicak: 0.0,  pmin_bar: 1.0}
+    musluk_DN15:         {ad: "Musluk DN15 (bahçe/temizlik)", VR_soguk: 0.30, VR_sicak: 0.0, pmin_bar: 0.5}
+    ayak_yikama:         {ad: "Abdest/ayak yıkama musluğu",  VR_soguk: 0.07, VR_sicak: 0.07, pmin_bar: 1.0}
+
+  # DIN 1988-300 Tablo 2 — pik debi sabitleri
+  pik_debi_sabitleri:
+    konut:    {a: 1.48, b: 0.19, c: 0.94, ad: "Konut"}
+    otel:     {a: 0.70, b: 0.48, c: 0.13, ad: "Otel"}
+    hastane:  {a: 0.75, b: 0.44, c: 0.18, ad: "Hastane (yataklı bölüm)"}
+    okul:     {a: 0.91, b: 0.31, c: 0.38, ad: "Okul"}
+    ofis:     {a: 0.91, b: 0.31, c: 0.38, ad: "İdari bina / ofis"}
+
+  # Maksimum hesap hızı [m/s] — hat tipine göre
+  # DIN 1988-300 Tablo 3: bağlantı hatları 2 m/s. Dağıtım hatlarında
+  # standart daha yükseğe izin verir; gürültü/darbe için 2 m/s önerilir.
+  hiz_siniri_ms:
+    baglanti: 2.0
+    dagitim: 2.0
+    kolon: 2.0
+    ana: 2.0
+
+  # TS EN 806-2: musluk noktalarında statik basınç 5 bar'ı aşmamalı
+  # (aşarsa basınç düşürücü gerekir).
+  max_statik_basinc_bar: 5.0
+  # Başlangıç basıncı "auto" ise eklenecek emniyet payı [bar]
+  hidrofor_emniyet_payi_bar: 0.3
+
+  # Yerel kayıp katsayıları ζ (tipik değerler, üretici kataloğu ile güncelleyin)
+  zeta:
+    dirsek_90: 1.2
+    dirsek_45: 0.5
+    te_gecis: 0.3
+    te_ayrilma: 1.3
+    te_birlesme: 0.9
+    reduksiyon: 0.4
+    kuresel_vana: 0.3
+    surgulu_vana: 0.3
+    ventil_vana: 4.0
+    cekvalf: 2.5
+    pislik_tutucu: 2.0
+    kollektor_cikis: 1.0
+
+  # Boru serileri: anma → iç çap [mm], pürüzlülük k [mm]
+  boru_serileri:
+    PPR_PN20:            # TS EN ISO 15874, SDR 6
+      puruzluluk_mm: 0.007
+      caplar: {"20": 13.2, "25": 16.6, "32": 21.2, "40": 26.6, "50": 33.4, "63": 42.0, "75": 50.0, "90": 60.0, "110": 73.4}
+    PPR_PN16:            # SDR 7,4
+      puruzluluk_mm: 0.007
+      caplar: {"20": 14.4, "25": 18.0, "32": 23.2, "40": 29.0, "50": 36.2, "63": 45.8, "75": 54.4, "90": 65.4, "110": 79.8}
+    PEX_AL_PEX:          # çok katmanlı
+      puruzluluk_mm: 0.007
+      caplar: {"16": 12.0, "20": 16.0, "26": 20.0, "32": 26.0, "40": 33.0, "50": 42.0, "63": 54.0}
+    BAKIR:               # TS EN 1057
+      puruzluluk_mm: 0.0015
+      caplar: {"15": 13.0, "18": 16.0, "22": 20.0, "28": 26.0, "35": 32.6, "42": 39.6, "54": 51.0, "76": 72.0}
+    GALVANIZ:            # TS EN 10255 orta seri, eskimiş boru pürüzlülüğü
+      puruzluluk_mm: 0.15
+      caplar: {"15": 16.1, "20": 21.7, "25": 27.3, "32": 36.0, "40": 41.9, "50": 53.1, "65": 68.9, "80": 80.9, "100": 105.3}
+
+# ---------------------------------------------------------------------
+#  ATIK (PİS) SU — TS EN 12056-2, Sistem I
+#  (tek kolon, kısmi dolu yatay bağlantılar, dolma oranı 0,5)
+#  Qww = K·√ΣDU ; Qww ≥ en büyük tek DU
+# ---------------------------------------------------------------------
+atik_su:
+  # Tablo 3 — Kullanım sıklık faktörü K
+  K:
+    konut: 0.5
+    ofis: 0.5
+    pansiyon: 0.5
+    otel: 0.7
+    okul: 0.7
+    hastane: 0.7
+    restoran: 0.7
+    umumi_wc: 1.0
+    laboratuvar: 1.2
+
+  # Tablo 2 — Tahliye birimleri DU [l/s], Sistem I
+  armaturler:
+    lavabo:               {ad: "Lavabo",                    DU: 0.5}
+    bide:                 {ad: "Bide",                      DU: 0.5}
+    dus_tapasiz:          {ad: "Duş (tapasız)",             DU: 0.6}
+    dus_tapali:           {ad: "Duş (tapalı)",              DU: 0.8}
+    pisuvar_rezervuarli:  {ad: "Pisuvar (rezervuarlı)",     DU: 0.8}
+    pisuvar_basincli:     {ad: "Pisuvar (basınçlı yıkama)", DU: 0.5}
+    kuvet:                {ad: "Küvet",                     DU: 0.8}
+    evye:                 {ad: "Evye",                      DU: 0.8}
+    bulasik_makinesi:     {ad: "Bulaşık makinesi (ev)",     DU: 0.8}
+    camasir_makinesi:     {ad: "Çamaşır makinesi ≤6 kg",    DU: 0.8}
+    camasir_makinesi_12kg: {ad: "Çamaşır makinesi ≤12 kg",  DU: 1.5}
+    klozet_6L:            {ad: "Klozet 6 L rezervuar",      DU: 2.0, wc: true}
+    klozet_7_5L:          {ad: "Klozet 7,5 L rezervuar",    DU: 2.0, wc: true}
+    klozet_9L:            {ad: "Klozet 9 L rezervuar",      DU: 2.5, wc: true}
+    yer_suzgeci_DN50:     {ad: "Yer süzgeci DN50",          DU: 0.8}
+    yer_suzgeci_DN70:     {ad: "Yer süzgeci DN70",          DU: 1.5}
+    yer_suzgeci_DN100:    {ad: "Yer süzgeci DN100",         DU: 2.0}
+
+  # Tablo 5 — Havalandırmalı yatay bağlantı hatları, Sistem I: DN → Qmax [l/s]
+  yatay_havalandirmali: {50: 0.75, 60: 1.50, 70: 2.25, 80: 3.00, 90: 3.40, 100: 3.75}
+  # Tablo 6 — Havalandırmasız yatay bağlantı hatları, Sistem I (standart nüshanızla doğrulayın)
+  yatay_havalandirmasiz: {40: 0.50, 50: 0.80, 60: 1.00, 70: 1.50, 80: 2.00, 90: 2.25, 100: 2.50}
+  havalandirmasiz_sinirlar:
+    max_uzunluk_m: 4.0
+    max_dirsek: 3
+    max_dusey_dusus_m: 1.0
+    min_egim_yuzde: 1.0
+
+  # Tablo 11 — Birincil havalandırmalı kolon: DN → [köşeli giriş, yuvarlatılmış/45° giriş] Qmax [l/s]
+  kolon_birincil:
+    60: [0.5, 0.7]
+    70: [1.5, 2.0]
+    80: [2.0, 2.6]
+    90: [2.7, 3.5]
+    100: [4.0, 5.2]
+    125: [5.8, 7.6]
+    150: [9.5, 12.4]
+    200: [16.0, 21.0]
+  # Tablo 12 — İkincil havalandırmalı kolon (standart nüshanızla doğrulayın)
+  kolon_ikincil:
+    100: [5.6, 7.3]
+    125: [7.6, 10.0]
+    150: [12.4, 18.3]
+    200: [21.0, 27.3]
+
+  # WC bağlanan hat/kolon minimum DN. EN 12056-2 DN80/90'a koşullu izin
+  # verir; Türkiye uygulamasında DN100 yerleşik pratiktir.
+  wc_min_DN: 100
+
+  # Kollektör (yatay toplama) hidrolik hesap — Prandtl-Colebrook, Ek B
+  kollektor:
+    puruzluluk_mm: 1.0          # EN 12056-2 Ek B: kb = 1,0 mm
+    kinematik_viskozite: 1.31e-6
+    max_dolma_bina_ici: 0.5     # h/d
+    max_dolma_bina_disi: 0.7    # h/d
+    min_egim_yuzde: 1.0
+    min_hiz_ms: 0.5             # kendini temizleme (uyarı)
+    max_hiz_ms: 3.0             # (uyarı)
+  min_egim_baglanti_yuzde: 1.0
+
+  # DN → gerçek iç çap [mm] (PVC/PP tipik; boru serinize göre güncelleyin)
+  ic_caplar: {40: 36, 50: 46, 60: 56, 70: 71, 80: 75, 90: 84, 100: 103, 125: 118, 150: 152, 200: 190, 250: 237, 300: 285}
+
+# ---------------------------------------------------------------------
+#  HAVALANDIRMA — EN 16798-1 / EN 16798-3
+# ---------------------------------------------------------------------
+havalandirma:
+  # Mahal tipleri. taze: kişi başı [l/s·kişi] + alan başı [l/s·m²]
+  # egzoz_ls: sabit egzoz [l/s], egzoz_ach: hava değişimi [1/h],
+  # egzoz_armatur_m3h: armatür başına egzoz [m³/h]
+  # basinc: "negatif" → egzoz > taze hava olmalı
+  mahal_tipleri:
+    ofis:       {ad: "Ofis",            taze_kisi_ls: 7.0, taze_alan_ls_m2: 0.7, m2_kisi: 10.0, kaynak: "EN 16798-1 Kat. II, az kirletici bina"}
+    toplanti:   {ad: "Toplantı odası",  taze_kisi_ls: 7.0, taze_alan_ls_m2: 0.7, m2_kisi: 2.5,  kaynak: "EN 16798-1 Kat. II"}
+    sinif:      {ad: "Derslik",         taze_kisi_ls: 7.0, taze_alan_ls_m2: 0.7, m2_kisi: 2.0,  kaynak: "EN 16798-1 Kat. II"}
+    restoran:   {ad: "Restoran salonu", taze_kisi_ls: 7.0, taze_alan_ls_m2: 0.7, m2_kisi: 1.5,  kaynak: "EN 16798-1 Kat. II"}
+    magaza:     {ad: "Mağaza",          taze_kisi_ls: 7.0, taze_alan_ls_m2: 0.7, m2_kisi: 7.0,  kaynak: "EN 16798-1 Kat. II"}
+    koridor:    {ad: "Koridor",         taze_kisi_ls: 0.0, taze_alan_ls_m2: 0.7, m2_kisi: 0,    kaynak: "EN 16798-1 Kat. II (yalnız bina yükü)"}
+    konut_banyo:  {ad: "Konut banyo",   egzoz_ls: 15.0, basinc: negatif, kaynak: "EN 16798-1 Tablo B.8, Kat. II"}
+    konut_wc:     {ad: "Konut WC",      egzoz_ls: 10.0, basinc: negatif, kaynak: "EN 16798-1 Tablo B.8, Kat. II"}
+    konut_mutfak: {ad: "Konut mutfak",  egzoz_ls: 20.0, basinc: negatif, kaynak: "EN 16798-1 Tablo B.8, Kat. II"}
+    genel_wc:   {ad: "Genel WC",        egzoz_ach: 10.0, egzoz_armatur_m3h: 50.0, basinc: negatif, kaynak: "Uygulama pratiği (idare şartnamesine göre güncelleyin)"}
+    otopark:    {ad: "Kapalı otopark",  egzoz_ach: 6.0, basinc: negatif, kaynak: "Normal işletme 6/h; yangın durumu için ayrı hesap (yangın yönetmeliği)"}
+    depo:       {ad: "Depo",            egzoz_ach: 1.0, kaynak: "Uygulama pratiği"}
+  # Taze hava terminali "auto" olan mahalde egzoz/taze oranı (dengeli mahal için)
+  egzoz_taze_orani: 0.9
+
+  # Maksimum hava hızı [m/s] — konfor uygulaması (düşük hızlı sistem)
+  hiz_siniri_ms:
+    ana: 6.0
+    brans: 4.5
+    baglanti: 3.0
+  # Kanal boyutlandırma hedef / maksimum özgül sürtünme kaybı [Pa/m]
+  hedef_R_Pa_m: 1.0
+  max_R_Pa_m: 1.5
+  # Kanal malzemesi pürüzlülüğü [mm] (ASHRAE Fundamentals, Duct Design)
+  malzeme_puruzluluk_mm:
+    galvaniz: 0.09
+    spiro: 0.09
+    paslanmaz: 0.05
+    pvc: 0.01
+    flex: 3.0
+  daire_caplar_mm: [100, 125, 160, 200, 250, 315, 355, 400, 450, 500, 560, 630, 710, 800, 900, 1000, 1120, 1250]
+  dikdortgen:
+    adim_mm: 50
+    min_mm: 100
+    max_mm: 2000
+    max_en_boy_orani: 4.0
+  # Yerel kayıp katsayıları ζ (tipik değerler, ASHRAE fitting veritabanı ile güncelleyin)
+  zeta:
+    dirsek_90: 0.25          # yuvarlatılmış, R/D=1,5
+    dirsek_90_keskin: 1.2    # kanatsız köşe
+    dirsek_90_kanatli: 0.35  # yönlendirici kanatlı
+    dirsek_45: 0.15
+    te_gecis: 0.2
+    te_ayrilma: 1.0
+    reduksiyon: 0.05
+    ani_genisleme: 0.5
+    ayar_damperi: 0.3
+    yangin_damperi: 0.5
+    susturucu: 1.5
+    flex_baglanti: 0.5
+    cati_kapagi: 1.0
+  fan_verimi: 0.6
+  emniyet_katsayisi: 1.10
+  # Kollar arası basınç farkı bu oranı aşarsa denge damperi gerekir
+  denge_toleransi: 0.10
+  # EN 16798-3 — SFP sınıfları [W/(m³/s)] üst sınır
+  sfp_siniflari: {SFP0: 300, SFP1: 500, SFP2: 750, SFP3: 1250, SFP4: 2000, SFP5: 3000, SFP6: 4500}
+  hava_sicakligi_C: 20.0
