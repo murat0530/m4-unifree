@@ -52,7 +52,45 @@ Bu rapor BS EN 12056-2:2000 tablolarını görüntü olarak alıntılar. Değerl
 | Genel WC 10 h⁻¹ + 50 m³/h·armatür; otopark 6 h⁻¹ | ⚠️ Uygulama pratiği. İdare şartnamesi ve yangın yönetmeliği esas alınmalı |
 | SFP sınıfları (EN 16798-3) | ⚠️ Teyit edilmeli |
 
-## 5. İncelenen diğer açık kaynak projeler
+## 5. Yangın — BYKHY + TS EN 12845
+
+Birincil kaynak: **BYKHY resmî konsolide metni** ([mevzuat.gov.tr](https://www.mevzuat.gov.tr/MevzuatMetin/21.5.200712937.pdf)). Maddeler metinden doğrudan okundu.
+İkincil kaynak: İtalyan Mühendisler Odası (Nuoro) ders notu *Impianti estinzione* — EN 12845 tabloları alıntılı.
+
+| Değer | Kaynak | Sonuç |
+|---|---|---|
+| Tasarım yoğunluğu ve alanı (DT 2,25/84; OT1 5/72-90; OT2 5/144-180; OT3 5/216-270; OT4 5/360; YT 260-325) | BYKHY Ek-8/B ve EN 12845 Tablo 3 (İtalyan notu) | ✅ İki kaynak birebir aynı |
+| YT-1 yoğunluğu | BYKHY Ek-8/B **7,7**; EN 12845 **7,5** mm/dk | 🔧 Kaynaklar farklı. İhtiyatlı olarak 7,7 alındı. |
+| Su temin süresi 30/60/90 dk | BYKHY md. 92/3 | ✅ |
+| Minimum depo hacmi (Ek-8/A) | BYKHY Ek-8/A | ✅ Tablo okundu. Satır eşleşmeleri PDF düzeninden çıkarıldı. |
+| Dolap/hidrant ek debisi (100/200, 400/1000/1500 l/dk) | BYKHY Ek-8/C | ✅ |
+| Yarı-sert dolap 100 l/dk @ 4 bar; yassı 400 l/dk @ 4 bar; lüle > 9 bar → basınç düşürücü | BYKHY md. 94/1-b-5,6 | ✅ |
+| Dolap aralığı 30 m (sprinkler hattından beslenirse 45 m) | BYKHY md. 94/1-b-2 | ✅ |
+| Hidrant 1900 l/dk @ 7 bar; ring yoksa min DN100 | BYKHY md. 95/2,5 | ✅ |
+| Pompa: kapalı vana ≤ %140; %150 debide ≥ %65; talep ≤ %130 anma; yedek pompa | BYKHY md. 93/1-2 | ✅ |
+| Sprinkler zorunluluk eşikleri (30,50 / 51,50 m; 600 m² otopark; 100 oda/200 yatak; 2000 m² mağaza; 1000 m² parlayıcı) | BYKHY md. 96/2 | ✅ |
+| DT ve OT-1'de sprinkler başına 21 m² | BYKHY md. 96/5 | ✅ (EN 12845 OT için 12 m² der; yönetmelik hükmü uygulandı) |
+| Min. sprinkler basıncı DT 0,70 / OT 0,35 / YT 0,50 bar | İtalyan notu (EN 12845) | ✅ |
+| K faktörleri DT 57, OT 80, YT 80/115 | İtalyan notu (EN 12845 Tablo 37) | ✅ |
+| Min. boru çapı (K ≤ 80 tek sprinkler: 20 mm, diğer: 25 mm) | İtalyan notu (EN 12845 Tablo 36) | ✅ |
+| Sprinkler başına max alan OT2-4: 12 m², YT: 9 m² | İtalyan notu (12 m²), IS 15105 özeti (9 m²) | ✅ / ⚠️ |
+| Hazen-Williams biçimi `6,05·10⁵·Q^1,85/(C^1,85·d^4,87)` | Canute (EN 12845 hesap yazılımı) dokümantasyonu | ✅ |
+| Eşdeğer boy C düzeltmesi `(C/120)^1,85` (C=100 → 0,714) | NICET çalışma kılavuzu | ✅ |
+| Eşdeğer boy tablosu (dirsek, te, vana) | NFPA 13 tablosu (ft→m) | ⚠️ EN 12845 Tablo 39 ile teyit edilmeli. Alarm vanası için üretici değeri girilmeli. |
+| Hız sınırları 6 m/s (vana) / 10 m/s | — | ⚠️ İkincil kaynakta bulunamadı. Lisanslı metinle teyit edilmeli. |
+
+### Hesap motorunun doğrulanması (`tests/test_yangin.py`, 18 test)
+- **Tek sprinkler:** Kaynak basıncı el hesabıyla 2·10⁻⁴ bar içinde aynı.
+- **İtalyan notundaki örnek:** OT2, 144 m², 12 m²/sprinkler → 12 sprinkler, 60 l/dk, 0,5625 bar. Birebir tuttu.
+- **Dallanmış ağ:**
+  - Kütle dengesi sağlanıyor.
+  - Simetrik kollarda debiler eşit.
+  - Her çıkışta Q = K√P geçerli.
+  - Kritik çıkış tam sınırda (oran 1,0000).
+  - Enerji dengesi 10⁻⁶ bar içinde.
+- **Hazen-Williams:** C=120 kaybı, Darcy-Colebrook ile hesaplanan yeni çelik (k = 0,045 mm) kaybı ile eskimiş çelik (k = 0,5 mm) kaybı arasında kalıyor. Bu, iki bağımsız yöntem arasında fiziksel tutarlılık demek.
+
+## 6. İncelenen diğer açık kaynak projeler
 
 | Repo | Gözlem |
 |---|---|

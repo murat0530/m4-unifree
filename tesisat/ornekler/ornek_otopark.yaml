@@ -1,0 +1,707 @@
+# Bu dosya ornek_otopark_olustur.py ile üretilmiştir.
+# Hesap: python -m tesisat hesapla ornekler/ornek_otopark.yaml
+proje:
+  ad: Örnek Konut — Bodrum Kat Kapalı Otopark Yangın Tesisatı
+  isveren: Örnek Yapı A.Ş.
+  adres: Örnek Mah. Örnek Sk. No:1, İstanbul
+  revizyon: '0'
+  hazirlayan: Mak. Müh. ...
+  kontrol: ''
+  onay: ''
+bina:
+  kullanim: konut
+  yapi_yuksekligi_m: 28.5
+  kapali_otopark_m2: 1250
+  kat_adedi: 9
+yangin:
+  tehlike_sinifi: OT2
+  sistem: islak
+  boru_serisi: CELIK_EN10255_ORTA
+  malzeme: celik
+  kaynak:
+    ad: Yangın pompası çıkışı
+    kot_m: -1.0
+  sprinkler_varsayilan:
+    K: 80
+    alan_m2: 11.56
+  yedek_sprinkler: 6
+  pompa:
+    adet_asil: 1
+    adet_yedek: 1
+    emme_basinci_bar: 0.2
+    anma_debi_lpm: 1550
+    anma_basinc_bar: 4.7
+    kapali_vana_basinc_bar: 6.2
+    debi_150_basinc_bar: 3.4
+  depo:
+    hacim_m3: 110
+  hatlar:
+  - id: POMPA-KOL
+    ust: null
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '100'
+    parcalar:
+      kelebek_vana: 2
+      cekvalf: 1
+      dirsek_90: 2
+    vana_noktasi: true
+    aciklama: Pompa basma kollektörü
+  - id: KOLON
+    ust: POMPA-KOL
+    uzunluk_m: 4.2
+    kot_farki_m: 4.2
+    cap: '100'
+    parcalar:
+      alarm_vanasi: 1
+      kelebek_vana: 1
+      dirsek_90: 1
+    vana_noktasi: true
+    aciklama: Alarm vana istasyonu + kolon
+  - id: ANA-1
+    ust: KOLON
+    uzunluk_m: 15.0
+    kot_farki_m: 0.0
+    cap: '100'
+    parcalar:
+      dirsek_90: 1
+    aciklama: Tavan ana dağıtım
+  - id: CM-1
+    ust: ANA-1
+    uzunluk_m: 1.7
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar:
+      te_donus: 1
+  - id: R1-1
+    ust: CM-1
+    uzunluk_m: 1.7
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: S1-1
+    ust: R1-1
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R1-2
+    ust: R1-1
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S1-2
+    ust: R1-2
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R1-3
+    ust: R1-2
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S1-3
+    ust: R1-3
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R1-4
+    ust: R1-3
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar: {}
+  - id: S1-4
+    ust: R1-4
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R1-5
+    ust: R1-4
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S1-5
+    ust: R1-5
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R1-6
+    ust: R1-5
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S1-6
+    ust: R1-6
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: CM-2
+    ust: CM-1
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar: {}
+  - id: R2-1
+    ust: CM-2
+    uzunluk_m: 1.7
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: S2-1
+    ust: R2-1
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R2-2
+    ust: R2-1
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S2-2
+    ust: R2-2
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R2-3
+    ust: R2-2
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S2-3
+    ust: R2-3
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R2-4
+    ust: R2-3
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar: {}
+  - id: S2-4
+    ust: R2-4
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R2-5
+    ust: R2-4
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S2-5
+    ust: R2-5
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R2-6
+    ust: R2-5
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S2-6
+    ust: R2-6
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: CM-3
+    ust: CM-2
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar: {}
+  - id: R3-1
+    ust: CM-3
+    uzunluk_m: 1.7
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: S3-1
+    ust: R3-1
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R3-2
+    ust: R3-1
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S3-2
+    ust: R3-2
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R3-3
+    ust: R3-2
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S3-3
+    ust: R3-3
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R3-4
+    ust: R3-3
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar: {}
+  - id: S3-4
+    ust: R3-4
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R3-5
+    ust: R3-4
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S3-5
+    ust: R3-5
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R3-6
+    ust: R3-5
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S3-6
+    ust: R3-6
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: CM-4
+    ust: CM-3
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar: {}
+  - id: R4-1
+    ust: CM-4
+    uzunluk_m: 1.7
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: S4-1
+    ust: R4-1
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R4-2
+    ust: R4-1
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S4-2
+    ust: R4-2
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R4-3
+    ust: R4-2
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S4-3
+    ust: R4-3
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R4-4
+    ust: R4-3
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar: {}
+  - id: S4-4
+    ust: R4-4
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R4-5
+    ust: R4-4
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S4-5
+    ust: R4-5
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R4-6
+    ust: R4-5
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S4-6
+    ust: R4-6
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: CM-5
+    ust: CM-4
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '65'
+    parcalar: {}
+  - id: R5-1
+    ust: CM-5
+    uzunluk_m: 1.7
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: S5-1
+    ust: R5-1
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R5-2
+    ust: R5-1
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S5-2
+    ust: R5-2
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R5-3
+    ust: R5-2
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S5-3
+    ust: R5-3
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R5-4
+    ust: R5-3
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar: {}
+  - id: S5-4
+    ust: R5-4
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R5-5
+    ust: R5-4
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S5-5
+    ust: R5-5
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R5-6
+    ust: R5-5
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S5-6
+    ust: R5-6
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: CM-6
+    ust: CM-5
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '65'
+    parcalar: {}
+  - id: R6-1
+    ust: CM-6
+    uzunluk_m: 1.7
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: S6-1
+    ust: R6-1
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R6-2
+    ust: R6-1
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S6-2
+    ust: R6-2
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R6-3
+    ust: R6-2
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: S6-3
+    ust: R6-3
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R6-4
+    ust: R6-3
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar: {}
+  - id: S6-4
+    ust: R6-4
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R6-5
+    ust: R6-4
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S6-5
+    ust: R6-5
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: R6-6
+    ust: R6-5
+    uzunluk_m: 3.4
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: S6-6
+    ust: R6-6
+    uzunluk_m: 0.3
+    kot_farki_m: -0.3
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+  - id: YD-HAT-1
+    ust: KOLON
+    uzunluk_m: 18.0
+    kot_farki_m: -1.6
+    cap: '50'
+    parcalar:
+      te_donus: 1
+      dirsek_90: 3
+      surgulu_vana: 1
+    aciklama: Dolap besleme hattı
+  - id: YD-1
+    ust: YD-HAT-1
+    uzunluk_m: 1.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+    cikis: dolap_yari_sert
+    kat: '-1'
+    konum:
+    - 0.0
+    - 0.0
+  - id: YD-HAT-2
+    ust: YD-HAT-1
+    uzunluk_m: 25.0
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      dirsek_90: 2
+  - id: YD-2
+    ust: YD-HAT-2
+    uzunluk_m: 1.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+    cikis: dolap_yari_sert
+    kat: '-1'
+    konum:
+    - 25.0
+    - 0.0
+  senaryolar:
+  - ad: A — En uzak tasarım alanı (R4–R6)
+    acik:
+    - S6-2
+    - S6-3
+    - S6-4
+    - S6-5
+    - S6-6
+    - S5-2
+    - S5-3
+    - S5-4
+    - S5-5
+    - S5-6
+    - S4-4
+    - S4-5
+    - S4-6
+  - ad: B — Yakın tasarım alanı (R1–R3)
+    acik:
+    - S1-2
+    - S1-3
+    - S1-4
+    - S1-5
+    - S1-6
+    - S2-2
+    - S2-3
+    - S2-4
+    - S2-5
+    - S2-6
+    - S3-4
+    - S3-5
+    - S3-6
+  - ad: C — Alan A + yangın dolabı YD-2
+    acik:
+    - S6-2
+    - S6-3
+    - S6-4
+    - S6-5
+    - S6-6
+    - S5-2
+    - S5-3
+    - S5-4
+    - S5-5
+    - S5-6
+    - S4-4
+    - S4-5
+    - S4-6
+    - YD-2
+  - ad: D — İki yangın dolabı
+    acik:
+    - YD-1
+    - YD-2

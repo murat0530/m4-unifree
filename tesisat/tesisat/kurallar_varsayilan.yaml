@@ -258,3 +258,108 @@ havalandirma:
   # EN 16798-3 — SFP sınıfları [W/(m³/s)] üst sınır
   sfp_siniflari: {SFP0: 300, SFP1: 500, SFP2: 750, SFP3: 1250, SFP4: 2000, SFP5: 3000, SFP6: 4500}
   hava_sicakligi_C: 20.0
+
+# ---------------------------------------------------------------------
+#  YANGIN TESİSATI — BYKHY (Binaların Yangından Korunması Hakkında
+#  Yönetmelik, mevzuat.gov.tr konsolide metin) + TS EN 12845
+#  BYKHY md. 96/5: sprinkler tasarımı TS EN 12845'e göre yapılır.
+# ---------------------------------------------------------------------
+yangin:
+  # BYKHY Ek-8/B = TS EN 12845 Tablo 3. Alan: [ıslak/ön etkili, kuru/değişken]
+  # null → yönetmelik bir üst sınıfı işaret eder (LH kuru → OH1, OH4 kuru → YT1)
+  # YT1: BYKHY 7,7 mm/dk, EN 12845 7,5 mm/dk → ihtiyatlı olarak 7,7 alındı.
+  tehlike_siniflari:
+    DT:   {ad: "Düşük Tehlike (LH)",     yogunluk: 2.25, alan: [84, null],  pmin_bar: 0.70, K: [57],      max_alan_m2: 21, sure_dk: 30, grup: dusuk}
+    OT1:  {ad: "Orta Tehlike-1 (OH1)",   yogunluk: 5.0,  alan: [72, 90],    pmin_bar: 0.35, K: [80],      max_alan_m2: 21, sure_dk: 60, grup: orta}
+    OT2:  {ad: "Orta Tehlike-2 (OH2)",   yogunluk: 5.0,  alan: [144, 180],  pmin_bar: 0.35, K: [80],      max_alan_m2: 12, sure_dk: 60, grup: orta}
+    OT3:  {ad: "Orta Tehlike-3 (OH3)",   yogunluk: 5.0,  alan: [216, 270],  pmin_bar: 0.35, K: [80],      max_alan_m2: 12, sure_dk: 60, grup: orta}
+    OT4:  {ad: "Orta Tehlike-4 (OH4)",   yogunluk: 5.0,  alan: [360, null], pmin_bar: 0.35, K: [80],      max_alan_m2: 12, sure_dk: 60, grup: orta}
+    YT1:  {ad: "Yüksek Tehlike-1 (HHP1)", yogunluk: 7.7, alan: [260, 325],  pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9,  sure_dk: 90, grup: yuksek}
+    YT2:  {ad: "Yüksek Tehlike-2 (HHP2)", yogunluk: 10.0, alan: [260, 325], pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9,  sure_dk: 90, grup: yuksek}
+    YT3:  {ad: "Yüksek Tehlike-3 (HHP3)", yogunluk: 12.5, alan: [260, 325], pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9,  sure_dk: 90, grup: yuksek}
+  # Kaynaklar: yoğunluk/alan BYKHY Ek-8/B; süre BYKHY md. 92/3; pmin EN 12845 12.4;
+  # K EN 12845 Tablo 37; max alan: DT/OT1 BYKHY md. 96/5 (21 m²), diğerleri EN 12845.
+
+  # BYKHY Ek-8/C — depo hesabına eklenecek debiler [l/dk] ve süre [dk]
+  ek_su_ihtiyaci:
+    dusuk:   {dolap: 100, hidrant: 400,  sure_dk: 30}
+    orta12:  {dolap: 100, hidrant: 400,  sure_dk: 60}
+    orta34:  {dolap: 100, hidrant: 1000, sure_dk: 60}
+    yuksek:  {dolap: 200, hidrant: 1500, sure_dk: 90}
+
+  # BYKHY Ek-8/A — ön hesap için en az depo hacmi [m³]; h: en alt–en üst sprinkler kot farkı
+  # Satır anahtarı: "sınıf_sistem". Değerler [h≤15, 15<h≤30, 30<h≤45]; null → hidrolik hesap
+  min_depo_m3:
+    DT_islak:  [9, 10, 11]
+    OT1_islak: [55, 70, 80]
+    OT1_kuru:  [105, 125, 140]
+    OT2_islak: [105, 125, 140]
+    OT2_kuru:  [135, 160, 185]
+    OT3_islak: [135, 160, 185]
+    OT3_kuru:  [160, 185, 200]
+    OT4_islak: [160, 185, 200]
+
+  # BYKHY md. 94/1-b (5,6) ve md. 95/2 — çıkış elemanları
+  cikis_tipleri:
+    dolap_yari_sert: {ad: "Yangın dolabı, yarı-sert hortum (TS EN 671-1)", debi_lpm: 100,  basinc_bar: 4.0, max_basinc_bar: 9.0, hortum_max_m: 30}
+    dolap_yassi:     {ad: "Yangın dolabı, yassı hortum (TS EN 671-2)",     debi_lpm: 400,  basinc_bar: 4.0, max_basinc_bar: 9.0, hortum_max_m: 20}
+    hidrant:         {ad: "Yer üstü hidrant",                               debi_lpm: 1900, basinc_bar: 7.0}
+  dolap_araligi_max_m: 30          # md. 94/1-b-2
+  dolap_araligi_sprinklerli_m: 45  # sprinkler branşmanından beslenirse
+  hidrant_min_DN: 100              # md. 95/5 (ring yoksa)
+
+  # BYKHY md. 93/1 — pompa karakteristiği
+  pompa:
+    kapali_vana_max_oran: 1.40     # sıfır debide basınç ≤ %140 anma
+    debi_150_min_basinc_oran: 0.65 # %150 debide basınç ≥ %65 anma
+    yedek_zorunlu: true            # md. 93/2
+
+  # EN 12845 — hız sınırları [m/s] (⚠ lisanslı metinle teyit edilmeli)
+  hiz_max_vana_ms: 6.0
+  hiz_max_ms: 10.0
+  # EN 12845 Tablo 36 — minimum boru çapı [mm]
+  min_cap_K80_alti_mm: 20
+  min_cap_diger_mm: 25
+  # Statik basınç gradyanı [bar/m]
+  statik_bar_m: 0.0981
+
+  # Hazen-Williams C (EN 12845)
+  C_degerleri: {dokme_demir: 100, sfero: 110, celik: 120, galvaniz: 120, paslanmaz: 140, bakir: 140, cpvc: 150}
+
+  # Eşdeğer boylar [m], çelik C=120 için. Kaynak: NFPA 13 eşdeğer boy tablosu
+  # (ft→m). EN 12845 Tablo 39 değerleriyle karşılaştırılmalı (⚠).
+  # Diğer C için katsayı (C/120)^1.85 uygulanır.
+  esdeger_boy_m:
+    dirsek_90:   {20: 0.61, 25: 0.61, 32: 0.91, 40: 1.22, 50: 1.52, 65: 1.83, 80: 2.13, 100: 3.05, 125: 3.66, 150: 4.27, 200: 5.49}
+    dirsek_45:   {20: 0.30, 25: 0.30, 32: 0.30, 40: 0.61, 50: 0.61, 65: 0.91, 80: 0.91, 100: 1.22, 125: 1.52, 150: 2.13, 200: 2.74}
+    te_donus:    {20: 1.22, 25: 1.52, 32: 1.83, 40: 2.44, 50: 3.05, 65: 3.66, 80: 4.57, 100: 6.10, 125: 7.62, 150: 9.14, 200: 10.67}
+    surgulu_vana: {50: 0.30, 65: 0.30, 80: 0.30, 100: 0.61, 125: 0.61, 150: 0.91, 200: 1.22}
+    kelebek_vana: {50: 1.83, 65: 2.13, 80: 3.05, 100: 3.66, 125: 2.74, 150: 3.05, 200: 3.66}
+    cekvalf:     {25: 1.52, 32: 2.13, 40: 2.74, 50: 3.35, 65: 4.27, 80: 4.88, 100: 6.71, 125: 8.23, 150: 9.75, 200: 13.72}
+    alarm_vanasi: {80: 4.88, 100: 6.71, 150: 9.75, 200: 13.72}   # üretici değeri girilmeli; varsayılan = çekvalf
+
+  boru_serileri:
+    CELIK_EN10255_ORTA:   # TS EN 10255 orta seri; DN125/150 aynı et kalınlığı; DN200 219,1×6,3
+      malzeme: celik
+      caplar: {"20": 21.7, "25": 27.3, "32": 36.0, "40": 41.9, "50": 53.1, "65": 68.9, "80": 80.9, "100": 105.3, "125": 130.7, "150": 156.1, "200": 206.5}
+    CELIK_SCH40:          # ASTM A53/A795 Sch 40
+      malzeme: celik
+      caplar: {"25": 26.6, "32": 35.1, "40": 40.9, "50": 52.5, "65": 62.7, "80": 77.9, "100": 102.3, "125": 128.2, "150": 154.1, "200": 202.7}
+
+  # BYKHY md. 96/2 — sprinkler zorunluluğu eşikleri
+  zorunluluk:
+    yapi_yuksekligi_konut_disi_m: 30.50
+    yapi_yuksekligi_konut_m: 51.50
+    kapali_otopark_m2: 600
+    asansorlu_otopark_arac: 10
+    konaklama_oda: 100
+    konaklama_yatak: 200
+    konaklama_yapi_yuksekligi_m: 21.50
+    magaza_m2: 2000
+    parlayici_m2: 1000
+  # BYKHY md. 94/1-b-1 — yangın dolabı zorunluluğu
+  dolap_zorunluluk:
+    kullanim_m2: 1000   # imalathane, atölye, depo, konaklama, sağlık, toplanma, eğitim
+    otopark_m2: 600
+    kazan_kW: 350
+  yedek_sprinkler_min: 6   # md. 96/8
