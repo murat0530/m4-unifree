@@ -44,6 +44,7 @@ class ModulSonucu:
     ozet: dict = field(default_factory=dict)
     tablolar: list[Tablo] = field(default_factory=list)
     bulgular: list[Bulgu] = field(default_factory=list)
+    sekiller: list[dict] = field(default_factory=list)   # {"baslik", "svg"} — modülün ürettiği SVG
 
     def bulgu(self, seviye, nesne, mesaj, referans=""):
         self.bulgular.append(Bulgu(seviye, self.modul, nesne, mesaj, referans))
@@ -55,6 +56,7 @@ class ModulSonucu:
             "ozet": self.ozet,
             "tablolar": [t.sozluk() for t in self.tablolar],
             "bulgular": [b.sozluk() for b in self.bulgular],
+            "sekiller": [x["baslik"] for x in self.sekiller],
         }
 
 

@@ -16,7 +16,7 @@ Proje bilgilerini bir YAML dosyasından okur, hidrolik hesabı yapar ve sonucu y
 cd tesisat
 pip install pyyaml pytest
 python -m tesisat hesapla ornekler/ornek_otopark.yaml -o rapor.html --json sonuc.json
-python -m pytest -q tests        # 18 doğrulama testi
+python -m pytest -q tests        # 31 doğrulama testi
 ```
 
 Çıkış kodları:
@@ -34,25 +34,32 @@ Bu kodlar sayesinde araç CI'da veya bir otomasyonda da kullanılabilir.
 
 1. **Zorunluluk (BYKHY md. 96/2, 94/1-b-1):** Bina bilgilerinden sprinkler ve yangın dolabının zorunlu olup olmadığını belirler. Zorunlu olup projede yoksa HATA verir.
 2. **Tasarım kriterleri (Ek-8/B, EN 12845 Tablo 3):** Tehlike sınıfına ve ıslak/kuru sisteme göre yoğunluğu, tasarım alanını, minimum basıncı ve süreyi atar.
-3. **Tam hidrolik çözüm:**
+3. **Kapsama alanı (plandan):**
+   - Mahal sınırı (çokgen) ve sprinkler koordinatları verilirse, mahal sprinklerler arasında "en yakın sprinkler" kuralıyla bölünür (Voronoi).
+   - Her sprinklerin **gerçekte koruduğu alan** hesaplanır ve hidrolik hesaba bu alan girer (Q_min = yoğunluk × alan).
+   - Kontrol edilenler: korunmayan bölge (✕), sprinkler başına alan, komşu aralığı ≤ S_max, sprinklerler arası ≥ 2 m, duvara uzaklık ≤ 2,0 m (şaşırtmalı yerleşimde 2,3 m, açık kirişte 1,5 m).
+   - Tasarım alanının biçimi kontrol edilir (uzun kenar ≥ 1,2·√A).
+   - Sprinkler konmayan mahal HATA verir. Muaf mahaller (`muaf: true`) BYKHY md. 96/3'e göre gerekçeyle belirtilir.
+   - Raporda renkli bir **kapsama planı** (SVG) yer alır.
+4. **Tam hidrolik çözüm:**
    - Hazen-Williams (p = 6,05·10⁵·Q^1,85 / C^1,85·d^4,87) ve eşdeğer boylar kullanılır.
    - Her açık sprinklerin ve dolabın debisi, o noktadaki gerçek basınçtan hesaplanır (Q = K√P).
    - Ağdaki tüm açık çıkışların gereksinimini karşılayan en düşük pompa çıkış basıncı bulunur.
-4. **Senaryolar:**
+5. **Senaryolar:**
    - Her tasarım alanı (en uzak, en yüksek vb.) ve dolap eşzamanlılığı ayrı ayrı hesaplanır.
    - En büyük basınç talebi belirleyici olur.
    - Dolapla eşzamanlı senaryoda sprinklerler fazla basınç altında daha çok su atar. Bu fiziksel etki hesaba dahildir.
-5. **Kontroller:**
+6. **Kontroller:**
    - Sprinkler kapsama alanı (DT ve OT-1'de 21 m², diğer orta tehlikelerde 12 m², yüksek tehlikede 9 m²)
    - K faktörü (Tablo 37) ve minimum çap (Tablo 36)
    - Hız (vana noktasında 6 m/s, genel 10 m/s)
    - Dolap lüle basıncı (en fazla 9 bar) ve dolap aralığı (30/45 m)
    - Hidrant hattı (en az DN100) ve en az 6 yedek sprinkler
-6. **Pompa (md. 93):**
+7. **Pompa (md. 93):**
    - Önerilen anma noktasını verir.
    - Pompanın tüm senaryo taleplerini karşılayıp karşılamadığını, kapalı vana basıncını (≤ %140) ve %150 debideki basıncı (≥ %65) kontrol eder.
    - Yedek pompa olup olmadığını kontrol eder.
-7. **Depo (md. 92):**
+8. **Depo (md. 92):**
    - Hacim, en büyük sprinkler debisi ile Ek-8/C'deki dolap ve hidrant debisinin toplamı, süreyle çarpılarak bulunur.
    - Ek-8/A ön hesap değeri karşılaştırma için ayrıca gösterilir.
 
@@ -69,7 +76,11 @@ yangin:
   sistem: islak            # islak | kuru
   boru_serisi: CELIK_EN10255_ORTA   # veya CELIK_SCH40
   kaynak: {ad: "Pompa çıkışı", kot_m: -1.0}
-  sprinkler_varsayilan: {K: 80, alan_m2: 11.56}
+  sprinkler_varsayilan: {K: 80}          # alan plandan; plan yoksa alan_m2 girilir
+  mahaller:                # kapsama kontrolü için (koordinatlar metre)
+    - {id: OTP-A, ad: "Otopark A", yerlesim: standart,      # standart | sasirtmali
+       poligon: [[0, 0], [20.4, 0], [20.4, 20.4], [0, 20.4]]}
+    - {id: WC-1, poligon: [...], muaf: true, muaf_nedeni: "ıslak hacim, yanıcı yük yok"}
   yedek_sprinkler: 6
   pompa: {anma_debi_lpm: 1550, anma_basinc_bar: 4.7, kapali_vana_basinc_bar: 6.2,
           debi_150_basinc_bar: 3.4, emme_basinci_bar: 0.2, adet_asil: 1, adet_yedek: 1}
@@ -78,7 +89,8 @@ yangin:
     - {id: KOLON, ust: null, uzunluk_m: 4.2, kot_farki_m: 4.2, cap: "100",
        parcalar: {alarm_vanasi: 1, kelebek_vana: 1, dirsek_90: 1}, vana_noktasi: true}
     - {id: R1-1, ust: KOLON, uzunluk_m: 1.7, cap: "50", parcalar: {te_donus: 1}}
-    - {id: S1-1, ust: R1-1, uzunluk_m: 0.3, kot_farki_m: -0.3, cap: "25", sprinkler: true}
+    - {id: S1-1, ust: R1-1, uzunluk_m: 0.3, kot_farki_m: -0.3, cap: "25", sprinkler: true,
+       mahal: OTP-A, konum: [1.7, 1.7]}
     - {id: YD-1, ust: KOLON, uzunluk_m: 1, cap: "25", cikis: dolap_yari_sert, kat: "-1", konum: [0, 0]}
   senaryolar:
     - {ad: "En uzak alan", acik: [S1-1, ...]}

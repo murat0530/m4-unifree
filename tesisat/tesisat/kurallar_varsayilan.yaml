@@ -269,16 +269,26 @@ yangin:
   # null → yönetmelik bir üst sınıfı işaret eder (LH kuru → OH1, OH4 kuru → YT1)
   # YT1: BYKHY 7,7 mm/dk, EN 12845 7,5 mm/dk → ihtiyatlı olarak 7,7 alındı.
   tehlike_siniflari:
-    DT:   {ad: "Düşük Tehlike (LH)",     yogunluk: 2.25, alan: [84, null],  pmin_bar: 0.70, K: [57],      max_alan_m2: 21, sure_dk: 30, grup: dusuk}
-    OT1:  {ad: "Orta Tehlike-1 (OH1)",   yogunluk: 5.0,  alan: [72, 90],    pmin_bar: 0.35, K: [80],      max_alan_m2: 21, sure_dk: 60, grup: orta}
-    OT2:  {ad: "Orta Tehlike-2 (OH2)",   yogunluk: 5.0,  alan: [144, 180],  pmin_bar: 0.35, K: [80],      max_alan_m2: 12, sure_dk: 60, grup: orta}
-    OT3:  {ad: "Orta Tehlike-3 (OH3)",   yogunluk: 5.0,  alan: [216, 270],  pmin_bar: 0.35, K: [80],      max_alan_m2: 12, sure_dk: 60, grup: orta}
-    OT4:  {ad: "Orta Tehlike-4 (OH4)",   yogunluk: 5.0,  alan: [360, null], pmin_bar: 0.35, K: [80],      max_alan_m2: 12, sure_dk: 60, grup: orta}
-    YT1:  {ad: "Yüksek Tehlike-1 (HHP1)", yogunluk: 7.7, alan: [260, 325],  pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9,  sure_dk: 90, grup: yuksek}
-    YT2:  {ad: "Yüksek Tehlike-2 (HHP2)", yogunluk: 10.0, alan: [260, 325], pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9,  sure_dk: 90, grup: yuksek}
-    YT3:  {ad: "Yüksek Tehlike-3 (HHP3)", yogunluk: 12.5, alan: [260, 325], pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9,  sure_dk: 90, grup: yuksek}
+    DT:   {ad: "Düşük Tehlike (LH)",     yogunluk: 2.25, alan: [84, null],  pmin_bar: 0.70, K: [57],      max_alan_m2: 21, max_aralik_m: 4.6, sure_dk: 30, grup: dusuk}
+    OT1:  {ad: "Orta Tehlike-1 (OH1)",   yogunluk: 5.0,  alan: [72, 90],    pmin_bar: 0.35, K: [80],      max_alan_m2: 21, max_aralik_m: 4.6, sure_dk: 60, grup: orta}
+    OT2:  {ad: "Orta Tehlike-2 (OH2)",   yogunluk: 5.0,  alan: [144, 180],  pmin_bar: 0.35, K: [80],      max_alan_m2: 12, max_aralik_m: 4.0, sure_dk: 60, grup: orta}
+    OT3:  {ad: "Orta Tehlike-3 (OH3)",   yogunluk: 5.0,  alan: [216, 270],  pmin_bar: 0.35, K: [80],      max_alan_m2: 12, max_aralik_m: 4.0, sure_dk: 60, grup: orta}
+    OT4:  {ad: "Orta Tehlike-4 (OH4)",   yogunluk: 5.0,  alan: [360, null], pmin_bar: 0.35, K: [80],      max_alan_m2: 12, max_aralik_m: 4.0, sure_dk: 60, grup: orta}
+    YT1:  {ad: "Yüksek Tehlike-1 (HHP1)", yogunluk: 7.7, alan: [260, 325],  pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9, max_aralik_m: 3.7,  sure_dk: 90, grup: yuksek}
+    YT2:  {ad: "Yüksek Tehlike-2 (HHP2)", yogunluk: 10.0, alan: [260, 325], pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9, max_aralik_m: 3.7,  sure_dk: 90, grup: yuksek}
+    YT3:  {ad: "Yüksek Tehlike-3 (HHP3)", yogunluk: 12.5, alan: [260, 325], pmin_bar: 0.50, K: [80, 115], max_alan_m2: 9, max_aralik_m: 3.7,  sure_dk: 90, grup: yuksek}
   # Kaynaklar: yoğunluk/alan BYKHY Ek-8/B; süre BYKHY md. 92/3; pmin EN 12845 12.4;
   # K EN 12845 Tablo 37; max alan: DT/OT1 BYKHY md. 96/5 (21 m²), diğerleri EN 12845.
+  # max_aralik_m: EN 12845 Tablo 19 standart yerleşim (OT 4,0 m doğrulandı; DT 4,6 ve
+  # YT 3,7 ⚠ teyit edilmeli). OT1'de BYKHY 21 m²'ye izin verdiğinden DT aralığı (4,6) alındı ⚠.
+
+  # TS EN 12845 md. 12.3–12.4 — yerleşim kuralları
+  yerlesim:
+    min_aralik_m: 2.0              # md. 12.3 (kiriş vb. istisnalar mühendis kararı)
+    duvar_max_standart_m: 2.0      # md. 12.4.1 — ayrıca ≤ max_aralik/2
+    duvar_max_sasirtmali_m: 2.3
+    duvar_max_acik_kiris_m: 1.5    # açık kirişli tavan, açık cepheli bina, yanıcı/metal dış duvar
+    alan_farki_uyari_orani: 0.05   # girdi alan_m2 ile plan alanı farkı
 
   # BYKHY Ek-8/C — depo hesabına eklenecek debiler [l/dk] ve süre [dk]
   ek_su_ihtiyaci:

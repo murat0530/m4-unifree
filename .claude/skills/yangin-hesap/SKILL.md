@@ -18,6 +18,8 @@ Hesap motoru: `tesisat/` (Python). Hesabı **asla elle veya tahminle yapma**. He
    - Tekrarlı ağlar (ızgara) için elle yazmak yerine `ornekler/ornek_otopark_olustur.py` gibi küçük bir üretici betik yaz.
    - Her hattın `ust` değeri, beslendiği hattın id'sidir.
    - `kot_farki_m` = bitiş kotu − başlangıç kotu.
+   - **Kapsama alanı:** Her mahal için `mahaller` altında `poligon` ver (çizimden, metre cinsinden). Her sprinklere `mahal` ve `konum: [x, y]` ekle. Alanı elle yazma; araç plandan hesaplar.
+   - Sprinkler konmayan mahaller (ıslak hacim, yangın merdiveni, asansör kuyusu) için `muaf: true` ve `muaf_nedeni` ver (BYKHY md. 96/3).
 3. **Senaryoları tanımla.**
    - Tasarım alanı = BYKHY Ek-8/B alanı. Sprinkler sayısı = ⌈alan / sprinkler başına alan⌉.
    - Alanın uzun kenarı ≥ 1,2·√A olmalı ve branşmanlara paralel uzanmalı.
@@ -34,6 +36,7 @@ Hesap motoru: `tesisat/` (Python). Hesabı **asla elle veya tahminle yapma**. He
    - Depo yetersiz → hesaplanan hacmi yukarı yuvarla.
    - Dolapta 9 bar aşımı → basınç düşürücü ekle (bunu çizime not et).
    - Tasarım alanı eksik → senaryoya sprinkler ekle.
+   - Korunmayan bölge (✕) veya duvar mesafesi aşımı → ilgili sıraya sprinkler ekle ya da ızgarayı kaydır. Bunu çizimde de düzeltmesi için kullanıcıya bildir.
 
    Kullanıcının kararı olan şeyleri (tehlike sınıfı, pompa markası/modeli) kendin değiştirme. Öner ve onay iste.
 6. **Teslim et.**

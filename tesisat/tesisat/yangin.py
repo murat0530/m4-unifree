@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import math
 
+from . import kapsama
 from .ortak import (BILGI, HATA, UYARI, GirdiHatasi, ModulSonucu, Tablo,
                     agac_sirala, yuvarla)
 
@@ -36,7 +37,7 @@ def hiz_ms(q_lpm: float, d_mm: float) -> float:
 # ---------------------------------------------------------------- ağ modeli
 class _Hat:
     __slots__ = ("id", "ust", "L", "dz", "dn", "d", "C", "leq", "vana", "cikis",
-                 "K", "preq", "qmin", "alan", "tip", "ham", "z_son")
+                 "K", "preq", "qmin", "alan", "alan_kaynak", "tip", "ham", "z_son")
 
 
 class YanginAgi:
@@ -85,6 +86,10 @@ class YanginAgi:
             if h.get("ust") is not None:
                 h["ust"] = str(h["ust"])
         sira = agac_sirala(ham_hatlar, "ust", "yangin")
+        self.geo: dict = {}
+        self.geo_alan: dict = {}
+        self.geo_notlar: list = []
+        self._geometri(girdi.get("mahaller") or [], ham_hatlar)
 
         self.hatlar: dict[str, _Hat] = {}
         self.sira: list[str] = []
@@ -110,6 +115,16 @@ class YanginAgi:
             if h.get("sprinkler") is not None:
                 s = h["sprinkler"] if isinstance(h["sprinkler"], dict) else {}
                 s = {**spr_vars, **s}
+                x.alan_kaynak = "girdi"
+                if x.id in self.geo_alan:
+                    plan = self.geo_alan[x.id]
+                    girilen = h["sprinkler"].get("alan_m2") if isinstance(h["sprinkler"], dict) else None
+                    oran = self.k["yerlesim"]["alan_farki_uyari_orani"]
+                    if girilen is not None and abs(girilen - plan) > oran * plan:
+                        self.geo_notlar.append((UYARI, x.id, f"Girilen alan {girilen:g} m² ≠ plandan hesaplanan "
+                                                f"{plan:.2f} m² — plan alanı kullanıldı", ""))
+                    s["alan_m2"] = plan
+                    x.alan_kaynak = "plan"
                 if "K" not in s or "alan_m2" not in s:
                     raise GirdiHatasi(f"yangin/{x.id}: sprinkler için K ve alan_m2 gerekli "
                                       "(veya sprinkler_varsayilan tanımlayın)")
@@ -143,6 +158,66 @@ class YanginAgi:
             raise GirdiHatasi("yangin: ağın tek bir başlangıç hattı olmalı (ust: null olan tek hat)")
 
     # -------------------------------------------------------------
+    def _geometri(self, mahaller: list, ham: list):
+        """Mahal çokgenleri + sprinkler konumlarından kapsama alanları (kapsama.py)."""
+        if not mahaller:
+            return
+        y = self.k["yerlesim"]
+        mh = {}
+        for m in mahaller:
+            mid = str(m.get("id", ""))
+            pol = m.get("poligon") or []
+            if not mid or len(pol) < 3:
+                raise GirdiHatasi(f"yangin.mahaller: id ve en az 3 köşeli poligon gerekli ({m})")
+            mh[mid] = {**m, "poligon": [tuple(map(float, p[:2])) for p in pol]}
+        gruplar: dict = {}
+        for h in ham:
+            if h.get("sprinkler") is None:
+                continue
+            if h.get("mahal") is None:
+                self.geo_notlar.append((UYARI, h["id"], "Sprinklerin mahal/konum bilgisi yok — geometrik "
+                                        "kapsama kontrolü yapılamadı, girilen alan kullanıldı", ""))
+                continue
+            mid = str(h["mahal"])
+            if mid not in mh:
+                raise GirdiHatasi(f"yangin/{h['id']}: mahal '{mid}' tanımlı değil")
+            if not h.get("konum"):
+                raise GirdiHatasi(f"yangin/{h['id']}: mahal verilmiş ama konum [x, y] yok")
+            gruplar.setdefault(mid, {})[h["id"]] = tuple(map(float, h["konum"][:2]))
+        smax = float(self.sinif["max_aralik_m"])
+        ref = "TS EN 12845 md. 12.2–12.4"
+        for mid, m in mh.items():
+            if m.get("acik_kiris"):
+                dmax = y["duvar_max_acik_kiris_m"]
+            elif m.get("yerlesim") == "sasirtmali":
+                dmax = y["duvar_max_sasirtmali_m"]
+            else:
+                dmax = min(y["duvar_max_standart_m"], smax / 2)
+            spr = gruplar.get(mid)
+            if not spr:
+                if m.get("muaf"):
+                    self.geo_notlar.append((BILGI, mid, f"Mahal sprinklerden muaf: {m.get('muaf_nedeni', '')}",
+                                            "BYKHY md. 96/3"))
+                else:
+                    self.geo_notlar.append((HATA, mid, "Mahalde sprinkler yok (muaf ise 'muaf: true' ve "
+                                            "gerekçe girin)", "BYKHY md. 96/3"))
+                continue
+            a = kapsama.mahal_analizi(m["poligon"], spr, smax, dmax, y["min_aralik_m"],
+                                      float(self.sinif["max_alan_m2"]))
+            a.update({"smax": smax, "dmax": dmax, "poligon": m["poligon"], "ad": m.get("ad", mid)})
+            self.geo[mid] = a
+            self.geo_alan.update(a["alanlar"])
+            for tur, nesne, mesaj in a["ihlaller"]:
+                if tur == "alan":
+                    continue  # sprinkler yerleşim kontrolünde raporlanır
+                seviye = UYARI if tur == "yakin" else HATA
+                ek = {"yakin": " (md. 12.3 istisnaları: birbirini ıslatmayacak şekilde ayrılmışsa)",
+                      "aralik": f" (Tablo 19)", "duvar": "", "korunmayan": "", "disarida": ""}[tur]
+                self.geo_notlar.append((seviye, nesne, f"[{a['ad']}] {mesaj}{ek}", ref))
+            if abs(a["hucre_toplami"] - a["mahal_alani"]) > 0.01 * a["mahal_alani"]:
+                self.geo_notlar.append((HATA, mid, f"Hücre toplamı {a['hucre_toplami']:.1f} m² ≠ mahal "
+                                        f"{a['mahal_alani']:.1f} m² (sprinkler mahal dışında olabilir)", ref))
+
     def _esdeger_boy(self, x: _Hat, parcalar: dict) -> float:
         tablo = self.k["esdeger_boy_m"]
         toplam = 0.0
@@ -258,6 +333,19 @@ def hesapla(proje: dict, kurallar: dict) -> ModulSonucu:
 
     _zorunluluk_kontrol(s, ag, bina, k)
     _eleman_kontrol(s, ag, k)
+    for seviye, nesne, mesaj, ref in ag.geo_notlar:
+        s.bulgu(seviye, nesne, mesaj, ref)
+    if ag.geo:
+        tg = Tablo("Kapsama alanı kontrolü (plandan)", ["Mahal", "Mahal alanı m²", "Sprinkler",
+                   "Σ hücre m²", "Min hücre m²", "Max hücre m²", "Max aralık m", "Max duvar m",
+                   "R_max m", "İhlal"])
+        for mid, a in ag.geo.items():
+            al = a["alanlar"].values()
+            ihlal = sum(1 for t in a["ihlaller"] if t[0] != "yakin")
+            tg.satirlar.append([a["ad"], yuvarla(a["mahal_alani"]), len(a["idler"]), yuvarla(a["hucre_toplami"]),
+                                yuvarla(min(al)), yuvarla(max(al)), a["smax"], a["dmax"], yuvarla(a["r_max"]),
+                                ihlal or "OK"])
+        s.tablolar.append(tg)
 
     senaryolar = g.get("senaryolar") or []
     if not senaryolar:
@@ -292,6 +380,7 @@ def hesapla(proje: dict, kurallar: dict) -> ModulSonucu:
             s.bulgu(HATA, ad, f"Açık sprinklerlerin toplam kapsama alanı {kapsama:.1f} m² < tasarım alanı "
                     f"{ag.tasarim_alani:g} m² — yaklaşık {eksik} sprinkler daha senaryoya eklenmeli",
                     "BYKHY Ek-8/B, TS EN 12845 Tablo 3")
+        _tasarim_alani_bicimi(s, ag, ad, spr)
         _senaryo_tablolari(s, ag, ad, acik, cz)
         _hiz_kontrol(s, ag, ad, cz, k)
         _dolap_basinc_kontrol(s, ag, ad, diger, cz)
@@ -301,6 +390,7 @@ def hesapla(proje: dict, kurallar: dict) -> ModulSonucu:
         s.bulgu(HATA, "senaryolar", "Sprinkler içeren hiçbir senaryo yok — en elverişsiz tasarım alanı hesaplanmalı")
 
     belirleyici = max(sonuclar, key=lambda r: r["cz"]["ps"])
+    _plan_cizimleri(s, ag, sonuclar)
     _pompa_depo(s, ag, g, sonuclar, belirleyici, k)
 
     s.ozet = {
@@ -344,6 +434,36 @@ def _senaryo_tablolari(s, ag: YanginAgi, ad, acik, cz):
     s.tablolar.append(c)
 
 
+def _tasarim_alani_bicimi(s, ag: YanginAgi, ad, spr):
+    """EN 12845: tasarım alanı yaklaşık dikdörtgen, uzun kenarı ≥ 1,2·√A."""
+    if not spr or not all(i in ag.geo_alan for i in spr):
+        return
+    mahal_ad = {i: m for m, a in ag.geo.items() for i in a["idler"]}
+    hucre = [ag.geo[mahal_ad[i]]["hucreler"][i] for i in spr]
+    a, b = kapsama.sinir_kutusu(hucre)
+    gerek = 1.2 * math.sqrt(ag.tasarim_alani)
+    if max(a, b) + 1e-6 < gerek:
+        s.bulgu(UYARI, ad, f"Tasarım alanının uzun kenarı {max(a, b):.2f} m < 1,2·√A = {gerek:.2f} m — "
+                "alan branşmanlar boyunca uzatılmalı", "TS EN 12845 (tasarım alanı biçimi)")
+
+
+def _plan_cizimleri(s, ag: YanginAgi, sonuclar):
+    if not ag.geo:
+        return
+    spr_sen = [r for r in sonuclar if r["spr"] and not r["diger"]] or [r for r in sonuclar if r["spr"]]
+    bel = max(spr_sen, key=lambda r: r["cz"]["ps"]) if spr_sen else None
+    acik = set(bel["spr"]) if bel else set()
+    for mid, a in ag.geo.items():
+        dolaplar = []
+        for i in ag.cikislar:
+            h = ag.hatlar[i]
+            if h.tip != "sprinkler" and h.ham.get("konum") and str(h.ham.get("mahal", mid)) == mid:
+                dolaplar.append((i, tuple(map(float, h.ham["konum"][:2]))))
+        baslik = f"Kapsama planı — {a['ad']}" + (f" (mavi: {bel['ad']})" if bel else "")
+        s.sekiller.append({"baslik": baslik, "svg": kapsama.svg_plan(
+            baslik, a["poligon"], a, float(ag.sinif["max_alan_m2"]), acik & set(a["idler"]), dolaplar)})
+
+
 def _hiz_kontrol(s, ag: YanginAgi, ad, cz, k):
     for hid in ag.sira:
         h = ag.hatlar[hid]
@@ -367,7 +487,7 @@ def _dolap_basinc_kontrol(s, ag: YanginAgi, ad, diger, cz):
 
 def _eleman_kontrol(s, ag: YanginAgi, k):
     sinif = ag.sinif
-    tb = Tablo("Sprinkler yerleşim kontrolü", ["Sprinkler", "K", "Kapsama m²", "Max m²",
+    tb = Tablo("Sprinkler yerleşim kontrolü", ["Sprinkler", "K", "Kapsama m²", "Alan kaynağı", "Max m²",
                                                 "Min Q l/dk", "Min P bar", "Durum"])
     for i in ag.sprinklerler:
         h = ag.hatlar[i]
@@ -380,7 +500,7 @@ def _eleman_kontrol(s, ag: YanginAgi, k):
             durum.append("K uygun değil")
             s.bulgu(UYARI, i, f"K={h.K:g} bu tehlike sınıfı için öngörülen {sinif['K']} değil",
                     "TS EN 12845 Tablo 37")
-        tb.satirlar.append([i, h.K, h.alan, sinif["max_alan_m2"], yuvarla(h.qmin, 1),
+        tb.satirlar.append([i, h.K, yuvarla(h.alan), h.alan_kaynak, sinif["max_alan_m2"], yuvarla(h.qmin, 1),
                             yuvarla(h.preq, 3), ", ".join(durum) or "OK"])
     if ag.sprinklerler:
         s.tablolar.append(tb)

@@ -4,7 +4,8 @@ Yerleşim (bodrum kat, tavan kotu +3,20 m, pompa çıkışı −1,00 m):
   * 6 branşman (R1…R6), her birinde 6 sprinkler, 3,40 × 3,40 m ızgara
     → sprinkler başına 11,56 m² (OT-2 sınırı 12 m²)
   * Ana dağıtım (CM) branşmanları 3,40 m aralıkla besler (uçtan besleme)
-  * 2 adet yarı-sert hortumlu yangın dolabı, aralarında 25 m
+  * 2 adet yarı-sert hortumlu yangın dolabı, aralarında ≈24 m
+  * Mahal sınırı (poligon) + sprinkler konumları → kapsama alanları plandan hesaplanır
 
 Çalıştırma:  python ornekler/ornek_otopark_olustur.py  → ornekler/ornek_otopark.yaml
 """
@@ -37,18 +38,20 @@ for i in range(1, N_BRANS + 1):
                        "cap": BRANS_CAPLARI[j - 1],
                        "parcalar": {"te_donus": 1} if j == 1 else {}})
         hatlar.append({"id": f"S{i}-{j}", "ust": f"R{i}-{j}", "uzunluk_m": 0.3, "kot_farki_m": -0.3,
-                       "cap": "25", "parcalar": {"te_donus": 1}, "sprinkler": True})
+                       "cap": "25", "parcalar": {"te_donus": 1}, "sprinkler": True,
+                       "mahal": "OTP-A",
+                       "konum": [round(ARALIK / 2 + ARALIK * (j - 1), 2), round(ARALIK / 2 + ARALIK * (i - 1), 2)]})
 
 # Yangın dolapları (kolon ayağından ayrı hat, dolap vanası +1,60 m)
 hatlar += [
     {"id": "YD-HAT-1", "ust": "KOLON", "uzunluk_m": 18.0, "kot_farki_m": -1.6, "cap": "50",
      "parcalar": {"te_donus": 1, "dirsek_90": 3, "surgulu_vana": 1}, "aciklama": "Dolap besleme hattı"},
     {"id": "YD-1", "ust": "YD-HAT-1", "uzunluk_m": 1.0, "kot_farki_m": 0.0, "cap": "25",
-     "parcalar": {"dirsek_90": 1}, "cikis": "dolap_yari_sert", "kat": "-1", "konum": [0.0, 0.0]},
+     "parcalar": {"dirsek_90": 1}, "cikis": "dolap_yari_sert", "kat": "-1", "mahal": "OTP-A", "konum": [0.3, 3.0]},
     {"id": "YD-HAT-2", "ust": "YD-HAT-1", "uzunluk_m": 25.0, "kot_farki_m": 0.0, "cap": "50",
      "parcalar": {"dirsek_90": 2}},
     {"id": "YD-2", "ust": "YD-HAT-2", "uzunluk_m": 1.0, "kot_farki_m": 0.0, "cap": "25",
-     "parcalar": {"dirsek_90": 1}, "cikis": "dolap_yari_sert", "kat": "-1", "konum": [25.0, 0.0]},
+     "parcalar": {"dirsek_90": 1}, "cikis": "dolap_yari_sert", "kat": "-1", "mahal": "OTP-A", "konum": [20.1, 17.0]},
 ]
 
 
@@ -83,7 +86,11 @@ proje = {
         "boru_serisi": "CELIK_EN10255_ORTA",
         "malzeme": "celik",
         "kaynak": {"ad": "Yangın pompası çıkışı", "kot_m": -1.0},
-        "sprinkler_varsayilan": {"K": 80, "alan_m2": round(ARALIK * ARALIK, 2)},
+        "sprinkler_varsayilan": {"K": 80},   # kapsama alanı plandan hesaplanır
+        "mahaller": [
+            {"id": "OTP-A", "ad": "Otopark A bölgesi (B1)", "yerlesim": "standart",
+             "poligon": [[0, 0], [N_SPR * ARALIK, 0], [N_SPR * ARALIK, N_BRANS * ARALIK], [0, N_BRANS * ARALIK]]},
+        ],
         "yedek_sprinkler": 6,
         "pompa": {"adet_asil": 1, "adet_yedek": 1, "emme_basinci_bar": 0.2,
                   "anma_debi_lpm": 1550, "anma_basinc_bar": 4.7,

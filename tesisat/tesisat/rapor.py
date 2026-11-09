@@ -24,6 +24,7 @@ td.n{text-align:right}tr.HATA td{background:var(--errbg)}tr.UYARI td{background:
 .durum-ok{color:var(--ok);font-weight:600}.durum-kotu{color:var(--err);font-weight:700}
 .imza{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:40px}
 .imza div{border-top:1px solid var(--ink);padding-top:6px;min-height:70px}
+figure.plan{margin:6px 0 18px}
 .not{border-left:4px solid var(--warn);background:var(--warnbg);padding:8px 12px;margin:16px 0}
 @media print{main{max-width:none;padding:0}h2{break-after:avoid}table{break-inside:auto}tr{break-inside:avoid}.kart div{background:none}}
 """
@@ -99,6 +100,8 @@ def html_rapor(proje: dict, sonuclar: list[ModulSonucu]) -> str:
         if s.ozet:
             p.append("<div class='tablo'><table><tbody>" + "".join(
                 f"<tr><th>{html.escape(str(k))}</th>{_hucre(v)}</tr>" for k, v in s.ozet.items()) + "</tbody></table></div>")
+        for sk in s.sekiller:  # SVG modül içinde üretilir; metinler orada kaçışlanır
+            p.append(f"<h3>{html.escape(sk['baslik'])}</h3><figure class='plan'>{sk['svg']}</figure>")
         for t in s.tablolar:
             p.append(_tablo(t))
 

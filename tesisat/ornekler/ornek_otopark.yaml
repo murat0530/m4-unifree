@@ -23,7 +23,19 @@ yangin:
     kot_m: -1.0
   sprinkler_varsayilan:
     K: 80
-    alan_m2: 11.56
+  mahaller:
+  - id: OTP-A
+    ad: Otopark A bölgesi (B1)
+    yerlesim: standart
+    poligon:
+    - - 0
+      - 0
+    - - 20.4
+      - 0
+    - - 20.4
+      - 20.4
+    - - 0
+      - 20.4
   yedek_sprinkler: 6
   pompa:
     adet_asil: 1
@@ -88,6 +100,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 1.7
+    - 1.7
   - id: R1-2
     ust: R1-1
     uzunluk_m: 3.4
@@ -102,6 +118,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 5.1
+    - 1.7
   - id: R1-3
     ust: R1-2
     uzunluk_m: 3.4
@@ -116,6 +136,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 8.5
+    - 1.7
   - id: R1-4
     ust: R1-3
     uzunluk_m: 3.4
@@ -130,6 +154,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 11.9
+    - 1.7
   - id: R1-5
     ust: R1-4
     uzunluk_m: 3.4
@@ -144,6 +172,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 15.3
+    - 1.7
   - id: R1-6
     ust: R1-5
     uzunluk_m: 3.4
@@ -158,6 +190,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 18.7
+    - 1.7
   - id: CM-2
     ust: CM-1
     uzunluk_m: 3.4
@@ -179,6 +215,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 1.7
+    - 5.1
   - id: R2-2
     ust: R2-1
     uzunluk_m: 3.4
@@ -193,6 +233,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 5.1
+    - 5.1
   - id: R2-3
     ust: R2-2
     uzunluk_m: 3.4
@@ -207,6 +251,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 8.5
+    - 5.1
   - id: R2-4
     ust: R2-3
     uzunluk_m: 3.4
@@ -221,6 +269,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 11.9
+    - 5.1
   - id: R2-5
     ust: R2-4
     uzunluk_m: 3.4
@@ -235,6 +287,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 15.3
+    - 5.1
   - id: R2-6
     ust: R2-5
     uzunluk_m: 3.4
@@ -249,6 +305,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 18.7
+    - 5.1
   - id: CM-3
     ust: CM-2
     uzunluk_m: 3.4
@@ -270,6 +330,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 1.7
+    - 8.5
   - id: R3-2
     ust: R3-1
     uzunluk_m: 3.4
@@ -284,6 +348,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 5.1
+    - 8.5
   - id: R3-3
     ust: R3-2
     uzunluk_m: 3.4
@@ -298,6 +366,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 8.5
+    - 8.5
   - id: R3-4
     ust: R3-3
     uzunluk_m: 3.4
@@ -312,6 +384,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 11.9
+    - 8.5
   - id: R3-5
     ust: R3-4
     uzunluk_m: 3.4
@@ -326,6 +402,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 15.3
+    - 8.5
   - id: R3-6
     ust: R3-5
     uzunluk_m: 3.4
@@ -340,6 +420,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 18.7
+    - 8.5
   - id: CM-4
     ust: CM-3
     uzunluk_m: 3.4
@@ -361,6 +445,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 1.7
+    - 11.9
   - id: R4-2
     ust: R4-1
     uzunluk_m: 3.4
@@ -375,6 +463,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 5.1
+    - 11.9
   - id: R4-3
     ust: R4-2
     uzunluk_m: 3.4
@@ -389,6 +481,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 8.5
+    - 11.9
   - id: R4-4
     ust: R4-3
     uzunluk_m: 3.4
@@ -403,6 +499,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 11.9
+    - 11.9
   - id: R4-5
     ust: R4-4
     uzunluk_m: 3.4
@@ -417,6 +517,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 15.3
+    - 11.9
   - id: R4-6
     ust: R4-5
     uzunluk_m: 3.4
@@ -431,6 +535,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 18.7
+    - 11.9
   - id: CM-5
     ust: CM-4
     uzunluk_m: 3.4
@@ -452,6 +560,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 1.7
+    - 15.3
   - id: R5-2
     ust: R5-1
     uzunluk_m: 3.4
@@ -466,6 +578,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 5.1
+    - 15.3
   - id: R5-3
     ust: R5-2
     uzunluk_m: 3.4
@@ -480,6 +596,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 8.5
+    - 15.3
   - id: R5-4
     ust: R5-3
     uzunluk_m: 3.4
@@ -494,6 +614,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 11.9
+    - 15.3
   - id: R5-5
     ust: R5-4
     uzunluk_m: 3.4
@@ -508,6 +632,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 15.3
+    - 15.3
   - id: R5-6
     ust: R5-5
     uzunluk_m: 3.4
@@ -522,6 +650,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 18.7
+    - 15.3
   - id: CM-6
     ust: CM-5
     uzunluk_m: 3.4
@@ -543,6 +675,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 1.7
+    - 18.7
   - id: R6-2
     ust: R6-1
     uzunluk_m: 3.4
@@ -557,6 +693,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 5.1
+    - 18.7
   - id: R6-3
     ust: R6-2
     uzunluk_m: 3.4
@@ -571,6 +711,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 8.5
+    - 18.7
   - id: R6-4
     ust: R6-3
     uzunluk_m: 3.4
@@ -585,6 +729,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 11.9
+    - 18.7
   - id: R6-5
     ust: R6-4
     uzunluk_m: 3.4
@@ -599,6 +747,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 15.3
+    - 18.7
   - id: R6-6
     ust: R6-5
     uzunluk_m: 3.4
@@ -613,6 +765,10 @@ yangin:
     parcalar:
       te_donus: 1
     sprinkler: true
+    mahal: OTP-A
+    konum:
+    - 18.7
+    - 18.7
   - id: YD-HAT-1
     ust: KOLON
     uzunluk_m: 18.0
@@ -632,9 +788,10 @@ yangin:
       dirsek_90: 1
     cikis: dolap_yari_sert
     kat: '-1'
+    mahal: OTP-A
     konum:
-    - 0.0
-    - 0.0
+    - 0.3
+    - 3.0
   - id: YD-HAT-2
     ust: YD-HAT-1
     uzunluk_m: 25.0
@@ -651,9 +808,10 @@ yangin:
       dirsek_90: 1
     cikis: dolap_yari_sert
     kat: '-1'
+    mahal: OTP-A
     konum:
-    - 25.0
-    - 0.0
+    - 20.1
+    - 17.0
   senaryolar:
   - ad: A — En uzak tasarım alanı (R4–R6)
     acik:

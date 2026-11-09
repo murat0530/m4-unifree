@@ -78,6 +78,21 @@ Birincil kaynak: **BYKHY resmî konsolide metni** ([mevzuat.gov.tr](https://www.
 | Eşdeğer boy C düzeltmesi `(C/120)^1,85` (C=100 → 0,714) | NICET çalışma kılavuzu | ✅ |
 | Eşdeğer boy tablosu (dirsek, te, vana) | NFPA 13 tablosu (ft→m) | ⚠️ EN 12845 Tablo 39 ile teyit edilmeli. Alarm vanası için üretici değeri girilmeli. |
 | Hız sınırları 6 m/s (vana) / 10 m/s | — | ⚠️ İkincil kaynakta bulunamadı. Lisanslı metinle teyit edilmeli. |
+| Sprinklerler arası en az 2 m (md. 12.3) | selvi.org EN 12845 özetleri | ✅ |
+| OT max aralık 4,0 m (Tablo 19) | selvi.org | ✅ |
+| DT 4,6 m / YT 3,7 m max aralık | — | ⚠️ Teyit edilmeli. OT-1'de BYKHY 21 m²'ye izin verdiği için 4,6 m alındı ⚠️ |
+| Duvara uzaklık ≤ min(2,0 m; S_max/2), şaşırtmalıda 2,3 m, açık kiriş/açık cephe/yanıcı-metal dış duvarda 1,5 m (md. 12.4.1) | selvi.org | ✅ |
+| Tasarım alanının uzun kenarı ≥ 1,2·√A | Yaygın EN 12845 uygulaması | ⚠️ Teyit edilmeli |
+
+### Kapsama geometrisi (`tests/test_kapsama.py`, 13 test)
+- **6×6 ızgara (3,4 m aralık, duvara 1,7 m):** Her hücre 11,56 m², toplam = mahal alanı (416,16 m²). R_max = √(2² + 2²) = 2,83 m.
+- **L biçimli mahal:** Köşe sprinklerinin hücresi el hesabıyla 4×4 = 16 m²; toplam = 108 m² (L alanı).
+- **Hatalı yerleşimler yakalanıyor:**
+  - eksik sprinkler → korunmayan bölge ve alan aşımı
+  - duvar 1 m uzaklaştırılmış → 2,70 m > 2 m
+  - 1,5 m aralık → < 2 m
+  - mahal dışındaki sprinkler
+  - kare biçimli tasarım alanı → 13,6 m < 14,4 m
 
 ### Hesap motorunun doğrulanması (`tests/test_yangin.py`, 18 test)
 - **Tek sprinkler:** Kaynak basıncı el hesabıyla 2·10⁻⁴ bar içinde aynı.
