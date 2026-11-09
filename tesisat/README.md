@@ -8,15 +8,15 @@ Proje bilgilerini bir YAML dosyasından okur, hidrolik hesabı yapar ve sonucu y
 | Temiz su | ⏳ Planlandı (kurallar hazır) | DIN 1988-300, TS EN 806 |
 | Atık su | ⏳ Planlandı (kurallar hazır) | TS EN 12056-2 |
 | Havalandırma | ⏳ Planlandı (kurallar hazır) | EN 16798-1/-3 |
-| DXF çizim kontrolü | ⏳ Planlandı | — |
+| DXF plan okuma (mahal, ad, tip, sprinkler, dolap) | ✅ | — |
 
 ## Kurulum ve çalıştırma
 
 ```bash
 cd tesisat
-pip install pyyaml pytest
+pip install -r requirements.txt
 python -m tesisat hesapla ornekler/ornek_otopark.yaml -o rapor.html --json sonuc.json
-python -m pytest -q tests        # 48 doğrulama testi
+python -m pytest -q tests        # 68 doğrulama testi
 ```
 
 Çıkış kodları:
@@ -31,6 +31,23 @@ Bu kodlar sayesinde araç CI'da veya bir otomasyonda da kullanılabilir.
 - `ornekler/dis_hastanesi_rapor.html`: bu projenin raporu
 - `ornekler/ornek_otopark.yaml`: konut altı 1.250 m² kapalı otopark, OT-2, 36 sprinkler, 2 yangın dolabı
 - `ornekler/ornek_otopark_rapor.html`: bu projenin ürettiği rapor
+
+## AutoCAD planından başlamak
+
+DWG doğrudan okunamaz. AutoCAD'de **Farklı Kaydet → DXF** (AutoCAD 2013 veya üstü) ile kaydedin.
+
+```bash
+pip install ezdxf
+python -m tesisat dxf-ozet plan.dxf          # katman, blok ve yazı adlarını gör
+python -m tesisat dxf-oku plan.dxf --mahal-katmani "A-MAHAL" --etiket-katmani "A-MAHAL-YAZI" \
+       --sprinkler-blok "SPR*" --dolap-blok "YANGIN*" --kat 3 -o kat3_mahaller.yaml
+```
+
+- **Mahal sınırı:** mahal katmanındaki kapalı polyline.
+- **Mahal adı:** sınırın içindeki yazı.
+- **Tip:** addan tahmin edilir. Örneğin "WC" → muaf, "PROTEZ LAB." → OT-2, "ENDODONTİ" → OT-1, "MEKANİK TESİSAT" → OT-3. Tahmin edilemeyen mahaller listelenir ve tipini mühendis girer.
+- **Birim:** $INSUNITS değerinden okunur (mm, cm ya da m). Çıktı koordinatları metredir.
+- **Sprinkler bloğu yoksa:** `kapsama.yerlesim_oner` ile yerleşim önerilir.
 
 ## Yangın modülü — ne yapar?
 

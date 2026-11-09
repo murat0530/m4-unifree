@@ -74,6 +74,9 @@ def html_rapor(proje: dict, sonuclar: list[ModulSonucu]) -> str:
              f"<div class='e'><span class='muted'>Hata</span><b>{c[HATA]}</b></div>"
              f"<div class='w'><span class='muted'>Uyarı</span><b>{c[UYARI]}</b></div>"
              f"<div><span class='muted'>Bilgi</span><b>{c[BILGI]}</b></div></div>")
+    if proje.get("kararlar"):
+        p.append("<h2>Tasarım kararları</h2><ol>" + "".join(f"<li>{html.escape(str(k))}</li>"
+                                                         for k in proje["kararlar"]) + "</ol>")
     if bina:
         p.append("<h2>Bina bilgileri</h2><div class='tablo'><table><tbody>")
         for k, v in bina.items():

@@ -137,7 +137,14 @@ def main():
                   "hazirlayan": "Mak. Müh. ...", "kontrol": "", "onay": "",
                   "not": "Mimari plan varsayımsaldır; gerçek plan koordinatları ile güncellenecektir."},
         "bina": {"kullanim": "saglik", "yapi_yuksekligi_m": 22.0, "kapali_alan_m2": 3600,
-                 "yatakli": False, "kat_adedi": 6},
+                 "yatakli": False, "kat_adedi": 6,
+                 "sprinkler_gerekcesi": "İşveren kararı — BYKHY md. 96/2 zorunluluğu olmasa da tüm bina sprinklerle korunacak"},
+        "kararlar": [
+            "Sprinkler yapılacak (işveren kararı).",
+            "Tehlike sınıfında ihtiyatlı değer: protez laboratuvarı OT2, arşiv ve depo OT3.",
+            "Pompa seçimi, en uzak tasarım alanı + en uzak yangın dolabının hidrolik olarak eşzamanlı "
+            "çalıştığı (en elverişsiz) senaryoya göre yapılır.",
+        ],
         "yangin": {
             "sistem": "islak",
             "boru_serisi": "CELIK_EN10255_ORTA",

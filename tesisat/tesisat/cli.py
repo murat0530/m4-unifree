@@ -11,7 +11,7 @@ from pathlib import Path
 
 import yaml
 
-from . import rapor, yangin
+from . import cizim, rapor, yangin
 from .ortak import HATA, UYARI, GirdiHatasi, VARSAYILAN_KURALLAR, kurallari_yukle
 
 MODULLER = {
@@ -52,7 +52,61 @@ def main(argv=None) -> int:
     h.add_argument("--json", help="JSON sonuç yolu")
     h.add_argument("--kurallar", help="Ek kural dosyası (YAML) — varsayılanları ezer")
     alt.add_parser("kurallar", help="Varsayılan kural dosyasının yolunu yaz")
+    oz = alt.add_parser("dxf-ozet", help="DXF katman/blok/yazı özetini göster (çizim standardını tanımak için)")
+    oz.add_argument("dxf")
+    ok = alt.add_parser("dxf-oku", help="DXF'ten mahal sınırları, adlar, sprinkler ve dolap konumlarını oku")
+    ok.add_argument("dxf")
+    ok.add_argument("--mahal-katmani", required=True, help="Virgülle ayrılmış katman desenleri, ör. 'A-MAHAL,ROOM*'")
+    ok.add_argument("--sprinkler-blok", default="", help="Sprinkler blok adı desenleri, ör. 'SPR*'")
+    ok.add_argument("--dolap-blok", default="", help="Yangın dolabı blok adı desenleri")
+    ok.add_argument("--etiket-katmani", default="", help="Mahal adı yazılarının katmanları (boş: tümü)")
+    ok.add_argument("--birim", choices=["mm", "cm", "m"], help="Çizim birimi ($INSUNITS yoksa)")
+    ok.add_argument("--kat", help="Kat etiketi (kimlik ön eki), ör. '3'")
+    ok.add_argument("-o", "--cikti", help="YAML çıktı (varsayılan: <dxf>_mahaller.yaml)")
     a = ap.parse_args(argv)
+
+    def liste(x):
+        return [t.strip() for t in x.split(",") if t.strip()]
+
+    if a.komut == "dxf-ozet":
+        try:
+            o = cizim.dxf_ozet(a.dxf)
+        except GirdiHatasi as e:
+            print(f"GİRDİ HATASI: {e}", file=sys.stderr)
+            return 2
+        print(f"Birim: {o['birim']}")
+        print("Katmanlar (varlık / kapalı çizgi / yazı):")
+        for k, n in sorted(o["katmanlar"].items(), key=lambda t: -t[1]):
+            print(f"  {k:30} {n:6} {o['kapali_cizgi'].get(k, 0):6} {o['yazi'].get(k, 0):6}")
+        print("Bloklar (adet):")
+        for k, n in sorted(o["bloklar"].items(), key=lambda t: -t[1]):
+            print(f"  {k:30} {n:6}")
+        print("Örnek yazılar:")
+        for k, t in o["ornek_yazilar"]:
+            print(f"  [{k}] {t}")
+        return 0
+
+    if a.komut == "dxf-oku":
+        try:
+            o = cizim.dxf_oku(a.dxf, liste(a.mahal_katmani), liste(a.sprinkler_blok), liste(a.dolap_blok),
+                              liste(a.etiket_katmani) or None, a.birim, a.kat)
+        except GirdiHatasi as e:
+            print(f"GİRDİ HATASI: {e}", file=sys.stderr)
+            return 2
+        cikti = Path(a.cikti or Path(a.dxf).with_suffix("").as_posix() + "_mahaller.yaml")
+        with open(cikti, "w", encoding="utf-8") as f:
+            f.write(f"# {Path(a.dxf).name} dosyasından okundu — birim: {o['birim']}, koordinatlar metre\n")
+            for u in o["uyarilar"]:
+                f.write(f"# UYARI: {u}\n")
+            yaml.safe_dump({k: o[k] for k in ("mahaller", "sprinklerler", "dolaplar")}, f,
+                           allow_unicode=True, sort_keys=False, width=140)
+        print(f"{len(o['mahaller'])} mahal, {len(o['sprinklerler'])} sprinkler, {len(o['dolaplar'])} dolap "
+              f"okundu (birim {o['birim']}) → {cikti}")
+        for m in o["mahaller"]:
+            print(f"  {m['id']:8} {m['alan_m2']:8.2f} m²  {m.get('tip', '??? TİP BELİRSİZ'):18} {m['ad']}")
+        for u in o["uyarilar"]:
+            print(f"  UYARI: {u}")
+        return 0
 
     if a.komut == "kurallar":
         print(VARSAYILAN_KURALLAR)

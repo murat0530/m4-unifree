@@ -785,7 +785,9 @@ def _zorunluluk_kontrol(s, ag: YanginAgi, bina: dict, k):
     if not neden and ag.sprinklerler:
         s.bulgu(BILGI, "zorunluluk", "Girilen bina verileriyle BYKHY md. 96/2 kapsamında sprinkler ZORUNLULUĞU "
                 "tespit edilmedi (yapı yüksekliği, otopark, yatak/oda sayısı, mağaza ve parlayıcı alan eşikleri). "
-                "Sistem idare/işveren şartı veya gönüllü olarak tasarlanıyor; yapılırsa TS EN 12845'e uygun olmalıdır.",
+                + (f"Gerekçe: {bina['sprinkler_gerekcesi']}. " if bina.get("sprinkler_gerekcesi") else
+                   "Sistem idare/işveren şartı veya gönüllü olarak tasarlanıyor. ")
+                + "Tasarım TS EN 12845'e uygun yapılmıştır.",
                 "BYKHY md. 96/2, 96/5")
     if neden:
         if ag.sprinklerler:

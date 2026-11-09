@@ -15,6 +15,10 @@ Hesap motoru: `tesisat/` (Python). Hesabı **asla elle veya tahminle yapma**. He
    - Kompartıman sınırları (Ek-4): mimari plandaki yangın duvarlarına göre `kompartimanlar` listesi.
    - Islak/kuru sistem, boru malzemesi, pompa ve depo kotları.
    - Çizimden alınacaklar: sprinkler ızgarası (S×D), branşman ve kolon güzergâhları, uzunluklar, kotlar, parçalar, dolap konumları.
+   - **Plan DXF olarak gelirse** (DWG ise kullanıcıdan AutoCAD'de "Farklı Kaydet → DXF" iste):
+     1. `python -m tesisat dxf-ozet plan.dxf` ile katman ve blok adlarını öğren.
+     2. `python -m tesisat dxf-oku plan.dxf --mahal-katmani ... --sprinkler-blok ... --kat N` ile mahalleri, adları, tipleri ve konumları al.
+     3. "TİP BELİRSİZ" mahalleri kullanıcıya sor. Asla tahmin etme.
 2. **YAML'ı oluştur.** Format için `tesisat/README.md` ve `tesisat/ornekler/ornek_otopark.yaml` dosyalarına bak.
    - Tekrarlı ağlar (ızgara) için elle yazmak yerine `ornekler/ornek_otopark_olustur.py` gibi küçük bir üretici betik yaz.
    - Her hattın `ust` değeri, beslendiği hattın id'sidir.
