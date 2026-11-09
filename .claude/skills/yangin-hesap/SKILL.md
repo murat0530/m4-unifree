@@ -11,7 +11,8 @@ Hesap motoru: `tesisat/` (Python). Hesabı **asla elle veya tahminle yapma**. He
 
 1. **Bilgi topla.** Eksik olanları kullanıcıya sor:
    - Bina: kullanım, yapı yüksekliği, kapalı otopark alanı, kat alanları. Bunlar zorunluluk kontrolü için gerekir.
-   - Tehlike sınıfı (BYKHY md. 19 / Ek-1). Emin değilsen gerekçesiyle öner ve kullanıcıya onaylat.
+   - Tehlike sınıfı: her mahale `tip` ver (`tesisat/tesisat/kurallar_varsayilan.yaml` → `mahal_tipleri`). Araç sınıfı BYKHY Ek-1/B'den atar. ⚠ işaretli (benzeşimle atanan) sınıfları kullanıcıya onaylat; farklı karar verilirse mahale `tehlike_sinifi:` yaz.
+   - Kompartıman sınırları (Ek-4): mimari plandaki yangın duvarlarına göre `kompartimanlar` listesi.
    - Islak/kuru sistem, boru malzemesi, pompa ve depo kotları.
    - Çizimden alınacaklar: sprinkler ızgarası (S×D), branşman ve kolon güzergâhları, uzunluklar, kotlar, parçalar, dolap konumları.
 2. **YAML'ı oluştur.** Format için `tesisat/README.md` ve `tesisat/ornekler/ornek_otopark.yaml` dosyalarına bak.
@@ -20,7 +21,8 @@ Hesap motoru: `tesisat/` (Python). Hesabı **asla elle veya tahminle yapma**. He
    - `kot_farki_m` = bitiş kotu − başlangıç kotu.
    - **Kapsama alanı:** Her mahal için `mahaller` altında `poligon` ver (çizimden, metre cinsinden). Her sprinklere `mahal` ve `konum: [x, y]` ekle. Alanı elle yazma; araç plandan hesaplar.
    - Sprinkler konmayan mahaller (ıslak hacim, yangın merdiveni, asansör kuyusu) için `muaf: true` ve `muaf_nedeni` ver (BYKHY md. 96/3).
-3. **Senaryoları tanımla.**
+   - Sprinkler konumu çizimde yoksa `kapsama.yerlesim_oner()` ile öner (örnek: `ornekler/dis_hastanesi_olustur.py`).
+3. **Senaryoları tanımla.** Geometri tam ise `otomatik_senaryo: {uzun_eksen: x}` ile adaylar otomatik üretilir; aşağıdakileri gerektiğinde ek olarak ver.
    - Tasarım alanı = BYKHY Ek-8/B alanı. Sprinkler sayısı = ⌈alan / sprinkler başına alan⌉.
    - Alanın uzun kenarı ≥ 1,2·√A olmalı ve branşmanlara paralel uzanmalı.
    - **En az iki aday alan** ver: hidrolik olarak en uzak olan ve en yüksek kottaki. Araç en kötüsünü seçer.

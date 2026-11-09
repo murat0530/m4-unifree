@@ -373,3 +373,48 @@ yangin:
     otopark_m2: 600
     kazan_kW: 350
   yedek_sprinkler_min: 6   # md. 96/8
+
+  # -------------------------------------------------------------------
+  # Mahal tipi → tehlike sınıfı kütüphanesi (BYKHY md. 19, Ek-1/B)
+  # Mahal tanımında 'tip' verilirse sınıf buradan atanır; 'tehlike_sinifi'
+  # açıkça verilirse o geçerlidir. ⚠ = yönetmelikte birebir karşılığı yok,
+  # benzeşimle atanmıştır → mühendis onayı gerekir.
+  # Bina su/pompa kapasitesi en yüksek sınıfa göre belirlenir (md. 19/1).
+  # -------------------------------------------------------------------
+  mahal_tipleri:
+    # Sağlık yapıları (hastane / diş hastanesi / poliklinik)
+    muayene_tedavi:  {sinif: OT1, ad: "Muayene / diş tedavi ünitesi", kaynak: "BYKHY Ek-1/B: Hastaneler → OT1"}
+    poliklinik:      {sinif: OT1, ad: "Poliklinik, bekleme, koridor", kaynak: "BYKHY Ek-1/B: Hastaneler → OT1"}
+    hasta_odasi:     {sinif: OT1, ad: "Hasta / gözlem odası", kaynak: "BYKHY Ek-1/B: Hastaneler → OT1"}
+    ameliyathane:    {sinif: OT1, ad: "Ameliyathane / cerrahi müdahale", kaynak: "BYKHY Ek-1/B: Hastaneler → OT1"}
+    goruntuleme:     {sinif: OT1, ad: "Röntgen / panoramik / tomografi", kaynak: "BYKHY Ek-1/B: Hastaneler → OT1"}
+    sterilizasyon:   {sinif: OT1, ad: "Sterilizasyon ünitesi", kaynak: "BYKHY Ek-1/B: Hastaneler → OT1"}
+    buro:            {sinif: OT1, ad: "İdari ofis / büro", kaynak: "BYKHY Ek-1/B: Bürolar → OT1"}
+    yemekhane:       {sinif: OT1, ad: "Kafeterya / yemekhane", kaynak: "BYKHY Ek-1/B: Lokantalar → OT1",
+                      not: "Pişirme davlumbazı ayrıca yerel söndürme ister"}
+    laboratuvar:     {sinif: OT2, ad: "Laboratuvar", kaynak: "BYKHY Ek-1/B: Fizik laboratuvarları → OT2"}
+    dis_protez_lab:  {sinif: OT2, ad: "Diş protez laboratuvarı", kaynak: "⚠ BYKHY Ek-1/B laboratuvar benzeşimi → OT2 (alçı, akrilik, mum, açık alev)"}
+    camasirhane:     {sinif: OT2, ad: "Çamaşırhane", kaynak: "BYKHY Ek-1/B: Çamaşırhaneler → OT2"}
+    otopark:         {sinif: OT2, ad: "Kapalı otopark", kaynak: "BYKHY Ek-1/B: Otoparklar → OT2"}
+    tesisat_odasi:   {sinif: OT3, ad: "Mekanik / tesisat odası", kaynak: "BYKHY Ek-1/B: Tesisat odaları → OT3"}
+    arsiv:           {sinif: OT3, ad: "Arşiv (kâğıt dosya)", kaynak: "⚠ Ek-1/B kitap depoları OT1 dışı; ihtiyatlı OT3. İstif > 2,1 m ise EN 12845 depolama kuralları"}
+    depo:            {sinif: OT3, ad: "Malzeme deposu", kaynak: "⚠ Ek-4 depolar 'OT3 ve üstü' ayrımı; ihtiyatlı OT3. Yüksek istifte EN 12845 depolama kuralları"}
+    # Sprinklerden muaf adaylar (md. 96/3) — muafiyet mühendis beyanıyla kesinleşir
+    islak_hacim:     {muaf: true, ad: "WC / lavabo / duş", kaynak: "BYKHY md. 96/3: yanıcı malzeme içermeyen ıslak hacim"}
+    merdiven:        {muaf: true, ad: "Yangın merdiveni yuvası", kaynak: "BYKHY md. 96/3"}
+    asansor_kuyusu:  {muaf: true, ad: "Asansör kuyusu", kaynak: "BYKHY md. 96/3"}
+    gazli_sonduruculu: {muaf: true, ad: "Gazlı söndürme ile korunan mahal (veri/elektrik)", kaynak: "BYKHY md. 96/3"}
+
+  # BYKHY Ek-4 — en fazla kompartıman alanı [m²]. katsayi: uygun yangın kontrol
+  # sistemi (algılama, sprinkler, duman tahliyesi) varsa çarpan; null → sınırsız
+  kompartiman:
+    konut:        {max_m2: null}
+    konaklama:    {max_m2: 4000, katsayi: 2}
+    saglik:       {max_m2: 1500, katsayi: 2}
+    egitim:       {max_m2: 6000, katsayi: null}
+    buro:         {max_m2: 8000, katsayi: 2}
+    ticaret:      {max_m2: 2000, katsayi: null}
+    depo_ot3:     {max_m2: 1000, katsayi: null}
+    depo_ot12:    {max_m2: 5000, katsayi: null}
+    otopark:      {max_m2: null}
+  dusuk_tehlike_kompartiman_m2: 126   # Ek-1/A ve md. 19/2-a (en az 30 dk dayanım)

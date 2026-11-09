@@ -197,7 +197,8 @@ def test_min_cap_tablo_36():
 def test_depo_hacmi_byky_92():
     s = y.hesapla(proje_yukle(ORNEK), K)
     satir = {r[0]: r[1] for t in s.tablolar if t.baslik == "Pompa ve depo" for r in t.satirlar}
-    q_spr = s.tablolar[1].satirlar[0][4]  # Senaryo A debisi
+    oz = next(t for t in s.tablolar if t.baslik == "Senaryo özeti")
+    q_spr = oz.satirlar[0][oz.kolonlar.index("Q toplam l/dk")]  # Senaryo A debisi
     assert satir["Hidrolik hesaba göre depo hacmi"].startswith(f"{(q_spr + 100) * 60 / 1000:.1f}")
 
 

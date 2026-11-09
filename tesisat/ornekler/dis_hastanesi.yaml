@@ -1,0 +1,1423 @@
+# dis_hastanesi_olustur.py ile üretilmiştir — VARSAYIMSAL plan.
+# Hesap: python -m tesisat hesapla ornekler/dis_hastanesi.yaml
+proje:
+  ad: Ağız ve Diş Sağlığı Hastanesi — 3. Kat Yangın Tesisatı (ÖN TASARIM)
+  isveren: ''
+  adres: ''
+  revizyon: 0-ön
+  hazirlayan: Mak. Müh. ...
+  kontrol: ''
+  onay: ''
+  not: Mimari plan varsayımsaldır; gerçek plan koordinatları ile güncellenecektir.
+bina:
+  kullanim: saglik
+  yapi_yuksekligi_m: 22.0
+  kapali_alan_m2: 3600
+  yatakli: false
+  kat_adedi: 6
+yangin:
+  sistem: islak
+  boru_serisi: CELIK_EN10255_ORTA
+  kaynak:
+    ad: Yangın pompası çıkışı (bodrum)
+    kot_m: -4.0
+  sprinkler_varsayilan:
+    K: 80
+  yedek_sprinkler: 6
+  pompa:
+    adet_asil: 1
+    adet_yedek: 1
+    emme_basinci_bar: 0.2
+  mahaller:
+  - id: KOR
+    ad: Poliklinik koridoru
+    tip: poliklinik
+    poligon:
+    - - 0
+      - 8
+    - - 30
+      - 8
+    - - 30
+      - 10
+    - - 0
+      - 10
+  - id: U1
+    ad: Diş tedavi ünitesi 1
+    tip: muayene_tedavi
+    poligon:
+    - - 0
+      - 10
+    - - 6
+      - 10
+    - - 6
+      - 16
+    - - 0
+      - 16
+  - id: U2
+    ad: Diş tedavi ünitesi 2
+    tip: muayene_tedavi
+    poligon:
+    - - 6
+      - 10
+    - - 12
+      - 10
+    - - 12
+      - 16
+    - - 6
+      - 16
+  - id: U3
+    ad: Diş tedavi ünitesi 3
+    tip: muayene_tedavi
+    poligon:
+    - - 12
+      - 10
+    - - 18
+      - 10
+    - - 18
+      - 16
+    - - 12
+      - 16
+  - id: U4
+    ad: Cerrahi müdahale odası
+    tip: ameliyathane
+    poligon:
+    - - 18
+      - 10
+    - - 24
+      - 10
+    - - 24
+      - 16
+    - - 18
+      - 16
+  - id: STR
+    ad: Sterilizasyon
+    tip: sterilizasyon
+    poligon:
+    - - 24
+      - 10
+    - - 30
+      - 10
+    - - 30
+      - 16
+    - - 24
+      - 16
+  - id: BEK
+    ad: Hasta bekleme
+    tip: poliklinik
+    poligon:
+    - - 0
+      - 16
+    - - 18
+      - 16
+    - - 18
+      - 20
+    - - 0
+      - 20
+  - id: RON
+    ad: Panoramik röntgen
+    tip: goruntuleme
+    poligon:
+    - - 18
+      - 16
+    - - 24
+      - 16
+    - - 24
+      - 20
+    - - 18
+      - 20
+  - id: ARS
+    ad: Hasta dosya arşivi
+    tip: arsiv
+    poligon:
+    - - 24
+      - 16
+    - - 30
+      - 16
+    - - 30
+      - 20
+    - - 24
+      - 20
+  - id: LAB
+    ad: Diş protez laboratuvarı
+    tip: dis_protez_lab
+    poligon:
+    - - 0
+      - 0
+    - - 10
+      - 0
+    - - 10
+      - 8
+    - - 0
+      - 8
+  - id: WC
+    ad: WC'ler
+    tip: islak_hacim
+    poligon:
+    - - 10
+      - 0
+    - - 14
+      - 0
+    - - 14
+      - 8
+    - - 10
+      - 8
+    muaf_nedeni: Yanıcı malzeme içermeyen ıslak hacim
+  - id: TES
+    ad: Mekanik tesisat odası
+    tip: tesisat_odasi
+    poligon:
+    - - 14
+      - 0
+    - - 18
+      - 0
+    - - 18
+      - 8
+    - - 14
+      - 8
+  - id: DEP
+    ad: Sarf malzeme deposu
+    tip: depo
+    poligon:
+    - - 18
+      - 0
+    - - 22
+      - 0
+    - - 22
+      - 8
+    - - 18
+      - 8
+  - id: IDR
+    ad: İdari ofisler
+    tip: buro
+    poligon:
+    - - 22
+      - 0
+    - - 30
+      - 0
+    - - 30
+      - 8
+    - - 22
+      - 8
+  kompartimanlar:
+  - id: K3
+    ad: 3. kat (tek kompartıman)
+    kullanim: saglik
+    mahaller:
+    - KOR
+    - U1
+    - U2
+    - U3
+    - U4
+    - STR
+    - BEK
+    - RON
+    - ARS
+    - LAB
+    - WC
+    - TES
+    - DEP
+    - IDR
+  otomatik_senaryo:
+    uzun_eksen: x
+  hatlar:
+  - id: POMPA
+    ust: null
+    uzunluk_m: 5.0
+    kot_farki_m: 0.0
+    cap: '100'
+    parcalar:
+      kelebek_vana: 2
+      cekvalf: 1
+      dirsek_90: 3
+    vana_noktasi: true
+  - id: KOLON
+    ust: POMPA
+    uzunluk_m: 20.8
+    kot_farki_m: 14.8
+    cap: '100'
+    parcalar:
+      alarm_vanasi: 1
+      dirsek_90: 2
+    vana_noktasi: true
+    aciklama: Alarm vana istasyonu + kolon (bodrum → 3. kat)
+  - id: KAT-VANA
+    ust: KOLON
+    uzunluk_m: 1.5
+    kot_farki_m: 0.0
+    cap: '100'
+    parcalar:
+      kelebek_vana: 1
+      te_donus: 1
+    vana_noktasi: true
+    aciklama: Kat zon vanası + akış anahtarı (md. 96/7)
+  - id: ANA-B1
+    ust: KAT-VANA
+    uzunluk_m: 6.0
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar:
+      te_donus: 1
+  - id: U2-B1
+    ust: ANA-B1
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      te_donus: 1
+  - id: U2-S1
+    ust: U2-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U2
+    konum:
+    - 7.5
+    - 11.5
+  - id: U2-B2
+    ust: U2-B1
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: U2-S2
+    ust: U2-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U2
+    konum:
+    - 10.5
+    - 11.5
+  - id: U2-B3
+    ust: U2-B2
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U2-S4
+    ust: U2-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U2
+    konum:
+    - 10.5
+    - 14.5
+  - id: U2-B4
+    ust: U2-B3
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U2-S3
+    ust: U2-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U2
+    konum:
+    - 7.5
+    - 14.5
+  - id: ANA-B2
+    ust: ANA-B1
+    uzunluk_m: 0.3
+    kot_farki_m: 0.0
+    cap: '65'
+    parcalar: {}
+  - id: BEK-B1
+    ust: ANA-B2
+    uzunluk_m: 9.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      te_donus: 1
+  - id: BEK-S3
+    ust: BEK-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: BEK
+    konum:
+    - 9.0
+    - 18.0
+  - id: BEK-B2
+    ust: BEK-B1
+    uzunluk_m: 3.6
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      dirsek_90: 1
+  - id: BEK-S2
+    ust: BEK-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: BEK
+    konum:
+    - 5.4
+    - 18.0
+  - id: BEK-B3
+    ust: BEK-B2
+    uzunluk_m: 3.6
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: BEK-S1
+    ust: BEK-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: BEK
+    konum:
+    - 1.8
+    - 18.0
+  - id: BEK-B4
+    ust: BEK-B3
+    uzunluk_m: 10.8
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: BEK-S4
+    ust: BEK-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: BEK
+    konum:
+    - 12.6
+    - 18.0
+  - id: BEK-B5
+    ust: BEK-B4
+    uzunluk_m: 3.6
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: BEK-S5
+    ust: BEK-B5
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: BEK
+    konum:
+    - 16.2
+    - 18.0
+  - id: ANA-B3
+    ust: ANA-B2
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '65'
+    parcalar: {}
+  - id: LAB-B1
+    ust: ANA-B3
+    uzunluk_m: 4.25
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: LAB-S6
+    ust: LAB-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 3.75
+    - 6.0
+  - id: LAB-B2
+    ust: LAB-B1
+    uzunluk_m: 2.5
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      dirsek_90: 1
+  - id: LAB-S5
+    ust: LAB-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 1.25
+    - 6.0
+  - id: LAB-B3
+    ust: LAB-B2
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      dirsek_90: 1
+  - id: LAB-S1
+    ust: LAB-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 1.25
+    - 2.0
+  - id: LAB-B4
+    ust: LAB-B3
+    uzunluk_m: 2.5
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      dirsek_90: 1
+  - id: LAB-S2
+    ust: LAB-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 3.75
+    - 2.0
+  - id: LAB-B5
+    ust: LAB-B4
+    uzunluk_m: 2.5
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      dirsek_90: 1
+  - id: LAB-S3
+    ust: LAB-B5
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 6.25
+    - 2.0
+  - id: LAB-B6
+    ust: LAB-B5
+    uzunluk_m: 2.5
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: LAB-S4
+    ust: LAB-B6
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 8.75
+    - 2.0
+  - id: LAB-B7
+    ust: LAB-B6
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: LAB-S8
+    ust: LAB-B7
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 8.75
+    - 6.0
+  - id: LAB-B8
+    ust: LAB-B7
+    uzunluk_m: 2.5
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: LAB-S7
+    ust: LAB-B8
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: LAB
+    konum:
+    - 6.25
+    - 6.0
+  - id: ANA-B4
+    ust: ANA-B3
+    uzunluk_m: 2.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar: {}
+  - id: U1-B1
+    ust: ANA-B4
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      te_donus: 1
+  - id: U1-S1
+    ust: U1-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U1
+    konum:
+    - 1.5
+    - 11.5
+  - id: U1-B2
+    ust: U1-B1
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: U1-S2
+    ust: U1-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U1
+    konum:
+    - 4.5
+    - 11.5
+  - id: U1-B3
+    ust: U1-B2
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U1-S4
+    ust: U1-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U1
+    konum:
+    - 4.5
+    - 14.5
+  - id: U1-B4
+    ust: U1-B3
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U1-S3
+    ust: U1-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U1
+    konum:
+    - 1.5
+    - 14.5
+  - id: ANA-D1
+    ust: KAT-VANA
+    uzunluk_m: 0.3
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar:
+      te_donus: 1
+  - id: KOR-B1
+    ust: ANA-D1
+    uzunluk_m: 1.88
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      te_donus: 1
+  - id: KOR-S4
+    ust: KOR-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 13.125
+    - 9.0
+  - id: KOR-B2
+    ust: KOR-B1
+    uzunluk_m: 3.75
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      dirsek_90: 1
+  - id: KOR-S3
+    ust: KOR-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 9.375
+    - 9.0
+  - id: KOR-B3
+    ust: KOR-B2
+    uzunluk_m: 3.75
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar:
+      dirsek_90: 1
+  - id: KOR-S2
+    ust: KOR-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 5.625
+    - 9.0
+  - id: KOR-B4
+    ust: KOR-B3
+    uzunluk_m: 3.75
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      dirsek_90: 1
+  - id: KOR-S1
+    ust: KOR-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 1.875
+    - 9.0
+  - id: KOR-B5
+    ust: KOR-B4
+    uzunluk_m: 15.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      dirsek_90: 1
+  - id: KOR-S5
+    ust: KOR-B5
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 16.875
+    - 9.0
+  - id: KOR-B6
+    ust: KOR-B5
+    uzunluk_m: 3.75
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: KOR-S6
+    ust: KOR-B6
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 20.625
+    - 9.0
+  - id: KOR-B7
+    ust: KOR-B6
+    uzunluk_m: 3.75
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: KOR-S7
+    ust: KOR-B7
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 24.375
+    - 9.0
+  - id: KOR-B8
+    ust: KOR-B7
+    uzunluk_m: 3.75
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: KOR-S8
+    ust: KOR-B8
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: KOR
+    konum:
+    - 28.125
+    - 9.0
+  - id: ANA-D2
+    ust: ANA-D1
+    uzunluk_m: 0.3
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar: {}
+  - id: U3-B1
+    ust: ANA-D2
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      te_donus: 1
+  - id: U3-S1
+    ust: U3-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U3
+    konum:
+    - 13.5
+    - 11.5
+  - id: U3-B2
+    ust: U3-B1
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: U3-S2
+    ust: U3-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U3
+    konum:
+    - 16.5
+    - 11.5
+  - id: U3-B3
+    ust: U3-B2
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U3-S4
+    ust: U3-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U3
+    konum:
+    - 16.5
+    - 14.5
+  - id: U3-B4
+    ust: U3-B3
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U3-S3
+    ust: U3-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U3
+    konum:
+    - 13.5
+    - 14.5
+  - id: ANA-D3
+    ust: ANA-D2
+    uzunluk_m: 1.0
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar: {}
+  - id: TES-B1
+    ust: ANA-D3
+    uzunluk_m: 2.33
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      te_donus: 1
+  - id: TES-S3
+    ust: TES-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: TES
+    konum:
+    - 16.0
+    - 6.667
+  - id: TES-B2
+    ust: TES-B1
+    uzunluk_m: 2.67
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: TES-S2
+    ust: TES-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: TES
+    konum:
+    - 16.0
+    - 4.0
+  - id: TES-B3
+    ust: TES-B2
+    uzunluk_m: 2.67
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: TES-S1
+    ust: TES-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: TES
+    konum:
+    - 16.0
+    - 1.333
+  - id: ANA-D4
+    ust: ANA-D3
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '80'
+    parcalar: {}
+  - id: DEP-B1
+    ust: ANA-D4
+    uzunluk_m: 2.33
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      te_donus: 1
+  - id: DEP-S3
+    ust: DEP-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: DEP
+    konum:
+    - 20.0
+    - 6.667
+  - id: DEP-B2
+    ust: DEP-B1
+    uzunluk_m: 2.67
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: DEP-S2
+    ust: DEP-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: DEP
+    konum:
+    - 20.0
+    - 4.0
+  - id: DEP-B3
+    ust: DEP-B2
+    uzunluk_m: 2.67
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: DEP-S1
+    ust: DEP-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: DEP
+    konum:
+    - 20.0
+    - 1.333
+  - id: ANA-D5
+    ust: ANA-D4
+    uzunluk_m: 1.0
+    kot_farki_m: 0.0
+    cap: '65'
+    parcalar: {}
+  - id: U4-B1
+    ust: ANA-D5
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      te_donus: 1
+  - id: U4-S1
+    ust: U4-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U4
+    konum:
+    - 19.5
+    - 11.5
+  - id: U4-B2
+    ust: U4-B1
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: U4-S2
+    ust: U4-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U4
+    konum:
+    - 22.5
+    - 11.5
+  - id: U4-B3
+    ust: U4-B2
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U4-S4
+    ust: U4-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U4
+    konum:
+    - 22.5
+    - 14.5
+  - id: U4-B4
+    ust: U4-B3
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: U4-S3
+    ust: U4-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: U4
+    konum:
+    - 19.5
+    - 14.5
+  - id: ANA-D6
+    ust: ANA-D5
+    uzunluk_m: 0.3
+    kot_farki_m: 0.0
+    cap: '65'
+    parcalar: {}
+  - id: RON-B1
+    ust: ANA-D6
+    uzunluk_m: 10.5
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      te_donus: 1
+  - id: RON-S1
+    ust: RON-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: RON
+    konum:
+    - 19.5
+    - 18.0
+  - id: RON-B2
+    ust: RON-B1
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: RON-S2
+    ust: RON-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: RON
+    konum:
+    - 22.5
+    - 18.0
+  - id: ANA-D7
+    ust: ANA-D6
+    uzunluk_m: 5.0
+    kot_farki_m: 0.0
+    cap: '65'
+    parcalar: {}
+  - id: IDR-B1
+    ust: ANA-D7
+    uzunluk_m: 5.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      te_donus: 1
+  - id: IDR-S3
+    ust: IDR-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: IDR
+    konum:
+    - 24.0
+    - 6.0
+  - id: IDR-B2
+    ust: IDR-B1
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: IDR-S1
+    ust: IDR-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: IDR
+    konum:
+    - 24.0
+    - 2.0
+  - id: IDR-B3
+    ust: IDR-B2
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: IDR-S2
+    ust: IDR-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: IDR
+    konum:
+    - 28.0
+    - 2.0
+  - id: IDR-B4
+    ust: IDR-B3
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: IDR-S4
+    ust: IDR-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: IDR
+    konum:
+    - 28.0
+    - 6.0
+  - id: ANA-D8
+    ust: ANA-D7
+    uzunluk_m: 1.0
+    kot_farki_m: 0.0
+    cap: '50'
+    parcalar: {}
+  - id: STR-B1
+    ust: ANA-D8
+    uzunluk_m: 4.0
+    kot_farki_m: 0.0
+    cap: '40'
+    parcalar:
+      te_donus: 1
+  - id: STR-S1
+    ust: STR-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: STR
+    konum:
+    - 25.5
+    - 11.5
+  - id: STR-B2
+    ust: STR-B1
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '32'
+    parcalar:
+      dirsek_90: 1
+  - id: STR-S2
+    ust: STR-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: STR
+    konum:
+    - 28.5
+    - 11.5
+  - id: STR-B3
+    ust: STR-B2
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: STR-S4
+    ust: STR-B3
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: STR
+    konum:
+    - 28.5
+    - 14.5
+  - id: STR-B4
+    ust: STR-B3
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: STR-S3
+    ust: STR-B4
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: STR
+    konum:
+    - 25.5
+    - 14.5
+  - id: ANA-D9
+    ust: ANA-D8
+    uzunluk_m: 0.3
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar: {}
+  - id: ARS-B1
+    ust: ANA-D9
+    uzunluk_m: 10.5
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      te_donus: 1
+  - id: ARS-S1
+    ust: ARS-B1
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: ARS
+    konum:
+    - 25.5
+    - 18.0
+  - id: ARS-B2
+    ust: ARS-B1
+    uzunluk_m: 3.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+  - id: ARS-S2
+    ust: ARS-B2
+    uzunluk_m: 0.2
+    kot_farki_m: -0.2
+    cap: '25'
+    parcalar:
+      te_donus: 1
+    sprinkler: true
+    mahal: ARS
+    konum:
+    - 28.5
+    - 18.0
+  - id: YD-1-HAT
+    ust: KAT-VANA
+    uzunluk_m: 15.6
+    kot_farki_m: -1.1999999999999997
+    cap: '50'
+    parcalar:
+      te_donus: 1
+      dirsek_90: 2
+      surgulu_vana: 1
+  - id: YD-1
+    ust: YD-1-HAT
+    uzunluk_m: 1.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+    cikis: dolap_yari_sert
+    kat: '3'
+    mahal: KOR
+    konum:
+    - 1.0
+    - 9.6
+    sprinkler_hattindan: true
+  - id: YD-2-HAT
+    ust: KAT-VANA
+    uzunluk_m: 15.6
+    kot_farki_m: -1.1999999999999997
+    cap: '50'
+    parcalar:
+      te_donus: 1
+      dirsek_90: 2
+      surgulu_vana: 1
+  - id: YD-2
+    ust: YD-2-HAT
+    uzunluk_m: 1.0
+    kot_farki_m: 0.0
+    cap: '25'
+    parcalar:
+      dirsek_90: 1
+    cikis: dolap_yari_sert
+    kat: '3'
+    mahal: KOR
+    konum:
+    - 29.0
+    - 9.6
+    sprinkler_hattindan: true

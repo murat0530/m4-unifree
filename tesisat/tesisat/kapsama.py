@@ -230,3 +230,140 @@ def svg_plan(baslik: str, poligon: list[Nokta], analiz: dict, alan_max: float,
 
 def _spr_konum(analiz, i):
     return analiz["_konum"][i]
+
+
+# ---------------------------------------------------------------- yerleşim önerisi
+def yerlesim_oner(poligon: list[Nokta], s_max: float, alan_max: float, duvar_max: float,
+                  min_aralik: float = 2.0, on_ek: str = "S", azami: int = 400) -> dict[str, Nokta]:
+    """Mahal için kuralları sağlayan EN AZ sprinklerli dikdörtgen ızgara.
+
+    Sınır kutusu nx × ny eşit hücreye bölünür, sprinklerler hücre merkezlerine
+    konur (duvara uzaklık = aralığın yarısı). Mahal dışına düşenler atılır ve
+    sonuç mahal_analizi ile doğrulanır; ihlal varsa bir sonraki aday denenir.
+    İçbükey (L, U) mahallerde de çalışır; yine de çıktı mühendisçe kontrol edilmelidir.
+    """
+    xs = [p[0] for p in poligon]
+    ys = [p[1] for p in poligon]
+    x0, y0 = min(xs), min(ys)
+    L, W = max(xs) - x0, max(ys) - y0
+    adaylar = []
+    for nx in range(1, 80):
+        sx = L / nx
+        if sx < min_aralik and nx > 1:
+            break
+        for ny in range(1, 80):
+            sy = W / ny
+            if sy < min_aralik and ny > 1:
+                break
+            if sx > s_max + 1e-9 or sy > s_max + 1e-9 or sx * sy > alan_max + 1e-9:
+                continue
+            if sx / 2 > duvar_max + 1e-9 or sy / 2 > duvar_max + 1e-9:
+                continue
+            adaylar.append((nx * ny, abs(sx - sy), nx, ny))
+    adaylar.sort()
+    for _, _, nx, ny in adaylar[:60]:
+        sx, sy = L / nx, W / ny
+        pts = {}
+        k = 1
+        for j in range(ny):
+            for i in range(nx):
+                p = (round(x0 + sx * (i + 0.5), 3), round(y0 + sy * (j + 0.5), 3))
+                if icinde(p, poligon):
+                    pts[f"{on_ek}{k}"] = p
+                    k += 1
+        if not pts or len(pts) > azami:
+            continue
+        a = mahal_analizi(poligon, pts, s_max, duvar_max, min_aralik, alan_max)
+        if not [t for t in a["ihlaller"] if t[0] != "yakin"]:
+            return pts
+    raise ValueError("Uygun yerleşim bulunamadı — mahal biçimi için elle yerleşim gerekli")
+
+
+SINIF_RENK = {"DT": "#e3f2e1", "OT1": "#dcebf8", "OT2": "#fdf0c8", "OT3": "#fbdcc0", "OT4": "#f7c8b8",
+              "YT1": "#f2b6c6", "YT2": "#e7a6c9", "YT3": "#d995c8", None: "#eeeeee"}
+
+
+def svg_kat_plani(baslik: str, mahaller: list[dict], acik: set[str] | None = None,
+                  dolaplar: list[tuple[str, Nokta]] | None = None, genislik: int = 980) -> str:
+    """Kat planı: mahal sınırları (tehlike sınıfı rengi), sprinkler hücreleri, tasarım alanı.
+
+    mahaller: [{"id", "ad", "sinif", "poligon", "analiz" (None → sprinklersiz/muaf), "alan_max"}]
+    """
+    from html import escape
+    tum = [p for m in mahaller for p in m["poligon"]]
+    x0, x1 = min(p[0] for p in tum), max(p[0] for p in tum)
+    y0, y1 = min(p[1] for p in tum), max(p[1] for p in tum)
+    pad = 30
+    olcek = (genislik - 2 * pad) / max(x1 - x0, 1e-6)
+    yuk = (y1 - y0) * olcek + 2 * pad + 46
+    acik = acik or set()
+
+    def T(p):
+        return pad + (p[0] - x0) * olcek, pad + (y1 - p[1]) * olcek
+
+    def yol(pp):
+        return " ".join(f"{a:.1f},{b:.1f}" for a, b in map(T, pp))
+
+    o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {genislik} {yuk:.0f}" role="img" '
+         f'aria-label="{escape(baslik)}" style="width:100%;height:auto;max-width:{genislik}px;background:#fff;'
+         f'border:1px solid #d9dde5;border-radius:6px">']
+    for m in mahaller:
+        renk = "url(#tarama)" if m.get("analiz") is None else SINIF_RENK.get(m.get("sinif"), "#eee")
+        o.append(f'<polygon points="{yol(m["poligon"])}" fill="{renk}"/>')
+    o.insert(1, '<defs><pattern id="tarama" width="8" height="8" patternUnits="userSpaceOnUse" '
+                'patternTransform="rotate(45)"><rect width="8" height="8" fill="#f4f4f4"/>'
+                '<line x1="0" y1="0" x2="0" y2="8" stroke="#c9c9c9" stroke-width="2"/></pattern></defs>')
+    for m in mahaller:
+        a = m.get("analiz")
+        if not a:
+            continue
+        for i in a["idler"]:
+            h = a["hucreler"][i]
+            if not h:
+                continue
+            asim = a["alanlar"][i] > m["alan_max"] + 1e-9
+            o.append(f'<polygon points="{yol(h)}" fill="{"#f6b8b3" if asim else "none"}" stroke="#8a93a3" '
+                     f'stroke-width="0.5" stroke-dasharray="3 2"/>')
+            if i in acik:
+                o.append(f'<polygon points="{yol(h)}" fill="#2f6fd6" fill-opacity="0.22" stroke="#2f6fd6" '
+                         f'stroke-width="1"/>')
+    for m in mahaller:
+        o.append(f'<polygon points="{yol(m["poligon"])}" fill="none" stroke="#1d2433" stroke-width="2"/>')
+    for m in mahaller:
+        a = m.get("analiz")
+        if a:
+            for i, v, d in a["korunmayan"][:40]:
+                x, y = T(v)
+                o.append(f'<g stroke="#b3261e" stroke-width="2"><line x1="{x - 5:.1f}" y1="{y - 5:.1f}" '
+                         f'x2="{x + 5:.1f}" y2="{y + 5:.1f}"/><line x1="{x - 5:.1f}" y1="{y + 5:.1f}" '
+                         f'x2="{x + 5:.1f}" y2="{y - 5:.1f}"/></g>')
+            for i in a["idler"]:
+                sx, sy = T(a["_konum"][i])
+                o.append(f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="3.2" '
+                         f'fill="{"#2f6fd6" if i in acik else "#1d2433"}"/>')
+        xs = [p[0] for p in m["poligon"]]
+        ys = [p[1] for p in m["poligon"]]
+        cx, cy = T(((min(xs) + max(xs)) / 2, max(ys)))
+        etiket = f'{m["id"]} · {m.get("sinif") or "MUAF"}'
+        o.append(f'<text x="{cx:.1f}" y="{cy + 13:.1f}" text-anchor="middle" font-size="10.5" font-weight="bold" '
+                 f'font-family="Arial" fill="#1d2433" paint-order="stroke" stroke="#fff" stroke-width="3">'
+                 f'{escape(etiket)}</text>')
+    for ad, p in dolaplar or []:
+        x, y = T(p)
+        o.append(f'<rect x="{x - 6:.1f}" y="{y - 6:.1f}" width="12" height="12" fill="#b3261e"/>'
+                 f'<text x="{x + 9:.1f}" y="{y + 4:.1f}" font-size="10" fill="#b3261e" font-family="Arial" '
+                 f'font-weight="bold" paint-order="stroke" stroke="#fff" stroke-width="3">{escape(ad)}</text>')
+    ly = yuk - 20
+    o.append(f'<line x1="{pad}" y1="{ly}" x2="{pad + 5 * olcek:.1f}" y2="{ly}" stroke="#1d2433" stroke-width="2"/>'
+             f'<text x="{pad}" y="{ly - 4}" font-size="10" font-family="Arial">5 m</text>')
+    lx = pad + 5 * olcek + 24
+    kullanilan = sorted({m.get("sinif") for m in mahaller if m.get("analiz")}, key=lambda k: list(SINIF_RENK).index(k))
+    lej = [(SINIF_RENK[k], k) for k in kullanilan] + [("url(#tarama)", "muaf"), ("#2f6fd6", "tasarım alanı"),
+                                                        ("#f6b8b3", "alan aşımı")]
+    for r, t in lej:
+        op = ' fill-opacity="0.4"' if r == "#2f6fd6" else ""
+        o.append(f'<rect x="{lx:.1f}" y="{ly - 9}" width="12" height="10" fill="{r}"{op} stroke="#8a93a3"/>'
+                 f'<text x="{lx + 16:.1f}" y="{ly}" font-size="10" font-family="Arial">{escape(t)}</text>')
+        lx += 22 + 7 * len(t)
+    o.append("</svg>")
+    return "".join(o)

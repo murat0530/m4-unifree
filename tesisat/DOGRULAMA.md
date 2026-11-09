@@ -84,6 +84,19 @@ Birincil kaynak: **BYKHY resmî konsolide metni** ([mevzuat.gov.tr](https://www.
 | Duvara uzaklık ≤ min(2,0 m; S_max/2), şaşırtmalıda 2,3 m, açık kiriş/açık cephe/yanıcı-metal dış duvarda 1,5 m (md. 12.4.1) | selvi.org | ✅ |
 | Tasarım alanının uzun kenarı ≥ 1,2·√A | Yaygın EN 12845 uygulaması | ⚠️ Teyit edilmeli |
 
+### Tehlike sınıflandırması ve kompartıman (BYKHY resmî metin)
+| Değer | Kaynak | Sonuç |
+|---|---|---|
+| Hastaneler, oteller, konutlar, lokantalar, okullar, bürolar → OT1 | BYKHY Ek-1/B "Çeşitli" satırı | ✅ |
+| Fizik laboratuvarları, çamaşırhaneler, otoparklar → OT2; tesisat odaları → OT3 | BYKHY Ek-1/B | ✅ |
+| Diş protez laboratuvarı → OT2; arşiv ve depo → OT3 | Benzeşim (ihtiyatlı) | ⚠️ Mühendis kararı. Araç bu atamalarda UYARI verir. |
+| Islak hacim, merdiven, asansör kuyusu, gazlı söndürmeli mahal muafiyeti | BYKHY md. 96/3 | ✅ |
+| Su ve pompa kapasitesi en yüksek sınıfa göre | BYKHY md. 19/1 | ✅ |
+| Düşük Tehlike: kompartıman ≤ 126 m², en az 30 dk dayanım | BYKHY md. 19/2-a, Ek-1/A | ✅ |
+| Sağlık yapısı kompartımanı ≤ 1500 m², yangın kontrol sistemi ile ×2 | BYKHY Ek-4, not (1) | ✅ |
+| Diş hekimi muayenehanesi = büro binası; hastane ve klinik = sağlık yapısı | BYKHY md. 11/1-b, 12/1 | ✅ |
+| Ek-7'deki sağlık tesisi düzenlemelerinin bir kısmı Danıştay kararıyla iptal (E.2019/261) | BYKHY dipnotu | ℹ️ Ek-1 ve Ek-4 bu iptalden etkilenmiyor |
+
 ### Kapsama geometrisi (`tests/test_kapsama.py`, 13 test)
 - **6×6 ızgara (3,4 m aralık, duvara 1,7 m):** Her hücre 11,56 m², toplam = mahal alanı (416,16 m²). R_max = √(2² + 2²) = 2,83 m.
 - **L biçimli mahal:** Köşe sprinklerinin hücresi el hesabıyla 4×4 = 16 m²; toplam = 108 m² (L alanı).
