@@ -164,11 +164,25 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
         k = len(cocuklar)
         sis = sistem(hid)
         dugum = f"{hid} bitiş düğümü"
+        spr_cikis = p.tip == "sprinkler"
         if k == 0:
             if not p.tip:   # K0
                 belirsiz("Fitting", dugum, "Kör uç (çıkışsız hat sonu) — tapa/kapak gerekebilir",
                          "Çizimden kontrol; tapa kalemi ekleyin", ETKI_MIKTAR, bag_kaynak=(hid,))
+            elif spr_cikis:   # E1: hat ucundaki sprinkler bağlantısı (½")
+                m.satirlar.append(Satir(f"FIT-SPRUC-{p.dn}x15", f"Sprinkler uç bağlantısı DN{p.dn}×½\" (redüksiyonlu "
+                                        f"dirsek veya redüksiyonlu manşon){fit_ek(p.dn)}", sis, kat(p), dugum,
+                                        f"{p.dn}x15", "adet", 1, HESAPLANAN,
+                                        "Kural E1: hat ucunda sprinkler — bağlantı parçası var, tipi geometriye bağlı"))
             continue
+        if k == 1 and spr_cikis:   # T4: hat ortasında sprinkler çıkışı → giriş × geçiş × ½"
+            c = cocuklar[0]
+            m.satirlar.append(Satir(f"FIT-TE-{p.dn}x{c.dn}x15", f"Te {p.dn}×{c.dn}×½\" (sprinkler çıkışlı)"
+                                    f"{fit_ek(p.dn)}", sis, kat(p), dugum, f"{p.dn}x{c.dn}x15", "adet", 1, HESAPLANAN,
+                                    "Kural T4: hat ortasında sprinkler çıkışı = 1 te (çap değişimi te içinde)"))
+            continue
+        if k >= 2 and spr_cikis:   # sprinkler çıkışı + 2 devam → 4 yollu
+            k += 1
         if k == 1:
             c = cocuklar[0]
             if c.dn != p.dn:   # R1
@@ -184,7 +198,7 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
                          "Çizimden bağlantı tipini belirleyip kalemi ekleyin", ETKI_MIKTAR,
                          bag_kaynak=(dugum, c.id))
             continue
-        if k == 2:   # T1: üç ağızlı te (giriş × geçiş × kol)
+        if k == 2 and not spr_cikis:   # T1: üç ağızlı te (giriş × geçiş × kol)
             gecis, kol = sorted(cocuklar, key=lambda x: (-x.dn, x.id in te_beyan))
             esit = p.dn == gecis.dn == kol.dn
             ad = (f"Te {p.dn}×{gecis.dn}×{kol.dn} (giriş×geçiş×kol)" +
@@ -219,6 +233,11 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
                  "güzergâh geometrisi olmadığından fiziksel dirsek sayısı doğrulanamadı",
                  "DXF boru katmanından güzergâh okununca açı kuralıyla (D2) yeniden sayılacak", ETKI_MIKTAR,
                  bag_kod_on_ek="FIT-DIRSEK")
+    if any(s.kod.startswith("FIT-SPRUC") for s in m.satirlar):
+        belirsiz("Fitting", "uç sprinklerler", "Hat ucundaki sprinkler bağlantısının tipi (redüksiyonlu dirsek / "
+                 "redüksiyonlu manşon) boru geometrisi olmadan belirlenemez — adet kesin, tanım değil",
+                 "Çizimden sprinklerin borunun altında mı ucunda mı olduğunu belirleyin", ETKI_TANIM,
+                 bag_kod_on_ek="FIT-SPRUC")
     if _baglanti(ayar, 25) is None or _baglanti(ayar, 100) is None or not fit_sinif:
         belirsiz("Fitting", "tümü", "Fitting bağlantı yöntemi (dişli / kaynaklı / yivli) ve/veya malzeme sınıfı "
                  "(ör. TS EN 10242 temper döküm, TS EN 10253 kaynaklı) tüm çaplar için tanımlı değil — satın alma "

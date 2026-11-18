@@ -85,7 +85,9 @@ Düğüm = bir hattın bitiş noktası. Gelen hat P, giden hatlar c₁…c_k.
 | **R1a** | k = 1 ve DN(c) > DN(P) | Ek olarak "akış yönünde çap büyüyor" belirsizliği | — |
 | **R2** | k = 1 ve hidrolik girdide c için te beyan edilmiş | Kalem yok ("bu bağlantı parçası metrajda YOK"). Belirsizlik, düğüme ve c'nin satırlarına bağlanır. | — |
 | **T1** | k = 2 | 1 adet **üç ağızlı te: giriş × geçiş × kol**, örneğin `FIT-TE-40x32x25`. Kol küçük çaplı çıkıştır; çaplar eşitse kol, girdide te beyan edilen çıkıştır. Geçiş giriş çapından küçükse not satırına satın alma alternatifi ("eşit te + redüksiyon") yazılır, ama bu alternatif **ayrıca sayılmaz**. | hesaplanan |
-| **C1** | k ≥ 3 | "(k+1) yollu bağlantı" (kollektör, haç ya da ardışık te) | **kontrol gerekli** |
+| **T4** | P'nin ucunda sprinkler var ve k = 1 (sprinkler hat ortasında) | 1 adet te DN(P)×DN(c)×½", sprinkler çıkışlı | hesaplanan |
+| **E1** | P'nin ucunda sprinkler var ve k = 0 (hat ucunda sprinkler) | 1 adet "sprinkler uç bağlantısı DN(P)×½" (redüksiyonlu dirsek veya redüksiyonlu manşon)". Adet kesindir, tipi geometriye bağlı olduğu için "kalem tanımı" belirsizliği bağlanır. | hesaplanan |
+| **C1** | k ≥ 3, ya da sprinkler çıkışı + 2 devam | "(k+1) yollu bağlantı" (kollektör, haç ya da ardışık te) | **kontrol gerekli** |
 
 *Önceki sürümden değişiklik:* Eski T2 kuralı te'ye ek olarak ayrı bir redüksiyon sayıyordu; bu çift sayımdı ve kaldırıldı. Eski T3 kuralı ("eşit çaplı iki çıkışta geçiş yönü belirsiz") da kaldırıldı. Üç ağızlı tanımda iki çıkış eşit çaplı olduğundan yön, satın alınacak kalemi değiştirmez.
 

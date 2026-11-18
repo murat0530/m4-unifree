@@ -243,3 +243,27 @@ def test_her_sey_tamamsa_teklife_hazir(tmp_path):
     td = {r[0]: r[1] for r in load_workbook(x, data_only=True)["Teklif durumu"].iter_rows(min_row=7, values_only=True)
           if r[0]}
     assert td["TEKLİF DURUMU"] == "TEKLİF TAMAMLANMADI"
+
+
+def test_hat_ortasi_ve_ucu_sprinkler_T4_E1():
+    # T12 tipi branş: kollektör DN40 → DN32 (2. sprinkler hat ortasında) → DN25 (1. sprinkler uçta)
+    h = [{"id": "K", "ust": None, "uzunluk_m": 2, "cap": "40"},
+         {"id": "Sb", "ust": "K", "uzunluk_m": 1.348, "cap": "32", "sprinkler": True},
+         {"id": "Sa", "ust": "Sb", "uzunluk_m": 3.167, "cap": "25", "sprinkler": True}]
+    m = metraj.metraj_cikar(proje(h), K)
+    c = say(m)
+    assert c["FIT-TE-32x25x15"] == 1          # T4: 1¼"×1"×½" sprinkler çıkışlı te
+    assert c["FIT-SPRUC-25x15"] == 1          # E1: 1"×½" uç bağlantısı
+    assert c["FIT-RED-40x32"] == 1            # R1
+    uc = [b for b in m.belirsizlikler if b.nesne == "uç sprinklerler"]
+    assert uc and uc[0].etki == metraj.ETKI_TANIM
+
+
+def test_sprinkler_cikisi_ve_iki_devam_coklu():
+    h = [{"id": "K", "ust": None, "uzunluk_m": 2, "cap": "50", "sprinkler": True},
+         {"id": "A", "ust": "K", "uzunluk_m": 2, "cap": "32"}, {"id": "SA", "ust": "A", "uzunluk_m": 0.2, "cap": "25",
+                                                                 "sprinkler": True},
+         {"id": "B", "ust": "K", "uzunluk_m": 2, "cap": "32"}, {"id": "SB", "ust": "B", "uzunluk_m": 0.2, "cap": "25",
+                                                                 "sprinkler": True}]
+    m = metraj.metraj_cikar(proje(h), K)
+    assert say(m)["FIT-COKLU-DN50-4YOL"] == 1
