@@ -1,16 +1,16 @@
-"""Yangın tesisatı metraj motoru — MİKTAR üretir, fiyat üretmez.
+"""Yangın tesisatı metraj motoru — MİKTAR üretir, fiyat ve poz üretmez.
 
-Girdi: hesaplanmış ağ modeli (yangin.YanginAgi). Çıktı: detay metraj satırları,
-belirsizlikler ve iç tutarlılık kontrolleri. Fiyat ve poz ayrı tabloda tutulur
-(metraj_excel.py → "Fiyatlar" sayfası); burada hiçbir poz numarası üretilmez.
+Girdi: ağ modeli (yangin.YanginAgi). Çıktı: detay metraj satırları, belirsizlikler
+(her biri numaralı ve ilgili satırlara bağlı) ve iç tutarlılık sayıları.
 
-Her satırın "çıkarım yöntemi" şunlardan biridir:
-  ölçülen         çizimden (DXF) doğrudan ölçülen uzunluk/konum
-  hesaplanan      ağ topolojisi veya yazılı bir kuraldan türetilen miktar
-  elle girilen    proje dosyasına kullanıcının girdiği değer
-  kontrol gerekli kural kesin karar veremedi; mühendis çizimden doğrulamalı
+İki ayrı kavram:
+  * ÇIKARIM YÖNTEMİ — miktar nereden geldi:
+        ölçülen | hesaplanan | elle girilen | kontrol gerekli
+  * ONAY DURUMU — satır teklife girebilir mi (Excel'de formülle):
+        belirsizlik açık | onay bekliyor | onaylandı
+    Bir satıra bağlı açık belirsizlik varsa, yöntemi ne olursa olsun "belirsizlik açık"tır.
 
-Fitting tanıma kuralları: METRAJ_KURALLARI.md (bu modülle birebir aynı tutulmalı).
+Kurallar: METRAJ_KURALLARI.md (bu modülle birebir aynı tutulmalı).
 """
 from __future__ import annotations
 
@@ -22,6 +22,8 @@ from .yangin import YanginAgi
 
 OLCULEN, HESAPLANAN, ELLE, KONTROL = "ölçülen", "hesaplanan", "elle girilen", "kontrol gerekli"
 YONTEMLER = (OLCULEN, HESAPLANAN, ELLE, KONTROL)
+# Belirsizliğin teklife etkisi
+ETKI_MIKTAR, ETKI_TANIM, ETKI_KAPSAM = "miktar", "kalem tanımı", "kapsam"
 
 SERI_AD = {
     "CELIK_EN10255_ORTA": "Çelik boru TS EN 10255 orta seri",
@@ -53,6 +55,7 @@ class Satir:
     miktar: float
     yontem: str
     not_: str = ""
+    belirsizlik_ids: list[str] = field(default_factory=list)
 
     def __post_init__(self):
         if self.yontem not in YONTEMLER:
@@ -64,8 +67,12 @@ class Belirsizlik:
     kategori: str
     nesne: str
     aciklama: str
-    kalem_kodu: str
     oneri: str
+    etki: str = ETKI_MIKTAR
+    bag_kaynak: tuple[str, ...] = ()      # bu kaynak nesnelerin satırlarına bağlanır
+    bag_kod_on_ek: str | None = None      # ve/veya kodu bu önekle başlayan satırlara
+    id: str = ""
+    kalem_kodlari: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -73,8 +80,8 @@ class Metraj:
     proje_adi: str
     satirlar: list[Satir] = field(default_factory=list)
     belirsizlikler: list[Belirsizlik] = field(default_factory=list)
-    model: dict = field(default_factory=dict)        # iç tutarlılık kontrolü için modelden sayılar
-    referans: dict | None = None                     # kontrol edilmiş metraj {kalem_kodu: miktar}
+    model: dict = field(default_factory=dict)
+    referans: dict | None = None
 
 
 def _yontem(deger: str | None, varsayilan: str = ELLE) -> str:
@@ -85,22 +92,42 @@ def _yontem(deger: str | None, varsayilan: str = ELLE) -> str:
     return deger
 
 
+def _baglanti(ayar: dict, dn: int) -> str | None:
+    """Bağlantı yöntemi: tek değer veya {"<=50": "dişli", ">=65": "yivli"} biçiminde DN aralıkları."""
+    b = ayar.get("baglanti_yontemi")
+    if b is None or isinstance(b, str):
+        return b
+    for anahtar, deger in b.items():
+        a = str(anahtar).replace(" ", "")
+        if (a.startswith("<=") and dn <= int(a[2:])) or (a.startswith(">=") and dn >= int(a[2:])) \
+                or (a.isdigit() and dn == int(a)):
+            return deger
+    return None
+
+
 def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
     if "yangin" not in proje:
         raise GirdiHatasi("metraj: projede 'yangin' bölümü yok")
     g = proje["yangin"]
     ag = YanginAgi(g, kurallar)
     m = Metraj((proje.get("proje") or {}).get("ad", "Proje"))
+    ayar = g.get("metraj") or {}
     seri = ag.seri_ad
     malzeme = SERI_AD.get(seri, seri)
+    fit_sinif = ayar.get("fitting_malzeme")
+
+    def fit_ek(dn):
+        parca = [x for x in (_baglanti(ayar, dn), fit_sinif) if x]
+        return f" — {', '.join(parca)}" if parca else ""
+
+    def belirsiz(*a, **k):
+        m.belirsizlikler.append(Belirsizlik(*a, **k))
 
     # --- sistem sınıflaması: hattın aşağısındaki çıkış tipleri
     asagi: dict[str, set] = {}
     for hid in reversed(ag.sira):
         h = ag.hatlar[hid]
-        tipler = set()
-        if h.tip:
-            tipler.add("sprinkler" if h.tip == "sprinkler" else "dolap")
+        tipler = {("sprinkler" if h.tip == "sprinkler" else "dolap")} if h.tip else set()
         for c in ag.cocuk.get(hid, []):
             tipler |= asagi[c]
         asagi[hid] = tipler
@@ -111,25 +138,23 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
             return "Yangın — sprinkler"
         if t == {"dolap"}:
             return "Yangın — dolap/hidrant"
-        if t:
-            return "Yangın — ortak besleme"
-        return "Yangın — çıkışsız hat"
+        return "Yangın — ortak besleme" if t else "Yangın — çıkışsız hat"
 
     def kat(h):
         return str(h.ham.get("kat", "")) or "-"
 
-    # --- 1) Borular
+    # --- 1) Borular (B1–B3)
     for hid in ag.sira:
         h = ag.hatlar[hid]
         if h.L <= 0:
-            m.belirsizlikler.append(Belirsizlik("Boru", hid, "Hat uzunluğu 0 — metraja girmedi", "", "Uzunluğu girin"))
+            belirsiz("Boru", hid, "Hat uzunluğu 0 — metraja girmedi", "Uzunluğu girin", ETKI_MIKTAR)
             continue
         not_ = f"düşey bileşen {abs(h.dz):.2f} m dahil" if abs(h.dz) > 1e-9 else ""
         m.satirlar.append(Satir(f"BORU-{seri}-DN{h.dn}", f"{malzeme} DN{h.dn}", sistem(hid), kat(h), hid,
                                 str(h.dn), "m", round(h.L, 3), _yontem(h.ham.get("uzunluk_yontemi")), not_))
         if not asagi[hid]:
-            m.belirsizlikler.append(Belirsizlik("Boru", hid, "Hattın aşağısında çıkış (sprinkler/dolap) yok",
-                                                f"BORU-{seri}-DN{h.dn}", "Ölü hat mı, eksik çıkış mı? Çizimden kontrol"))
+            belirsiz("Boru", hid, "Hattın aşağısında çıkış (sprinkler/dolap) yok", "Ölü hat mı, eksik çıkış mı? "
+                     "Çizimden kontrol", ETKI_MIKTAR, bag_kaynak=(hid,))
 
     # --- 2) Topolojiden fittingler (düğüm = hattın bitiş noktası)
     te_beyan = {hid for hid in ag.sira if (ag.hatlar[hid].ham.get("parcalar") or {}).get("te_donus")}
@@ -138,65 +163,69 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
         cocuklar = [ag.hatlar[c] for c in ag.cocuk.get(hid, [])]
         k = len(cocuklar)
         sis = sistem(hid)
-        kaynak = f"{hid} bitiş düğümü"
+        dugum = f"{hid} bitiş düğümü"
         if k == 0:
-            if not p.tip:
-                m.belirsizlikler.append(Belirsizlik("Fitting", kaynak, "Kör uç (çıkışsız hat sonu) — tapa/kapak "
-                                                    "gerekebilir", "", "Çizimden kontrol; tapa kalemi ekleyin"))
+            if not p.tip:   # K0
+                belirsiz("Fitting", dugum, "Kör uç (çıkışsız hat sonu) — tapa/kapak gerekebilir",
+                         "Çizimden kontrol; tapa kalemi ekleyin", ETKI_MIKTAR, bag_kaynak=(hid,))
             continue
         if k == 1:
             c = cocuklar[0]
-            if c.dn != p.dn:
-                m.satirlar.append(Satir(f"FIT-RED-{p.dn}x{c.dn}", f"Redüksiyon DN{p.dn}×DN{c.dn}", sis, kat(p), kaynak,
-                                        f"{p.dn}x{c.dn}", "adet", 1, HESAPLANAN,
+            if c.dn != p.dn:   # R1
+                m.satirlar.append(Satir(f"FIT-RED-{p.dn}x{c.dn}", f"Redüksiyon DN{p.dn}×DN{c.dn}{fit_ek(p.dn)}", sis,
+                                        kat(p), dugum, f"{p.dn}x{c.dn}", "adet", 1, HESAPLANAN,
                                         "Kural R1: tek çıkışlı düğümde çap değişimi"))
-                if c.dn > p.dn:
-                    m.belirsizlikler.append(Belirsizlik("Fitting", kaynak, f"Akış yönünde çap büyüyor (DN{p.dn}→DN{c.dn})",
-                                                        f"FIT-RED-{p.dn}x{c.dn}", "Çap seçimini kontrol edin"))
-            if c.id in te_beyan:
-                m.belirsizlikler.append(Belirsizlik(
-                    "Fitting", kaynak, f"Hidrolik girdide '{c.id}' için te beyan edilmiş, topolojide tek çıkış var "
-                    "(uç bağlantı: dirsek mi, te + tapa mı?)", "", "Çizimden bağlantı tipini belirleyin; otomatik "
-                    "kesinleştirilmedi"))
+                if c.dn > p.dn:   # R1a
+                    belirsiz("Fitting", dugum, f"Akış yönünde çap büyüyor (DN{p.dn}→DN{c.dn})", "Çap seçimini kontrol "
+                             "edin", ETKI_MIKTAR, bag_kaynak=(dugum,))
+            if c.id in te_beyan:   # R2: eksik olabilecek bağlantı parçası
+                belirsiz("Fitting", dugum, f"Hidrolik girdide '{c.id}' için te beyan edilmiş, topolojide tek çıkış "
+                         "var — uç bağlantı dirsek mi, te + tapa mı? Bu bağlantı parçası metrajda YOK.",
+                         "Çizimden bağlantı tipini belirleyip kalemi ekleyin", ETKI_MIKTAR,
+                         bag_kaynak=(dugum, c.id))
             continue
-        if k == 2:
-            # Kural T1: küçük çaplı çıkış = kol; eşitse te beyan edilen çıkış kol sayılır
+        if k == 2:   # T1: üç ağızlı te (giriş × geçiş × kol)
             gecis, kol = sorted(cocuklar, key=lambda x: (-x.dn, x.id in te_beyan))
-            a, b = gecis, kol
-            m.satirlar.append(Satir(f"FIT-TE-{p.dn}x{kol.dn}", f"Te DN{p.dn}×DN{kol.dn}" +
-                                    (" (eşit)" if kol.dn == p.dn else " (redüksiyonlu çıkış)"), sis, kat(p), kaynak,
-                                    f"{p.dn}x{kol.dn}", "adet", 1, HESAPLANAN, "Kural T1: iki çıkışlı düğüm = 1 te"))
+            esit = p.dn == gecis.dn == kol.dn
+            ad = (f"Te {p.dn}×{gecis.dn}×{kol.dn} (giriş×geçiş×kol)" +
+                  (" eşit" if esit else " redüksiyonlu") + fit_ek(p.dn))
+            not_ = "Kural T1: iki çıkışlı düğüm = 1 te."
             if gecis.dn != p.dn:
-                m.satirlar.append(Satir(f"FIT-RED-{p.dn}x{gecis.dn}", f"Redüksiyon DN{p.dn}×DN{gecis.dn}", sis, kat(p),
-                                        kaynak, f"{p.dn}x{gecis.dn}", "adet", 1, HESAPLANAN,
-                                        "Kural T2: te geçiş tarafında çap değişimi (redüksiyonlu te olarak da "
-                                        "temin edilebilir)"))
-            if a.dn == b.dn and a.dn != p.dn:
-                m.belirsizlikler.append(Belirsizlik("Fitting", kaynak, f"İki çıkış da DN{a.dn}, giriş DN{p.dn}: hangi "
-                                                    "kolun geçiş olduğu topolojiden belirlenemez",
-                                                    f"FIT-TE-{p.dn}x{kol.dn}", "Çizimden geçiş yönünü belirleyin"))
+                not_ += (f" Satın alma alternatifi: eşit te DN{p.dn} + redüksiyon {p.dn}×{gecis.dn} — "
+                         "alternatif ayrıca SAYILMAZ.")
+            m.satirlar.append(Satir(f"FIT-TE-{p.dn}x{gecis.dn}x{kol.dn}", ad, sis, kat(p), dugum,
+                                    f"{p.dn}x{gecis.dn}x{kol.dn}", "adet", 1, HESAPLANAN, not_))
             continue
-        # k >= 3
-        m.satirlar.append(Satir(f"FIT-COKLU-DN{p.dn}-{k + 1}YOL", f"{k + 1} yollu bağlantı DN{p.dn} "
-                                "(kollektör / haç / ardışık te)", sis, kat(p), kaynak, str(p.dn), "adet", 1, KONTROL,
+        # C1: k ≥ 3
+        m.satirlar.append(Satir(f"FIT-COKLU-DN{p.dn}-{k + 1}YOL", f"{k + 1} yollu bağlantı DN{p.dn} (kollektör / haç / "
+                                f"ardışık te){fit_ek(p.dn)}", sis, kat(p), dugum, str(p.dn), "adet", 1, KONTROL,
                                 "Kural C1: üçten fazla çıkış — fiziksel çözüm çizimden belirlenmeli"))
-        m.belirsizlikler.append(Belirsizlik("Fitting", kaynak, f"{k} çıkışlı düğüm ({', '.join(c.id for c in cocuklar)})"
-                                            " — kollektör, haç veya ardışık te olabilir",
-                                            f"FIT-COKLU-DN{p.dn}-{k + 1}YOL", "Çizimden belirleyip uygun kaleme çevirin"))
+        belirsiz("Fitting", dugum, f"{k} çıkışlı düğüm ({', '.join(c.id for c in cocuklar)}) — kollektör, haç veya "
+                 "ardışık te olabilir", "Çizimden belirleyip uygun kaleme çevirin", ETKI_TANIM, bag_kaynak=(dugum,))
 
-    # --- 3) Girdideki parça listesinden dirsek ve vanalar (hidrolik girdisi; geometriyle doğrulanmadı)
+    # --- 3) Girdideki parça listesinden dirsek ve vanalar (D1, V1)
     for hid in ag.sira:
         h = ag.hatlar[hid]
         for ad, adet in (h.ham.get("parcalar") or {}).items():
             if ad in DIRSEK_AD:
-                m.satirlar.append(Satir(f"FIT-{ad.upper().replace('_', '')}-DN{h.dn}", f"{DIRSEK_AD[ad]} DN{h.dn}",
-                                        sistem(hid), kat(h), hid, str(h.dn), "adet", float(adet), ELLE,
-                                        "Kural D1: hidrolik parça listesinden; geometriyle doğrulanmadı"))
+                m.satirlar.append(Satir(f"FIT-{ad.upper().replace('_', '')}-DN{h.dn}", f"{DIRSEK_AD[ad]} DN{h.dn}"
+                                        f"{fit_ek(h.dn)}", sistem(hid), kat(h), hid, str(h.dn), "adet", float(adet),
+                                        ELLE, "Kural D1: hidrolik parça listesinden; geometriyle doğrulanmadı"))
             elif ad in VANA_AD:
                 m.satirlar.append(Satir(f"VANA-{ad.upper()}-DN{h.dn}", f"{VANA_AD[ad]} DN{h.dn}", sistem(hid), kat(h),
                                         hid, str(h.dn), "adet", float(adet), ELLE, "Kural V1: hidrolik parça listesinden"))
+    if any(s.kod.startswith("FIT-DIRSEK") for s in m.satirlar):
+        belirsiz("Fitting", "dirsekler", "Dirsek adetleri hidrolik eşdeğer boy için girilmiş parça listesinden; boru "
+                 "güzergâh geometrisi olmadığından fiziksel dirsek sayısı doğrulanamadı",
+                 "DXF boru katmanından güzergâh okununca açı kuralıyla (D2) yeniden sayılacak", ETKI_MIKTAR,
+                 bag_kod_on_ek="FIT-DIRSEK")
+    if _baglanti(ayar, 25) is None or _baglanti(ayar, 100) is None or not fit_sinif:
+        belirsiz("Fitting", "tümü", "Fitting bağlantı yöntemi (dişli / kaynaklı / yivli) ve/veya malzeme sınıfı "
+                 "(ör. TS EN 10242 temper döküm, TS EN 10253 kaynaklı) tüm çaplar için tanımlı değil — satın alma "
+                 "tanımı eksik", "yangin.metraj.baglanti_yontemi ({'<=50': 'dişli', '>=65': 'yivli'}) ve "
+                 "fitting_malzeme girin", ETKI_TANIM, bag_kod_on_ek="FIT-")
 
-    # --- 4) Çıkış elemanları
+    # --- 4) Çıkış elemanları (S1, O1)
     for hid in ag.cikislar:
         h = ag.hatlar[hid]
         yontem = _yontem(h.ham.get("konum_yontemi"))
@@ -208,38 +237,67 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
             m.satirlar.append(Satir(f"CIKIS-{h.tip.upper()}", CIKIS_AD.get(h.tip, h.tip), sistem(hid), kat(h), hid, "",
                                     "adet", 1, yontem, ""))
     if ag.sprinklerler:
-        m.belirsizlikler.append(Belirsizlik(
-            "Sprinkler", "tümü", "Sprinkler tipi (sarkık/dik/yan duvar), sıcaklık sınıfı ve tepki süresi (standart/"
-            "hızlı) projede tanımlı değil — tek kalem altında toplandı", "SPR-K80",
-            "Mahal bazında tip ve sıcaklık sınıfını belirleyin (ör. hastane hasta alanlarında hızlı tepkili)"))
+        belirsiz("Sprinkler", "tümü", "Sprinkler tipi (sarkık/dik/yan duvar), sıcaklık sınıfı ve tepki süresi "
+                 "(standart/hızlı) tanımlı değil — tek kalem altında toplandı", "Mahal bazında tip ve sıcaklık "
+                 "sınıfını belirleyin", ETKI_TANIM, bag_kod_on_ek="SPR-K")
+        # S2–S4: yedek sprinkler, dolabı ve anahtarı AYRI kalemler
         yedek = g.get("yedek_sprinkler")
+        k80 = sorted({int(round(ag.hatlar[i].K)) for i in ag.sprinklerler})
         if yedek:
-            m.satirlar.append(Satir("SPR-YEDEK", "Yedek sprinkler (dolabı ve anahtarıyla)", "Yangın — sprinkler", "-",
-                                    "yangin.yedek_sprinkler", "", "adet", float(yedek), ELLE, "BYKHY md. 96/8: en az 6"))
+            m.satirlar.append(Satir("SPR-YEDEK-BASLIK", f"Yedek sprinkler başlığı (K{'/K'.join(map(str, k80))})",
+                                    "Yangın — sprinkler", "-", "yangin.yedek_sprinkler", "", "adet", float(yedek), ELLE,
+                                    "Kural S2: BYKHY md. 96/8 en az 6"))
+        dolap = ayar.get("yedek_dolap_adet")
+        anahtar = ayar.get("sprinkler_anahtari_adet")
+        m.satirlar.append(Satir("SPR-YEDEK-DOLAP", "Yedek sprinkler dolabı (kabin)", "Yangın — sprinkler", "-",
+                                "yangin.metraj.yedek_dolap_adet" if dolap else "kural S3", "", "adet",
+                                float(dolap or 1), ELLE if dolap else HESAPLANAN,
+                                "Kural S3: girilmemişse tesis başına 1 (varsayım)"))
+        m.satirlar.append(Satir("SPR-ANAHTAR", "Sprinkler değiştirme anahtarı", "Yangın — sprinkler", "-",
+                                "yangin.metraj.sprinkler_anahtari_adet" if anahtar else "kural S4", "", "adet",
+                                float(anahtar or len(k80)),
+                                ELLE if anahtar else HESAPLANAN,
+                                "Kural S4: girilmemişse sprinkler tipi (K) başına 1 (varsayım); BYKHY md. 96/8"))
+        if not dolap or not anahtar:
+            belirsiz("Sprinkler", "yedek dolap/anahtar", "Yedek sprinkler dolabı ve/veya anahtar adedi girilmedi; "
+                     "varsayım kuralıyla (S3/S4) hesaplandı", "Adetleri işveren/şartnameye göre girin "
+                     "(yangin.metraj.yedek_dolap_adet, sprinkler_anahtari_adet)", ETKI_MIKTAR,
+                     bag_kaynak=tuple(x for x, v in [("kural S3", dolap), ("kural S4", anahtar)] if not v))
 
-    # --- 5) Askı (yalnızca kural tanımlıysa)
+    # --- 5) Askı — yalnızca kural tanımlıysa, her zaman ÖN HESAP (A1)
     aralik = ((kurallar.get("metraj") or {}).get("aski_araligi_m")) or {}
     if aralik:
         toplam: dict[int, float] = {}
         for hid in ag.sira:
             h = ag.hatlar[hid]
-            yatay = max(h.L - abs(h.dz), 0.0)
-            toplam[h.dn] = toplam.get(h.dn, 0.0) + yatay
+            toplam[h.dn] = toplam.get(h.dn, 0.0) + max(h.L - abs(h.dz), 0.0)
         for dn, L in sorted(toplam.items()):
             a = aralik.get(dn) or aralik.get(str(dn))
             if not a or L <= 0:
                 continue
-            m.satirlar.append(Satir(f"ASKI-DN{dn}", f"Boru askısı DN{dn}", "Yangın — tümü", "-", f"Σ yatay boru DN{dn}",
-                                    str(dn), "adet", float(math.ceil(L / float(a))), HESAPLANAN,
-                                    f"Kural A1: ⌈{L:.1f} m / {a} m⌉ (aralık kural dosyasından)"))
+            m.satirlar.append(Satir(f"ASKI-DN{dn}", f"Boru askısı DN{dn} (ÖN HESAP)", "Yangın — tümü", "-",
+                                    f"Σ yatay boru DN{dn}", str(dn), "adet", float(math.ceil(L / float(a))), HESAPLANAN,
+                                    f"Kural A1: ⌈{L:.1f} m / {a} m⌉ — yaklaşık"))
+        belirsiz("Askı", "tümü", "Askı adedi ön hesaptır: DN bazında toplam yatay uzunluk / aralık. Hat uçları, "
+                 "branşman başları, vana/ağırlık noktaları ve özel (sismik) destekler temsil edilmiyor",
+                 "Nihai metraj için hat bazında askı yerleşimi ve destek kuralları gerekli", ETKI_MIKTAR,
+                 bag_kod_on_ek="ASKI-")
     else:
-        m.belirsizlikler.append(Belirsizlik("Askı", "tümü", "Askı aralığı kuralı tanımlı değil — askı hesaplanmadı",
-                                            "", "Firma/şartname askı aralığını kurallar_ek.metraj.aski_araligi_m "
-                                            "olarak girin (DN → m)"))
-    for kalem, neden in [("İşçilik", "işçilik birimi poz/firma kuralına bağlı — hesaplanmadı"),
-                         ("Boya / korozyon koruması", "şartnameye bağlı — hesaplanmadı"),
-                         ("Pompa grubu, depo, alarm/izleme", "ekipman kalemleri bu metraj kapsamı dışında")]:
-        m.belirsizlikler.append(Belirsizlik(kalem, "tümü", neden, "", "Kural/şartname tanımlandığında eklenecek"))
+        belirsiz("Askı", "tümü", "Askı aralığı kuralı tanımlı değil — askı hesaplanmadı; teklifte askı kalemi YOK",
+                 "Firma/şartname askı kuralını girin (kurallar_ek.metraj.aski_araligi_m)", ETKI_KAPSAM)
+    for kalem, neden in [("İşçilik", "işçilik birimi poz/firma kuralına bağlı — teklifte YOK"),
+                         ("Boya / korozyon koruması", "şartnameye bağlı — teklifte YOK"),
+                         ("Pompa grubu, depo, alarm/izleme", "ekipman kalemleri bu metraj kapsamı dışında — teklifte YOK")]:
+        belirsiz(kalem, "tümü", neden, "Kapsama alınacaksa kural/şartname tanımlanmalı", ETKI_KAPSAM)
+
+    # --- numaralandır ve satırlara bağla
+    for i, b in enumerate(m.belirsizlikler, 1):
+        b.id = f"B{i:02d}"
+        for s in m.satirlar:
+            if (b.bag_kaynak and s.kaynak in b.bag_kaynak) or (b.bag_kod_on_ek and s.kod.startswith(b.bag_kod_on_ek)):
+                s.belirsizlik_ids.append(b.id)
+                if s.kod not in b.kalem_kodlari:
+                    b.kalem_kodlari.append(s.kod)
 
     m.model = {
         "Σ boru uzunluğu (m)": round(sum(ag.hatlar[h].L for h in ag.sira), 3),

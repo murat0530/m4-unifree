@@ -16,7 +16,7 @@ Proje bilgilerini bir YAML dosyasından okur, hidrolik hesabı yapar ve sonucu y
 cd tesisat
 pip install -r requirements.txt
 python -m tesisat hesapla ornekler/ornek_otopark.yaml -o rapor.html --json sonuc.json
-python -m pytest -q tests        # 78 doğrulama testi
+python -m pytest -q tests        # 81 doğrulama testi
 ```
 
 Çıkış kodları:
@@ -59,7 +59,8 @@ Aracın ürettiği şey **yalnızca miktardır**; poz numarası ve fiyat üretme
 
 | Sayfa | İçerik |
 |---|---|
-| Detay metraj | Her satırda kalem kodu, sistem, kat, kaynak nesne, DN, birim, miktar ve **çıkarım yöntemi** (ölçülen / hesaplanan / elle girilen / kontrol gerekli) |
+| Teklif durumu | Açık belirsizlik, onay, poz, fiyat, tarih/kaynak ve referans doğrulaması. Biri bile eksikse **TEKLİF TAMAMLANMADI** gösterir. |
+| Detay metraj | Her satırda kalem kodu, sistem, kat, kaynak nesne, DN, birim, miktar, **çıkarım yöntemi**, bağlı **belirsizlik no**, mühendis onayı ve **onay durumu** |
 | Sistem-DN özeti | Sistem ve kalem bazında toplamlar (formülle Detay sayfasına bağlı) |
 | Belirsizlikler | Kuralların kesin karar veremediği bağlantılar, tanımsız kurallar ve kapsam dışı kalemler |
 | Keşif özeti | Kalem toplamları. Poz ve fiyat Fiyatlar sayfasından okunur; pozu girilmemiş kalem "POZ YOK" görünür. |

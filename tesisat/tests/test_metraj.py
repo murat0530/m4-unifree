@@ -43,15 +43,47 @@ def test_U1_zinciri_el_hesabi():
          spr("S4", "B4", parcalar={"te_donus": 1})]
     m = metraj.metraj_cikar(proje(h), K)
     c = say(m)
-    assert c["FIT-TE-40x25"] == 1 and c["FIT-RED-40x32"] == 1            # T1 + T2
-    assert c["FIT-TE-32x25"] == 1 and c["FIT-RED-32x25"] == 1
-    assert c["FIT-TE-25x25"] == 1
+    # T1: üç ağızlı te (giriş×geçiş×kol); "te + redüksiyon" alternatifi AYRICA SAYILMAZ
+    assert c["FIT-TE-40x32x25"] == 1 and c["FIT-TE-32x25x25"] == 1 and c["FIT-TE-25x25x25"] == 1
+    assert not any(k.startswith("FIT-RED") for k in c)
     assert sum(v for k, v in c.items() if k.startswith("FIT-TE")) == 3    # uç sprinklerde te yok
-    acik = " | ".join(b.aciklama for b in m.belirsizlikler)
-    assert "'S4' için te beyan edilmiş" in acik                            # R2: kesinleştirilmedi
-    assert "hangi kolun geçiş olduğu" in acik                              # T3 (B2 düğümü)
+    r2 = [b for b in m.belirsizlikler if "'S4' için te beyan edilmiş" in b.aciklama]
+    assert r2 and "metrajda YOK" in r2[0].aciklama                         # R2: kesinleştirilmedi
+    s4 = [s for s in m.satirlar if s.kaynak == "S4"]
+    assert s4 and all(r2[0].id in s.belirsizlik_ids for s in s4)          # belirsizlik satıra bağlı
     assert c["SPR-K80"] == 4
     assert c["BORU-CELIK_EN10255_ORTA-DN25"] == pytest.approx(3 + 3 + 4 * 0.2)
+
+
+def test_belirsizlik_satirlara_bagli_ve_yontemden_ayri():
+    h = [{"id": "P", "ust": None, "uzunluk_m": 3, "cap": "40"}, spr("S1", "P"),
+         {"id": "B", "ust": "P", "uzunluk_m": 3, "cap": "25"}, spr("S2", "B")]
+    m = metraj.metraj_cikar(proje(h), K)
+    te = [s for s in m.satirlar if s.kod.startswith("FIT-TE")][0]
+    assert te.yontem == metraj.HESAPLANAN                                  # yöntem değişmedi
+    bag = [b for b in m.belirsizlikler if b.id in te.belirsizlik_ids]
+    assert any(b.etki == metraj.ETKI_TANIM and "bağlantı yöntemi" in b.aciklama for b in bag)
+    # bağlantı yöntemi ve malzeme verilirse kalem tanımına girer, belirsizlik kalkar
+    p = proje(h, metraj={"baglanti_yontemi": {"<=50": "dişli", ">=65": "yivli"},
+                         "fitting_malzeme": "TS EN 10242 temper döküm"})
+    m = metraj.metraj_cikar(p, K)
+    te = [s for s in m.satirlar if s.kod.startswith("FIT-TE")][0]
+    assert "dişli, TS EN 10242 temper döküm" in te.kalem
+    assert not any("bağlantı yöntemi" in b.aciklama for b in m.belirsizlikler)
+
+
+def test_yedek_sprinkler_ayri_kalemler():
+    h = [{"id": "P", "ust": None, "uzunluk_m": 3, "cap": "40"}, spr("S1", "P")]
+    m = metraj.metraj_cikar(proje(h, yedek_sprinkler=6), K)
+    c = say(m)
+    assert c["SPR-YEDEK-BASLIK"] == 6 and c["SPR-YEDEK-DOLAP"] == 1 and c["SPR-ANAHTAR"] == 1
+    assert not any("dolabı ve anahtarıyla" in s.kalem for s in m.satirlar)
+    assert any(b.kategori == "Sprinkler" and "yedek" in b.nesne for b in m.belirsizlikler)  # S3/S4 varsayım
+    m = metraj.metraj_cikar(proje(h, yedek_sprinkler=6,
+                                  metraj={"yedek_dolap_adet": 2, "sprinkler_anahtari_adet": 3}), K)
+    c = say(m)
+    assert c["SPR-YEDEK-DOLAP"] == 2 and c["SPR-ANAHTAR"] == 3
+    assert not any("yedek" in b.nesne for b in m.belirsizlikler)
 
 
 def test_coklu_dugum_kontrol_gerekli_ve_kor_uc():
@@ -106,6 +138,9 @@ def test_aski_yalniz_kural_varsa():
     m = metraj.metraj_cikar(proje(h), k2)
     aski = [s for s in m.satirlar if s.kod == "ASKI-DN50"][0]
     assert aski.miktar == 3 and aski.yontem == metraj.HESAPLANAN   # ⌈(10−2)/3⌉ = 3 (yalnız yatay)
+    assert "ÖN HESAP" in aski.kalem
+    on = [b for b in m.belirsizlikler if b.id in aski.belirsizlik_ids]
+    assert on and "ön hesap" in on[0].aciklama                       # her zaman açık belirsizlikle
 
 
 def test_sistem_siniflamasi():
@@ -133,15 +168,17 @@ def test_ornek_ic_tutarlilik():
 
 
 def _recalc(yol):
-    out = subprocess.run([sys.executable, str(RECALC), str(yol), "120"], capture_output=True, text=True, timeout=200)
+    out = subprocess.run([sys.executable, str(RECALC), str(yol), "180"], capture_output=True, text=True, timeout=300)
     return json.loads(out.stdout)
 
 
-@pytest.mark.skipif(RECALC is None or shutil.which("soffice") is None and not Path("/usr/bin/libreoffice").exists(),
-                    reason="LibreOffice/recalc yok")
+LO = RECALC is not None and (shutil.which("soffice") or Path("/usr/bin/libreoffice").exists())
+
+
+@pytest.mark.skipif(not LO, reason="LibreOffice/recalc yok")
 def test_excel_fiyat_ve_referans(tmp_path):
     ref = tmp_path / "ref.csv"
-    ref.write_text("kalem_kodu,miktar\nSPR-K80,55\nBORU-CELIK_EN10255_ORTA-DN25,118.0\nFIT-TE-25x25,12\n",
+    ref.write_text("kalem_kodu,miktar\nSPR-K80,55\nBORU-CELIK_EN10255_ORTA-DN25,118.0\nFIT-TE-25x25x25,12\n",
                    encoding="utf-8")
     x = tmp_path / "m.xlsx"
     assert main(["metraj", str(ORNEK), "-o", str(x), "--referans", str(ref)]) == 0
@@ -150,16 +187,59 @@ def test_excel_fiyat_ve_referans(tmp_path):
     for r in range(7, fy.max_row + 1):
         if fy.cell(r, 1).value == "SPR-K80":
             fy.cell(r, 4).value = "TEST-POZ"
-            fy.cell(r, 5).value = 100.0
+            fy.cell(r, 5).value = 100.0          # tarih/kaynak BİLEREK boş
     wb.save(x)
     sonuc = _recalc(x)
     assert sonuc["status"] == "success" and sonuc["total_errors"] == 0
     wb = load_workbook(x, data_only=True)
     kes = {r[0]: r for r in wb["Keşif özeti"].iter_rows(min_row=2, values_only=True) if r[0]}
-    assert kes["SPR-K80"][5] == "TEST-POZ" and kes["SPR-K80"][7] == pytest.approx(5500.0)
-    assert kes["FIT-TE-25x25"][5] == "POZ YOK" and kes["FIT-TE-25x25"][7] in (None, "")
-    dog = {r[0]: r for r in wb["Doğrulama"].iter_rows(min_row=12, values_only=True) if r[0]}
+    assert kes["SPR-K80"][7] == "TEST-POZ" and kes["SPR-K80"][9] == pytest.approx(5500.0)
+    assert kes["SPR-K80"][10] == "tarih/kaynak eksik"
+    assert kes["FIT-TE-25x25x25"][7] == "POZ YOK"
+    dog = {r[0]: r for r in wb["Doğrulama"].iter_rows(min_row=14, values_only=True) if r[0]}
     assert dog["SPR-K80"][6] == "TUTARLI"
     assert dog["BORU-CELIK_EN10255_ORTA-DN25"][6] == "TUTARLI"      # 117,38 vs 118 → %0,5 < %2
-    assert dog["FIT-TE-25x25"][6] == "FARK VAR"                       # 13 vs 12, adet toleransı 0
-    assert dog["FIT-RED-32x25"][6] == "REFERANSTA YOK"
+    assert dog["FIT-TE-25x25x25"][6] == "FARK VAR"                    # adet toleransı 0
+    assert wb["Doğrulama"]["B3"].value == "FARK VAR"
+    td = {r[0]: r[1] for r in wb["Teklif durumu"].iter_rows(min_row=7, values_only=True) if r[0]}
+    assert td["Fiyat tarihi veya kaynağı eksik kalem"] == 1
+    assert td["TEKLİF DURUMU"] == "TEKLİF TAMAMLANMADI"
+
+
+@pytest.mark.skipif(not LO, reason="LibreOffice/recalc yok")
+def test_her_sey_tamamsa_teklife_hazir(tmp_path):
+    """Tüm belirsizlikler çözülür, satırlar onaylanır, poz/fiyat/tarih/kaynak girilir ve referans tutarlıysa
+    durum TEKLİFE HAZIR olmalı; tek bir eksik kalınca TAMAMLANMADI'ya dönmeli."""
+    m = metraj.metraj_cikar(proje_yukle(ORNEK), K)
+    for s in m.satirlar:
+        if s.yontem == metraj.KONTROL:
+            s.yontem = metraj.ELLE          # mühendis çizimden doğruladı (test senaryosu)
+    m.referans = dict(say(m))                # TEST: metrajın kendisi referans — yalnız mantık testi
+    x = tmp_path / "t.xlsx"
+    metraj_excel.yaz(m, x)
+    wb = load_workbook(x)
+    for r in range(2, wb["Belirsizlikler"].max_row + 1):
+        if wb["Belirsizlikler"].cell(r, 1).value:
+            wb["Belirsizlikler"].cell(r, 9).value = "çözüldü"
+    for r in range(2, len(m.satirlar) + 2):
+        wb["Detay metraj"].cell(r, 12).value = "evet"
+    fy = wb["Fiyatlar"]
+    import datetime as dt
+    eksik_r = None
+    for r in range(7, fy.max_row + 1):
+        if fy.cell(r, 1).value:
+            fy.cell(r, 4).value, fy.cell(r, 5).value = "TEST", 10.0
+            fy.cell(r, 6).value, fy.cell(r, 7).value = dt.date(2026, 11, 18), "test"
+            eksik_r = r
+    wb.save(x)
+    assert _recalc(x)["total_errors"] == 0
+    td = {r[0]: r[1] for r in load_workbook(x, data_only=True)["Teklif durumu"].iter_rows(min_row=7, values_only=True)
+          if r[0]}
+    assert td["TEKLİF DURUMU"] == "TEKLİFE HAZIR", td
+    wb = load_workbook(x)
+    wb["Fiyatlar"].cell(eksik_r, 7).value = None   # tek bir kaynak eksik
+    wb.save(x)
+    _recalc(x)
+    td = {r[0]: r[1] for r in load_workbook(x, data_only=True)["Teklif durumu"].iter_rows(min_row=7, values_only=True)
+          if r[0]}
+    assert td["TEKLİF DURUMU"] == "TEKLİF TAMAMLANMADI"
