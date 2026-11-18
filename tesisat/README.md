@@ -16,7 +16,7 @@ Proje bilgilerini bir YAML dosyasından okur, hidrolik hesabı yapar ve sonucu y
 cd tesisat
 pip install -r requirements.txt
 python -m tesisat hesapla ornekler/ornek_otopark.yaml -o rapor.html --json sonuc.json
-python -m pytest -q tests        # 81 doğrulama testi
+python -m pytest -q tests        # 102 doğrulama testi
 ```
 
 Çıkış kodları:
@@ -31,6 +31,25 @@ Bu kodlar sayesinde araç CI'da veya bir otomasyonda da kullanılabilir.
 - `ornekler/dis_hastanesi_rapor.html`: bu projenin raporu
 - `ornekler/ornek_otopark.yaml`: konut altı 1.250 m² kapalı otopark, OT-2, 36 sprinkler, 2 yangın dolabı
 - `ornekler/ornek_otopark_rapor.html`: bu projenin ürettiği rapor
+
+## Otomatik: DXF → hidrolik + metraj + yaklaşık teklif
+
+```bash
+pip install -r requirements.txt
+python -m tesisat ayar-oner plan.dxf -o ayar.yaml      # katman/blok adlarından ayar taslağı
+#   → ★ işaretlileri doldur (tehlike sınıfı, besleme kotu, kolon hatları)
+python -m tesisat otomatik ayar.yaml -o cikti/         # proje.yaml, hidrolik_rapor.html, metraj_teklif.xlsx, ozet.md
+```
+
+- **Boru ağı çizimden kurulur** (`boru_agi.py`: ezdxf + Shapely + NetworkX):
+  - Uç noktalar birleştirilir. Bir çizginin ucu öbür çizginin üzerine geliyorsa T bağlantısı kurulur. **İki çizginin kesişmesi bağlantı sayılmaz.**
+  - Sprinkler blokları en yakın boruya bağlanır.
+  - Çap etiketleri okunur (DN50, Ø50, 1¼", Ø33.7…) ve düz devam eden borulara yayılır.
+  - Dirsekler köşe açısından bulunur.
+  - Döngülü ağ hata verir.
+- **Fiyatlar:** `tesisat/fiyatlar/fiyat_listesi.yaml` dosyasından gelir (ÇŞB × güncelleme × iskonto; tahminlere genel gider ve kâr eklenir). Listede olmayan kalem fiyatsız kalır.
+- **DWG:** Yalnızca ODA File Converter kuruluysa okunur; aksi halde DXF kullanın.
+- **Claude Code:** `/yangin-tesisat` skill'i bu akışı uçtan uca yürütür.
 
 ## AutoCAD planından başlamak
 
@@ -162,7 +181,7 @@ kurallar_ek:               # (isteğe bağlı) idare şartnamesine göre varsay�
 
 ## Claude Code ile kullanım
 
-`/yangin-hesap` komutu (`.claude/skills/yangin-hesap/SKILL.md`) şunları yapar:
+`/yangin-tesisat` skill'i (`.claude/skills/yangin-tesisat/SKILL.md`) şunları yapar:
 1. Projenizin bilgilerinden ve çizimden okunan değerlerden YAML dosyasını hazırlar.
 2. Hesabı çalıştırır.
 3. HATA'ları yorumlar ve düzeltme önerir: çap büyütme, pompa seçimi, ek senaryo vb.

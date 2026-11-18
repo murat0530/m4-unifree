@@ -83,7 +83,7 @@ def _kodlar(m: Metraj):
     return sorted(((k, *v) for k, v in gor.items()), key=lambda t: (sira.get(t[0].split("-")[0], 9), t[0]))
 
 
-def yaz(m: Metraj, yol: str | Path) -> None:
+def yaz(m: Metraj, yol: str | Path, fiyat_listesi: dict | None = None) -> None:
     wb = Workbook()
     kodlar = _kodlar(m)
     nd, nb, nk = len(m.satirlar), len(m.belirsizlikler), len(kodlar)
@@ -92,7 +92,7 @@ def yaz(m: Metraj, yol: str | Path) -> None:
     _ozet(wb.create_sheet(S_OZET), m)
     _belirsiz(wb.create_sheet(S_BEL), m, nd)
     _kesif(wb.create_sheet(S_KESIF), kodlar)
-    _fiyat(wb.create_sheet(S_FIYAT), kodlar)
+    _fiyat(wb.create_sheet(S_FIYAT), kodlar, fiyat_listesi)
     _dogrulama(wb.create_sheet(S_DOG), m, kodlar)
     wb.save(yol)
 
@@ -274,7 +274,8 @@ def _kesif(ws, kodlar):
 
 
 # ---------------------------------------------------------------- Fiyatlar
-def _fiyat(ws, kodlar):
+def _fiyat(ws, kodlar, fiyat_listesi=None):
+    from .fiyat import esle
     ws["A1"] = "FİYAT TABLOSU — yalnızca SARI hücreleri doldurun"
     ws["A1"].font = Font(name=F, bold=True, size=12)
     for i, a in enumerate([
@@ -290,16 +291,19 @@ def _fiyat(ws, kodlar):
                                 "Fiyat durumu"], [30, 52, 7, 18, 16, 14, 40, 20])
     dv_f = DataValidation(type="decimal", operator="greaterThan", formula1="0", allow_blank=True,
                           error="Birim fiyat 0'dan büyük bir sayı olmalı", showErrorMessage=True)
-    dv_t = DataValidation(type="date", operator="between", formula1="DATE(2000,1,1)", formula2="DATE(2100,12,31)",
-                          allow_blank=True, error="Geçerli bir tarih girin (yyyy-aa-gg)", showErrorMessage=True)
+    dv_t = DataValidation(type="custom", formula1=f"OR(ISNUMBER(F{FIYAT_ILK}),LEN(F{FIYAT_ILK})=10)",
+                          allow_blank=True, error="Tarih girin (tarih hücresi veya yyyy-aa-gg)",
+                          showErrorMessage=True)
     ws.add_data_validation(dv_f)
     ws.add_data_validation(dv_t)
     for r, (kod, kalem, birim) in enumerate(kodlar, FIYAT_ILK):
         _h(ws, r, 1, kod)
         _h(ws, r, 2, kalem)
         _h(ws, r, 3, birim)
-        for c, fmt in [(4, "@"), (5, "#,##0.00"), (6, "yyyy-mm-dd"), (7, None)]:
-            _h(ws, r, c, None, GIRDI, fmt, SARI)
+        e = esle(kod, fiyat_listesi) if fiyat_listesi else None
+        degerler = [e["poz"] or None, e["fiyat"], e["tarih"], e["kaynak"]] if e else [None] * 4
+        for (c, fmt), v in zip([(4, "@"), (5, "#,##0.00"), (6, "@"), (7, None)], degerler):
+            _h(ws, r, c, v, GIRDI, fmt, SARI)
         _h(ws, r, 8, f'=IF(E{r}="","fiyat yok",IF(OR(F{r}="",G{r}=""),"tarih/kaynak eksik",'
                      f'IF(AND(D{r}="",{ONAY_HUCRE}="evet"),"poz yok","tamam")))', BAG)
         dv_f.add(f"E{r}")

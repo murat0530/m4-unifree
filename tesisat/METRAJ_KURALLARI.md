@@ -138,3 +138,31 @@ Düğüm = bir hattın bitiş noktası. Gelen hat P, giden hatlar c₁…c_k.
   Karşılaştırma Excel formülleriyle yapılır.
 - **Referans karşılaştırması:** `--referans` ile kontrol edilmiş bir metraj (CSV: `kalem_kodu,miktar`) verilirse kalem bazında fark hesaplanır. Tolerans: uzunlukta %2, adette tam eşitlik.
 - **Referans verilmezse** Doğrulama sayfası açıkça **"DOĞRULANMADI — referans metraj yok"** yazar.
+
+## DXF'ten ağ (boru_agi.py)
+
+- **G1:** Boru, boru katmanındaki LINE, LWPOLYLINE ve POLYLINE parçalarıdır. Yaylar kirişle yaklaşıklanır.
+- **G2:** Bağlantı yalnızca iki durumda kurulur:
+  - Uç noktalar birleştirme toleransı içindeyse.
+  - Bir parçanın **ucu** başka bir parçanın **gövdesi** üzerindeyse. Bu bir T bağlantısıdır ve gövde o noktada bölünür.
+
+  **İki gövdenin kesişmesi bağlantı değildir** (borunun üstünden ya da altından geçiş). Bu durum belirsizlik olarak raporlanır.
+- **G3:** Sprinkler bloğu en yakın boruya bağlanır (tolerans içinde). Bağlanamayan sprinkler raporlanır.
+- **G4:** Çap etiketi, en yakın boru parçasına atanır.
+  - Etiketsiz parçaya, düz devam eden bir düğüm üzerinden (yalnızca 2 bağlantılı ve sprinklersiz düğümler) komşu parçanın çapı yayılır.
+  - Hâlâ etiketsiz kalan parçaya, beslediği sprinkler sayısından çap **önerilir**. Bu öneri "kalem tanımı" belirsizliği olarak işaretlenir.
+- **G5:** Kaynak düğümünden ağaç kurulur. Döngü varsa hata verilir. Kaynağa bağlı olmayan parçalar ağ dışında bırakılır ve raporlanır.
+- **D2:** 2 bağlantılı ara düğümde yön değişimi 67,5° ve üzerindeyse 90° dirsek, 22,5° ile 67,5° arasındaysa 45° dirsek sayılır.
+- **T5:** Dallanmada, gelen yönden 45° ve üzeri sapan çıkışa hidrolik "te dönüş" kaybı eklenir.
+
+## Yivli kaplin (K1, ÖN HESAP)
+
+- Yivli bağlantılı her parça ve vana **ağzı** için 1 kaplin sayılır. Ağız çapı yivli aralıkta değilse sayılmaz; örneğin dişli 2" ağızlı bir çaprazın yalnızca DN65 ağzı sayılır.
+- Bunlara boru boy ekleri eklenir: ⌈boy / 6 m⌉ − 1.
+- İki parçanın ortak bağlantı uçları ayırt edilmediği için sonuç **üst sınırdır**. Bu yüzden satıra her zaman belirsizlik bağlanır.
+
+## Ek kalemler
+
+Ağdan türetilmeyen kalemler (heat plate, zon ekipmanı, platform, test vb.) proje ayarındaki `ek_kalemler` listesinden gelir.
+- Miktar bir sayı ya da `sprinkler`, `kat`, `boru_m` olabilir (× çarpan).
+- Sayı girilmişse yöntem "elle girilen", diğerlerinde "hesaplanan" olur.

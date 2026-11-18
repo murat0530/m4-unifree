@@ -1,0 +1,63 @@
+# =====================================================================
+#  FİYAT LİSTESİ — yangın tesisatı (KDV hariç birim fiyatlar)
+#  Kaynak: kullanıcının "T12 Mezanin Sprinkler — Maliyet ve Teklif Hesabı"
+#  çalışma kitabı (Teklif + Piyasa fiyatları sayfaları), 18.11.2026.
+#  Proje ayar dosyasındaki `fiyat:` bölümü bu listeyi ezer / genişletir.
+#
+#  Fiyat türleri:
+#   ÇŞB    → birim fiyat = ref × guncelleme × (1 − iskonto)
+#            (Bakanlık pozları kâr + genel gider dahil yayımlanır → GG/kâr EKLENMEZ)
+#   Tahmin → birim fiyat = tahmin × (1 + genel_gider) × (1 + kar)
+#   Net    → birim fiyat = net (olduğu gibi)
+#  Eşleşme: önce `kod` (tam), sonra `desen` (joker) + isteğe bağlı dn_min/dn_max.
+#  Listede olmayan kalem teklifte "fiyat yok" olarak kalır (UYDURULMAZ).
+# =====================================================================
+parametreler:
+  guncelleme: 1.25        # ÇŞB Ara-2025 → bugün (kullanıcı tahmini, Teklif!B3)
+  iskonto: 0.15           # Bakanlık fiyatına piyasa iskontosu (Teklif!B7)
+  genel_gider: 0.10       # Teklif!B4
+  kar: 0.15               # Teklif!B5
+  kdv: 0.20               # Teklif!B6
+  tarih: 2026-11-18
+  kaynak: "T12 teklif dosyası (kullanıcı), 18.11.2026"
+
+kalemler:
+  # --- borular (ÇŞB)
+  - {kod: BORU-CELIK_EN10255_ORTA-DN25,  tur: ÇŞB, ref: 480.00,  poz: "ÇŞB 25.300.1507/A–1512/A ara değer", not: "1\" pozu yok; 25,0 ve 38,0 mm pozları arası"}
+  - {kod: BORU-CELIK_EN10255_ORTA-DN32,  tur: ÇŞB, ref: 578.28,  poz: "ÇŞB 25.300.1513/A"}
+  - {kod: BORU-CELIK_EN10255_ORTA-DN40,  tur: ÇŞB, ref: 621.63,  poz: "ÇŞB 25.300.1105/A"}
+  - {kod: BORU-CELIK_EN10255_ORTA-DN50,  tur: ÇŞB, ref: 760.00,  poz: "", not: "ÇŞB pozu bulunamadı; 1½\" ile DN65 arası tahmini ref"}
+  - {kod: BORU-CELIK_EN10255_ORTA-DN65,  tur: ÇŞB, ref: 959.74,  poz: "ÇŞB 25.300.1520/A", not: "vidalı poz; yivli istenir"}
+  - {kod: BORU-CELIK_EN10255_ORTA-DN80,  tur: ÇŞB, ref: 1020.83, poz: "ÇŞB 25.300.1108/A", not: "vidalı poz; yivli istenir"}
+  - {kod: BORU-CELIK_EN10255_ORTA-DN100, tur: ÇŞB, ref: 1391.96, poz: "ÇŞB 25.300.1525/D", not: "bina dışı varyant; bina içi pozu yok"}
+  # --- sprinkler
+  - {kod: SPR-K80, tur: ÇŞB, ref: 323.68, poz: "ÇŞB 25.705.1101", not: "Dik DN15 standart tepkili pozu; sarkık/hızlı tepkili pozu yok — piyasa teyidi"}
+  - {kod: SPR-YEDEK-DOLAP,  tur: Tahmin, tahmin: 4500, poz: "", not: "TAKIM: dolap + 6 yedek başlık + anahtar"}
+  - {kod: SPR-YEDEK-BASLIK, tur: Net, net: 0, poz: "yedek dolap takımına dahil"}
+  - {kod: SPR-ANAHTAR,      tur: Net, net: 0, poz: "yedek dolap takımına dahil"}
+  # --- dişli fittingler: ÇŞB vidalı boru pozlarındaki %30 bağlantı parçasına dahil (ayrıca fiyatlanmaz)
+  - {desen: "FIT-*", dn_max: 50, tur: Net, net: 0, poz: "boru pozuna dahil (%30 bağlantı parçası)"}
+  # --- yivli parçalar (tahmin; piyasa araştırması teklifin üstünde: T 2.653, dirsek 1.413, kaplin 715–911 TL)
+  - {desen: "FIT-TE-*",       dn_min: 65, tur: Tahmin, tahmin: 1800, poz: "", not: "yivli T — Piyasa Duyar DV14 liste 2.653 TL"}
+  - {desen: "FIT-DIRSEK90-*", dn_min: 65, tur: Tahmin, tahmin: 900,  poz: "", not: "yivli dirsek — Piyasa Duyar DV9 4\" 1.413 TL"}
+  - {desen: "FIT-RED-*",      dn_min: 65, tur: Tahmin, tahmin: 1250, poz: "", not: "yivli redüksiyon — Claude tahmini (T fiyatının ~yarısı); toptancıdan teyit"}
+  - {desen: "YIVLI-KAPLIN-*", tur: Tahmin, tahmin: 450, poz: "", not: "Piyasa Duyar DN80 715 / DN100 911 TL"}
+  # --- vanalar
+  - {kod: VANA-KELEBEK_VANA-DN100, tur: Tahmin, tahmin: 11000, poz: ""}
+  - {kod: VANA-KELEBEK_VANA-DN80,  tur: Tahmin, tahmin: 9000,  poz: ""}
+  # --- ek kalemler (proje ayarındaki ek_kalemler kodlarıyla)
+  - {kod: EK-SEMER-DN200x100, tur: Tahmin, tahmin: 6500,  poz: ""}
+  - {kod: EK-HEATPLATE,       tur: Tahmin, tahmin: 150,   poz: ""}
+  - {kod: EK-AKIS-ANAHTARI,   tur: Tahmin, tahmin: 5500,  poz: ""}
+  - {kod: EK-TEST-DRENAJ,     tur: Tahmin, tahmin: 2500,  poz: ""}
+  - {kod: EK-MANOMETRE,       tur: Tahmin, tahmin: 900,   poz: ""}
+  - {kod: EK-HAVA-ATMA,       tur: Tahmin, tahmin: 1200,  poz: ""}
+  - {kod: EK-ASKI,            tur: Net,    net: 0,        poz: "boru pozuna dahil (%30 montaj malzemesi)"}
+  - {kod: EK-TIJ-EK,          tur: Tahmin, tahmin: 70,    poz: ""}
+  - {kod: EK-UZATMA-SOMUN,    tur: Tahmin, tahmin: 40,    poz: ""}
+  - {kod: EK-DEPREM,          tur: Tahmin, tahmin: 1800,  poz: ""}
+  - {kod: EK-BOYA,            tur: Tahmin, tahmin: 70,    poz: "", not: "ÇŞB boru pozlarında boya hariç"}
+  - {kod: EK-PLATFORM,        tur: Tahmin, tahmin: 3000,  poz: ""}
+  - {kod: EK-TEST,            tur: Tahmin, tahmin: 15000, poz: ""}
+  - {kod: EK-NAKLIYE,         tur: Tahmin, tahmin: 7500,  poz: ""}
+  - {kod: EK-ASBUILT,         tur: Tahmin, tahmin: 12000, poz: ""}

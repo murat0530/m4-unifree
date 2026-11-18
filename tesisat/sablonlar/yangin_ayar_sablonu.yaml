@@ -1,0 +1,92 @@
+# =====================================================================
+#  YANGIN TESİSATI — OTOMATİK HESAP AYAR ŞABLONU
+#  python -m tesisat otomatik bu_dosya.yaml -o cikti/
+#
+#  Örnek değerler T12 mezanin projesinden alınmıştır (iki kat, aynı plan).
+#  YENİ PROJEDE DEĞİŞTİRİLECEKLER: ★ işaretli satırlar.
+# =====================================================================
+proje:
+  ad: "T12 Mezanin — Sprinkler Tesisatı"          # ★
+  isveren: ""
+  hazirlayan: "Mak. Müh. ..."
+  revizyon: "0"
+
+bina:
+  kullanim: ticaret                               # ★ konut | saglik | ofis | ticaret | depo ...
+  # yapi_yuksekligi_m: 12
+  # kapali_otopark_m2: 0
+
+kararlar:                                          # ★ rapora ve teklife yazılır
+  - "Tehlike sınıfı Yüksek Tehlike (kullanıcı kararı)."
+  - "Varsayım satırları (kat yatay hattı, DN65 besleme) kabul edildi."
+
+# --- ÇİZİM ----------------------------------------------------------
+cizim:
+  dosya: plan.dxf                                  # ★ DXF (DWG yalnız ODA File Converter kuruluysa)
+  boru_katmani: ["Y-BORU*", "*SPRINK*BORU*"]        # ★ boru çizgilerinin katman desenleri
+  sprinkler_blok: ["SPR*"]                          # ★ sprinkler blok adı desenleri
+  dolap_blok: []                                    # yangın dolabı blokları (varsa)
+  etiket_katmani: []                                # çap yazılarının katmanları (boş = tümü)
+  # mahal_katmani: ["A-MAHAL"]                      # mahal sınırları (kapsama kontrolü için, isteğe bağlı)
+  # birim: mm                                       # $INSUNITS yoksa
+  uzun_eksen: x                                     # branşmanların yönü (tasarım alanı biçimi)
+  tolerans: {birlestirme_m: 0.02, sprinkler_m: 0.40, etiket_m: 0.80}
+  # Aynı plan birden fazla katta kullanılıyorsa her kat ayrı satır (on_ek kimlikleri ayırır).
+  # kaynak: planın beslendiği nokta — blok deseni veya nokta [x, y] (çizim biriminde)
+  # ust: bu planın bağlandığı (aşağıdaki ust_hatlar içindeki) hat
+  planlar:
+    - {ad: "Asma kat", on_ek: "A-", kaynak: {blok: "KOLON*"}, ust: "A-YAT"}
+    - {ad: "Alt kat",  on_ek: "B-", kaynak: {blok: "KOLON*"}, ust: "B-YAT"}
+
+# --- HİDROLİK ------------------------------------------------------
+yangin:
+  tehlike_sinifi: YT1                               # ★ DT, OT1..OT4, YT1..YT3
+  sistem: islak
+  boru_serisi: CELIK_EN10255_ORTA
+  kaynak: {ad: "DN200 ana hat T çıkışı", kot_m: 5.494}   # ★ besleme noktası ve kotu
+  sprinkler_varsayilan: {K: 80, alan_m2: 6.97}      # ★ mahal katmanı yoksa sprinkler başına alan (S×D)
+  yedek_sprinkler: 6
+  pompa: {adet_asil: 1, adet_yedek: 1}
+  metraj:
+    baglanti_yontemi: {"<=50": "dişli", ">=65": "yivli"}
+    fitting_malzeme: "siyah, TS EN 10242 temper döküm / yivli"
+    yedek_dolap_adet: 1
+    sprinkler_anahtari_adet: 1
+  # Planda görünmeyen düşey/bağlantı hatları (kolon, kat çıkışları) — kesitten elle
+  ust_hatlar:
+    - {id: D1,   ust: null, uzunluk_m: 0.309, kot_farki_m: 0,      cap: "100", kat: Depo,  uzunluk_yontemi: ölçülen, parcalar: {kelebek_vana: 1, dirsek_90: 1}, vana_noktasi: true}
+    - {id: D2,   ust: D1,   uzunluk_m: 0.315, kot_farki_m: -0.315, cap: "100", kat: Depo,  uzunluk_yontemi: ölçülen, parcalar: {dirsek_90: 1}}
+    - {id: D3,   ust: D2,   uzunluk_m: 0.678, kot_farki_m: 0,      cap: "100", kat: Depo,  uzunluk_yontemi: ölçülen, parcalar: {dirsek_90: 1}}
+    - {id: KOL1, ust: D3,   uzunluk_m: 3.685, kot_farki_m: -3.685, cap: "100", kat: Kolon, uzunluk_yontemi: ölçülen}
+    - {id: KOL2, ust: KOL1, uzunluk_m: 0.339, kot_farki_m: -0.339, cap: "100", kat: Kolon, uzunluk_yontemi: ölçülen}
+    - {id: KOL3, ust: KOL2, uzunluk_m: 2.5,   kot_farki_m: -2.5,   cap: "80",  kat: Kolon, uzunluk_yontemi: ölçülen, parcalar: {dirsek_90: 1}}
+    - {id: A-CIK, ust: KOL1, uzunluk_m: 0.23, cap: "80", kat: "Asma kat", uzunluk_yontemi: ölçülen, parcalar: {kelebek_vana: 1}, vana_noktasi: true}
+    - {id: A-YAT, ust: A-CIK, uzunluk_m: 2.5, cap: "80", kat: "Asma kat", uzunluk_yontemi: elle girilen}
+    - {id: B-CIK, ust: KOL3, uzunluk_m: 0.23, cap: "80", kat: "Alt kat", uzunluk_yontemi: ölçülen, parcalar: {kelebek_vana: 1}, vana_noktasi: true}
+    - {id: B-YAT, ust: B-CIK, uzunluk_m: 2.5, cap: "80", kat: "Alt kat", uzunluk_yontemi: elle girilen}
+  # senaryolar: verilmezse en elverişsiz tasarım alanları otomatik üretilir
+
+# --- AĞDAN TÜRETİLMEYEN KALEMLER -----------------------------------
+# miktar: sayı | sprinkler | kat | boru_m   (× carpan)
+ek_kalemler:
+  - {kod: EK-SEMER-DN200x100, kalem: "DN200×DN100 mekanik T / semer", birim: ad, miktar: 1}
+  - {kod: EK-HEATPLATE,     kalem: "Isı toplama plakası (heat plate)", birim: ad, miktar: sprinkler}
+  - {kod: EK-AKIS-ANAHTARI, kalem: "Akış anahtarı DN80 (kat zon)", birim: ad, miktar: kat}
+  - {kod: EK-TEST-DRENAJ,   kalem: "Test-drenaj vanası 1\" (gözetleme camlı)", birim: ad, miktar: kat}
+  - {kod: EK-MANOMETRE,     kalem: "Manometre + musluk", birim: ad, miktar: kat}
+  - {kod: EK-HAVA-ATMA,     kalem: "Otomatik hava atma", birim: ad, miktar: kat}
+  - {kod: EK-ASKI,          kalem: "Boru askısı + kelepçe", birim: ad, miktar: 46, not: "8 branş × 2 + kollektör 5 + kat hattı 2 = 23/kat"}
+  - {kod: EK-TIJ-EK,        kalem: "M10 ek tij – asma kat", birim: m, miktar: 103.5, not: "23 askı × 4,5 m"}
+  - {kod: EK-UZATMA-SOMUN,  kalem: "Uzatma somunu + kontra somun seti", birim: set, miktar: 46}
+  - {kod: EK-DEPREM,        kalem: "Deprem desteği (yanal/boyuna)", birim: ad, miktar: 6, not: "yük hesabıyla kesinleşir"}
+  - {kod: EK-BOYA,          kalem: "Pas önleyici + kırmızı boya", birim: m, miktar: boru_m}
+  - {kod: EK-PLATFORM,      kalem: "Makaslı platform kiralama", birim: gün, miktar: 10}
+  - {kod: EK-TEST,          kalem: "Hidrostatik test + devreye alma", birim: götürü, miktar: 1}
+  - {kod: EK-NAKLIYE,       kalem: "Nakliye + şantiye kurulum", birim: götürü, miktar: 1}
+  - {kod: EK-ASBUILT,       kalem: "As-built proje + test tutanakları", birim: götürü, miktar: 1}
+
+# --- FİYAT (isteğe bağlı) — tesisat/fiyatlar/fiyat_listesi.yaml'ı ezer/genişletir
+# fiyat:
+#   parametreler: {guncelleme: 1.25, iskonto: 0.15, genel_gider: 0.10, kar: 0.15, kdv: 0.20}
+#   kalemler:
+#     - {kod: SPR-K80, tur: Net, net: 344, poz: "", not: "toptancı teklifi"}

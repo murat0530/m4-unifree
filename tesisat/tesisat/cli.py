@@ -63,12 +63,51 @@ def main(argv=None) -> int:
     ok.add_argument("--birim", choices=["mm", "cm", "m"], help="Çizim birimi ($INSUNITS yoksa)")
     ok.add_argument("--kat", help="Kat etiketi (kimlik ön eki), ör. '3'")
     ok.add_argument("-o", "--cikti", help="YAML çıktı (varsayılan: <dxf>_mahaller.yaml)")
+    ao = alt.add_parser("ayar-oner", help="DXF'i tarayıp otomatik hesap için ayar taslağı üret")
+    ao.add_argument("dxf")
+    ao.add_argument("-o", "--cikti", help="Ayar YAML yolu (varsayılan: <dxf>_ayar.yaml)")
+    ot = alt.add_parser("otomatik", help="DXF/DWG + ayar dosyası → hidrolik rapor + metraj + yaklaşık teklif")
+    ot.add_argument("ayar")
+    ot.add_argument("-o", "--cikti", default="cikti", help="Çıktı klasörü")
     mt = alt.add_parser("metraj", help="Yangın ağından metraj cetveli (Excel) üret — miktar; fiyat ayrı sayfada")
     mt.add_argument("proje")
     mt.add_argument("-o", "--cikti", help="Excel yolu (varsayılan: <proje>_metraj.xlsx)")
     mt.add_argument("--referans", help="Kontrol edilmiş metraj CSV (kalem_kodu,miktar) — karşılaştırma için")
     mt.add_argument("--kurallar", help="Ek kural dosyası (YAML)")
     a = ap.parse_args(argv)
+
+    if a.komut == "ayar-oner":
+        from .otomatik import ayar_oner
+        hedef = a.cikti or str(Path(a.dxf).with_suffix("")) + "_ayar.yaml"
+        try:
+            r = ayar_oner(a.dxf, hedef)
+        except GirdiHatasi as e:
+            print(f"GİRDİ HATASI: {e}", file=sys.stderr)
+            return 2
+        print(f"Boru katmanı: {r['boru_katmani'][:3]} | Sprinkler bloğu: {r['sprinkler_blok'][:3]} "
+              f"({r['sprinkler_adedi']} adet) | Kaynak bloğu: {r['kaynak_blok'][:2]} | birim {r['birim']}")
+        for x in r["eksik"]:
+            print(f"  KONTROL: {x}")
+        print(f"→ {hedef}")
+        return 0
+
+    if a.komut == "otomatik":
+        from .otomatik import calistir_otomatik
+        try:
+            r = calistir_otomatik(a.ayar, a.cikti)
+        except GirdiHatasi as e:
+            print(f"GİRDİ HATASI: {e}", file=sys.stderr)
+            return 2
+        for n in r["notlar"]:
+            print(f"  {n}")
+        for k, v in r["hidrolik"].items():
+            print(f"  {k}: {v}")
+        print(f"  Hidrolik: {r['hata']} hata, {r['uyari']} uyarı | Metraj: {r['satir']} satır, "
+              f"{r['belirsizlik']} açık belirsizlik")
+        print(f"  Yaklaşık teklif (KDV hariç): {r['teklif_kdv_haric']:,.0f} TL — KDV dahil "
+              f"{r['teklif_kdv_dahil']:,.0f} TL ({len(r['fiyatsiz'])} kalem fiyatsız)")
+        print(f"  Çıktılar → {r['klasor']} (proje.yaml, hidrolik_rapor.html, metraj_teklif.xlsx, ozet.md)")
+        return 1 if r["hata"] else 0
 
     if a.komut == "metraj":
         from . import metraj, metraj_excel

@@ -15,6 +15,7 @@ Kurallar: METRAJ_KURALLARI.md (bu modülle birebir aynı tutulmalı).
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 
 from .ortak import GirdiHatasi
@@ -152,6 +153,9 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
         not_ = f"düşey bileşen {abs(h.dz):.2f} m dahil" if abs(h.dz) > 1e-9 else ""
         m.satirlar.append(Satir(f"BORU-{seri}-DN{h.dn}", f"{malzeme} DN{h.dn}", sistem(hid), kat(h), hid,
                                 str(h.dn), "m", round(h.L, 3), _yontem(h.ham.get("uzunluk_yontemi")), not_))
+        if h.ham.get("cap_onerildi"):
+            belirsiz("Boru", hid, f"Çap etiketi çizimde bulunamadı; DN{h.dn} beslenen sprinkler sayısından ÖNERİLDİ",
+                     "Çizimdeki çap etiketini ekleyin veya çapı doğrulayın", ETKI_TANIM, bag_kaynak=(hid,))
         if not asagi[hid]:
             belirsiz("Boru", hid, "Hattın aşağısında çıkış (sprinkler/dolap) yok", "Ölü hat mı, eksik çıkış mı? "
                      "Çizimden kontrol", ETKI_MIKTAR, bag_kaynak=(hid,))
@@ -244,6 +248,41 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
                  "tanımı eksik", "yangin.metraj.baglanti_yontemi ({'<=50': 'dişli', '>=65': 'yivli'}) ve "
                  "fitting_malzeme girin", ETKI_TANIM, bag_kod_on_ek="FIT-")
 
+    # --- 3b) Yivli kaplin (K1, ÖN HESAP): yalnız YİVLİ ağızlar (ağız çapı yivli aralıktaysa) + boru boy ekleri
+    yivli: dict[int, float] = {}
+
+    def agizlar(s):
+        """Kalem kodundan ağız çapları: TE-a x b x c → [a,b,c]; RED-axb → [a,b]; DIRSEK-DNa → [a,a];
+        VANA-…-DNa → [a,a]; COKLU-DNa → [a] (çıkış çapları bilinmiyor)."""
+        if s.kod.startswith(("FIT-TE", "FIT-RED")):
+            return [int(x) for x in re.findall(r"\d+", s.dn)]
+        if s.kod.startswith(("FIT-DIRSEK", "VANA-KELEBEK")):
+            return [int(s.dn)] * 2
+        if s.kod.startswith("FIT-COKLU"):
+            return [int(s.dn)]
+        return []
+
+    for s in list(m.satirlar):
+        if s.kod.startswith("BORU-"):
+            dn = int(s.dn)
+            if _baglanti(ayar, dn) == "yivli":
+                yivli[dn] = yivli.get(dn, 0) + max(0, math.ceil(s.miktar / float(ayar.get("boru_boyu_m", 6.0))) - 1)
+            continue
+        for a in agizlar(s):
+            if a != 15 and _baglanti(ayar, a) == "yivli":
+                yivli[a] = yivli.get(a, 0) + s.miktar
+    for dn, n in sorted(yivli.items()):
+        if n:
+            m.satirlar.append(Satir(f"YIVLI-KAPLIN-DN{dn}", f"Yivli kaplin DN{dn} (ÖN HESAP)", "Yangın — tümü", "-",
+                                    "kural K1", str(dn), "adet", float(n), HESAPLANAN,
+                                    "Kural K1: yivli parça/vana ağzı başına 1 + ⌈boy/6 m⌉−1 boru eki; ağız çapı "
+                                    "yivli aralıkta değilse sayılmaz"))
+    if yivli:
+        belirsiz("Fitting", "yivli kaplinler", "Yivli kaplin adedi ön hesaptır (parça ağzı + boru boyu ekleri); "
+                 "ortak bağlantı uçları ve ekipman (alarm vanası vb.) bağlantıları ayrıca belirlenmeli",
+                 "Çizimdeki kaplin bloklarından saydırın veya montaj detayından kesinleştirin", ETKI_MIKTAR,
+                 bag_kod_on_ek="YIVLI-KAPLIN")
+
     # --- 4) Çıkış elemanları (S1, O1)
     for hid in ag.cikislar:
         h = ag.hatlar[hid]
@@ -325,3 +364,20 @@ def metraj_cikar(proje: dict, kurallar: dict) -> Metraj:
         "Ağ hattı adedi": len(ag.sira),
     }
     return m
+
+
+def ek_kalemler_ekle(m: Metraj, ek: list[dict]) -> None:
+    """Ağdan türetilmeyen kalemler (proje ayarı). miktar: sayı | "sprinkler" | "kat" | "boru_m" (× carpan)."""
+    spr = sum(s.miktar for s in m.satirlar if s.kod.startswith("SPR-K"))
+    katlar = len({s.kat for s in m.satirlar if s.kod.startswith("SPR-K")}) or 1
+    boru = sum(s.miktar for s in m.satirlar if s.kod.startswith("BORU-"))
+    for e in ek or []:
+        mk = e.get("miktar", 1)
+        taban = {"sprinkler": spr, "kat": katlar, "boru_m": boru}.get(mk) if isinstance(mk, str) else float(mk)
+        if taban is None:
+            raise GirdiHatasi(f"ek_kalemler/{e.get('kod')}: miktar '{mk}' anlaşılamadı (sayı, sprinkler, kat, boru_m)")
+        miktar = round(taban * float(e.get("carpan", 1)), 3)
+        yontem = e.get("yontem") or (HESAPLANAN if isinstance(mk, str) else ELLE)
+        not_ = e.get("not", "") + (f" [{mk} × {e.get('carpan', 1)}]" if isinstance(mk, str) else "")
+        m.satirlar.append(Satir(e["kod"], e["kalem"], e.get("sistem", "Yangın — genel"), "-", "ek kalem (proje ayarı)",
+                                "", e.get("birim", "adet"), miktar, _yontem(yontem), not_.strip()))
