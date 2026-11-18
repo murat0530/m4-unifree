@@ -16,7 +16,7 @@ Proje bilgilerini bir YAML dosyasından okur, hidrolik hesabı yapar ve sonucu y
 cd tesisat
 pip install -r requirements.txt
 python -m tesisat hesapla ornekler/ornek_otopark.yaml -o rapor.html --json sonuc.json
-python -m pytest -q tests        # 68 doğrulama testi
+python -m pytest -q tests        # 78 doğrulama testi
 ```
 
 Çıkış kodları:
@@ -48,6 +48,25 @@ python -m tesisat dxf-oku plan.dxf --mahal-katmani "A-MAHAL" --etiket-katmani "A
 - **Tip:** addan tahmin edilir. Örneğin "WC" → muaf, "PROTEZ LAB." → OT-2, "ENDODONTİ" → OT-1, "MEKANİK TESİSAT" → OT-3. Tahmin edilemeyen mahaller listelenir ve tipini mühendis girer.
 - **Birim:** $INSUNITS değerinden okunur (mm, cm ya da m). Çıktı koordinatları metredir.
 - **Sprinkler bloğu yoksa:** `kapsama.yerlesim_oner` ile yerleşim önerilir.
+
+## Metraj cetveli (Excel)
+
+```bash
+python -m tesisat metraj ornekler/dis_hastanesi.yaml -o metraj.xlsx [--referans kontrol_edilmis.csv]
+```
+
+Aracın ürettiği şey **yalnızca miktardır**; poz numarası ve fiyat üretmez. Excel'de şu sayfalar bulunur:
+
+| Sayfa | İçerik |
+|---|---|
+| Detay metraj | Her satırda kalem kodu, sistem, kat, kaynak nesne, DN, birim, miktar ve **çıkarım yöntemi** (ölçülen / hesaplanan / elle girilen / kontrol gerekli) |
+| Sistem-DN özeti | Sistem ve kalem bazında toplamlar (formülle Detay sayfasına bağlı) |
+| Belirsizlikler | Kuralların kesin karar veremediği bağlantılar, tanımsız kurallar ve kapsam dışı kalemler |
+| Keşif özeti | Kalem toplamları. Poz ve fiyat Fiyatlar sayfasından okunur; pozu girilmemiş kalem "POZ YOK" görünür. |
+| Fiyatlar | Poz no ve birim fiyatın **kullanıcı tarafından** girildiği sarı hücreler |
+| Doğrulama | İç tutarlılık (model ↔ metraj) ve verilirse kontrol edilmiş referansla kalem bazında karşılaştırma. Referans yoksa sayfada "DOĞRULANMADI" yazar. |
+
+Fitting tanıma kuralları **[METRAJ_KURALLARI.md](METRAJ_KURALLARI.md)** dosyasında belgelenmiştir.
 
 ## Yangın modülü — ne yapar?
 

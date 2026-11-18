@@ -230,6 +230,8 @@ yangin:
     uzunluk_m: 5.0
     kot_farki_m: 0.0
     cap: '100'
+    kat: B
+    uzunluk_yontemi: elle girilen
     parcalar:
       kelebek_vana: 2
       cekvalf: 1
@@ -238,6 +240,8 @@ yangin:
   - id: KOLON
     ust: POMPA
     uzunluk_m: 20.8
+    kat: B→3
+    uzunluk_yontemi: elle girilen
     kot_farki_m: 14.8
     cap: '100'
     parcalar:
@@ -250,6 +254,8 @@ yangin:
     uzunluk_m: 1.5
     kot_farki_m: 0.0
     cap: '100'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
     parcalar:
       kelebek_vana: 1
       te_donus: 1
@@ -258,6 +264,8 @@ yangin:
   - id: ANA-B1
     ust: KAT-VANA
     uzunluk_m: 6.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '80'
     parcalar:
@@ -265,6 +273,8 @@ yangin:
   - id: U2-B1
     ust: ANA-B1
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -274,6 +284,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -284,6 +297,8 @@ yangin:
   - id: U2-B2
     ust: U2-B1
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -293,6 +308,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -303,6 +321,8 @@ yangin:
   - id: U2-B3
     ust: U2-B2
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -312,6 +332,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -322,6 +345,8 @@ yangin:
   - id: U2-B4
     ust: U2-B3
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -331,6 +356,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -341,12 +369,16 @@ yangin:
   - id: ANA-B2
     ust: ANA-B1
     uzunluk_m: 0.3
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '65'
     parcalar: {}
   - id: BEK-B1
     ust: ANA-B2
     uzunluk_m: 9.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -356,6 +388,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -366,6 +401,8 @@ yangin:
   - id: BEK-B2
     ust: BEK-B1
     uzunluk_m: 3.6
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -375,6 +412,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -385,6 +425,8 @@ yangin:
   - id: BEK-B3
     ust: BEK-B2
     uzunluk_m: 3.6
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -394,6 +436,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -404,6 +449,8 @@ yangin:
   - id: BEK-B4
     ust: BEK-B3
     uzunluk_m: 10.8
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -413,6 +460,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -423,6 +473,8 @@ yangin:
   - id: BEK-B5
     ust: BEK-B4
     uzunluk_m: 3.6
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -432,6 +484,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -442,12 +497,16 @@ yangin:
   - id: ANA-B3
     ust: ANA-B2
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '65'
     parcalar: {}
   - id: LAB-B1
     ust: ANA-B3
     uzunluk_m: 4.25
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '50'
     parcalar:
@@ -457,6 +516,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -467,6 +529,8 @@ yangin:
   - id: LAB-B2
     ust: LAB-B1
     uzunluk_m: 2.5
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '50'
     parcalar:
@@ -476,6 +540,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -486,6 +553,8 @@ yangin:
   - id: LAB-B3
     ust: LAB-B2
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '50'
     parcalar:
@@ -495,6 +564,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -505,6 +577,8 @@ yangin:
   - id: LAB-B4
     ust: LAB-B3
     uzunluk_m: 2.5
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -514,6 +588,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -524,6 +601,8 @@ yangin:
   - id: LAB-B5
     ust: LAB-B4
     uzunluk_m: 2.5
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -533,6 +612,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -543,6 +625,8 @@ yangin:
   - id: LAB-B6
     ust: LAB-B5
     uzunluk_m: 2.5
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -552,6 +636,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -562,6 +649,8 @@ yangin:
   - id: LAB-B7
     ust: LAB-B6
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -571,6 +660,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -581,6 +673,8 @@ yangin:
   - id: LAB-B8
     ust: LAB-B7
     uzunluk_m: 2.5
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -590,6 +684,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -600,12 +697,16 @@ yangin:
   - id: ANA-B4
     ust: ANA-B3
     uzunluk_m: 2.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar: {}
   - id: U1-B1
     ust: ANA-B4
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -615,6 +716,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -625,6 +729,8 @@ yangin:
   - id: U1-B2
     ust: U1-B1
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -634,6 +740,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -644,6 +753,8 @@ yangin:
   - id: U1-B3
     ust: U1-B2
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -653,6 +764,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -663,6 +777,8 @@ yangin:
   - id: U1-B4
     ust: U1-B3
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -672,6 +788,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -682,6 +801,8 @@ yangin:
   - id: ANA-D1
     ust: KAT-VANA
     uzunluk_m: 0.3
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '80'
     parcalar:
@@ -689,6 +810,8 @@ yangin:
   - id: KOR-B1
     ust: ANA-D1
     uzunluk_m: 1.88
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '50'
     parcalar:
@@ -698,6 +821,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -708,6 +834,8 @@ yangin:
   - id: KOR-B2
     ust: KOR-B1
     uzunluk_m: 3.75
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '50'
     parcalar:
@@ -717,6 +845,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -727,6 +858,8 @@ yangin:
   - id: KOR-B3
     ust: KOR-B2
     uzunluk_m: 3.75
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '50'
     parcalar:
@@ -736,6 +869,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -746,6 +882,8 @@ yangin:
   - id: KOR-B4
     ust: KOR-B3
     uzunluk_m: 3.75
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -755,6 +893,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -765,6 +906,8 @@ yangin:
   - id: KOR-B5
     ust: KOR-B4
     uzunluk_m: 15.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -774,6 +917,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -784,6 +930,8 @@ yangin:
   - id: KOR-B6
     ust: KOR-B5
     uzunluk_m: 3.75
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -793,6 +941,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -803,6 +954,8 @@ yangin:
   - id: KOR-B7
     ust: KOR-B6
     uzunluk_m: 3.75
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -812,6 +965,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -822,6 +978,8 @@ yangin:
   - id: KOR-B8
     ust: KOR-B7
     uzunluk_m: 3.75
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -831,6 +989,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -841,12 +1002,16 @@ yangin:
   - id: ANA-D2
     ust: ANA-D1
     uzunluk_m: 0.3
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '80'
     parcalar: {}
   - id: U3-B1
     ust: ANA-D2
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -856,6 +1021,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -866,6 +1034,8 @@ yangin:
   - id: U3-B2
     ust: U3-B1
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -875,6 +1045,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -885,6 +1058,8 @@ yangin:
   - id: U3-B3
     ust: U3-B2
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -894,6 +1069,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -904,6 +1082,8 @@ yangin:
   - id: U3-B4
     ust: U3-B3
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -913,6 +1093,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -923,12 +1106,16 @@ yangin:
   - id: ANA-D3
     ust: ANA-D2
     uzunluk_m: 1.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '80'
     parcalar: {}
   - id: TES-B1
     ust: ANA-D3
     uzunluk_m: 2.33
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -938,6 +1125,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -948,6 +1138,8 @@ yangin:
   - id: TES-B2
     ust: TES-B1
     uzunluk_m: 2.67
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -957,6 +1149,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -967,6 +1162,8 @@ yangin:
   - id: TES-B3
     ust: TES-B2
     uzunluk_m: 2.67
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -976,6 +1173,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -986,12 +1186,16 @@ yangin:
   - id: ANA-D4
     ust: ANA-D3
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '80'
     parcalar: {}
   - id: DEP-B1
     ust: ANA-D4
     uzunluk_m: 2.33
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -1001,6 +1205,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1011,6 +1218,8 @@ yangin:
   - id: DEP-B2
     ust: DEP-B1
     uzunluk_m: 2.67
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1020,6 +1229,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1030,6 +1242,8 @@ yangin:
   - id: DEP-B3
     ust: DEP-B2
     uzunluk_m: 2.67
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1039,6 +1253,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1049,12 +1266,16 @@ yangin:
   - id: ANA-D5
     ust: ANA-D4
     uzunluk_m: 1.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '65'
     parcalar: {}
   - id: U4-B1
     ust: ANA-D5
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -1064,6 +1285,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1074,6 +1298,8 @@ yangin:
   - id: U4-B2
     ust: U4-B1
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -1083,6 +1309,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1093,6 +1322,8 @@ yangin:
   - id: U4-B3
     ust: U4-B2
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1102,6 +1333,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1112,6 +1346,8 @@ yangin:
   - id: U4-B4
     ust: U4-B3
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1121,6 +1357,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1131,12 +1370,16 @@ yangin:
   - id: ANA-D6
     ust: ANA-D5
     uzunluk_m: 0.3
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '65'
     parcalar: {}
   - id: RON-B1
     ust: ANA-D6
     uzunluk_m: 10.5
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1146,6 +1389,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1156,6 +1402,8 @@ yangin:
   - id: RON-B2
     ust: RON-B1
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1165,6 +1413,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1175,12 +1426,16 @@ yangin:
   - id: ANA-D7
     ust: ANA-D6
     uzunluk_m: 5.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '65'
     parcalar: {}
   - id: IDR-B1
     ust: ANA-D7
     uzunluk_m: 5.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -1190,6 +1445,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1200,6 +1458,8 @@ yangin:
   - id: IDR-B2
     ust: IDR-B1
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -1209,6 +1469,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1219,6 +1482,8 @@ yangin:
   - id: IDR-B3
     ust: IDR-B2
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1228,6 +1493,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1238,6 +1506,8 @@ yangin:
   - id: IDR-B4
     ust: IDR-B3
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1247,6 +1517,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1257,12 +1530,16 @@ yangin:
   - id: ANA-D8
     ust: ANA-D7
     uzunluk_m: 1.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '50'
     parcalar: {}
   - id: STR-B1
     ust: ANA-D8
     uzunluk_m: 4.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '40'
     parcalar:
@@ -1272,6 +1549,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1282,6 +1562,8 @@ yangin:
   - id: STR-B2
     ust: STR-B1
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '32'
     parcalar:
@@ -1291,6 +1573,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1301,6 +1586,8 @@ yangin:
   - id: STR-B3
     ust: STR-B2
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1310,6 +1597,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1320,6 +1610,8 @@ yangin:
   - id: STR-B4
     ust: STR-B3
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1329,6 +1621,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1339,12 +1634,16 @@ yangin:
   - id: ANA-D9
     ust: ANA-D8
     uzunluk_m: 0.3
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar: {}
   - id: ARS-B1
     ust: ANA-D9
     uzunluk_m: 10.5
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1354,6 +1653,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1364,6 +1666,8 @@ yangin:
   - id: ARS-B2
     ust: ARS-B1
     uzunluk_m: 3.0
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: 0.0
     cap: '25'
     parcalar:
@@ -1373,6 +1677,9 @@ yangin:
     uzunluk_m: 0.2
     kot_farki_m: -0.2
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: hesaplanan
     parcalar:
       te_donus: 1
     sprinkler: true
@@ -1383,6 +1690,8 @@ yangin:
   - id: YD-1-HAT
     ust: KAT-VANA
     uzunluk_m: 15.6
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: -1.1999999999999997
     cap: '50'
     parcalar:
@@ -1394,10 +1703,12 @@ yangin:
     uzunluk_m: 1.0
     kot_farki_m: 0.0
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: elle girilen
     parcalar:
       dirsek_90: 1
     cikis: dolap_yari_sert
-    kat: '3'
     mahal: KOR
     konum:
     - 1.0
@@ -1406,6 +1717,8 @@ yangin:
   - id: YD-2-HAT
     ust: KAT-VANA
     uzunluk_m: 15.6
+    kat: '3'
+    uzunluk_yontemi: hesaplanan
     kot_farki_m: -1.1999999999999997
     cap: '50'
     parcalar:
@@ -1417,10 +1730,12 @@ yangin:
     uzunluk_m: 1.0
     kot_farki_m: 0.0
     cap: '25'
+    kat: '3'
+    uzunluk_yontemi: elle girilen
+    konum_yontemi: elle girilen
     parcalar:
       dirsek_90: 1
     cikis: dolap_yari_sert
-    kat: '3'
     mahal: KOR
     konum:
     - 29.0

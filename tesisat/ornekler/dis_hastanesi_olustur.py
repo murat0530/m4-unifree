@@ -75,13 +75,17 @@ def main():
     # --- ağ: pompa → kolon → koridor ana hattı (batı/doğu) → mahal branşmanları ---------
     z_tavan = KAT_KOTU + TAVAN
     toplam = sum(len(v) for v in yerlesim.values())
+    # metraj: kat ve uzunluğun elde ediliş yöntemi ("uzunluk_yontemi"); DXF'ten okunursa "ölçülen" olur
     hatlar.append({"id": "POMPA", "ust": None, "uzunluk_m": 5.0, "kot_farki_m": 0.0, "cap": "100",
+                   "kat": "B", "uzunluk_yontemi": "elle girilen",
                    "parcalar": {"kelebek_vana": 2, "cekvalf": 1, "dirsek_90": 3}, "vana_noktasi": True})
     hatlar.append({"id": "KOLON", "ust": "POMPA", "uzunluk_m": z_tavan - 0.2 - POMPA_KOT + 6.0,
+                   "kat": "B→3", "uzunluk_yontemi": "elle girilen",
                    "kot_farki_m": z_tavan - 0.2 - POMPA_KOT, "cap": "100",
                    "parcalar": {"alarm_vanasi": 1, "dirsek_90": 2}, "vana_noktasi": True,
                    "aciklama": "Alarm vana istasyonu + kolon (bodrum → 3. kat)"})
     hatlar.append({"id": "KAT-VANA", "ust": "KOLON", "uzunluk_m": 1.5, "kot_farki_m": 0.0, "cap": "100",
+                   "kat": "3", "uzunluk_yontemi": "elle girilen",
                    "parcalar": {"kelebek_vana": 1, "te_donus": 1}, "vana_noktasi": True,
                    "aciklama": "Kat zon vanası + akış anahtarı (md. 96/7)"})
 
@@ -99,6 +103,7 @@ def main():
         for k, (x, mid) in enumerate(grup):
             hid = f"ANA-{yon}{k + 1}"
             hatlar.append({"id": hid, "ust": onceki_id, "uzunluk_m": round(abs(x - onceki_x), 2) or 0.3,
+                           "kat": "3", "uzunluk_yontemi": "hesaplanan",
                            "kot_farki_m": 0.0, "cap": cap_sec(kalan[k]),
                            "parcalar": {"te_donus": 1} if k == 0 else {}})
             # mahal içi zincir: koridora en yakın sprinklerden başlayarak en yakın komşu
@@ -114,9 +119,11 @@ def main():
             for n, (sid, p) in enumerate(sira):
                 bid = f"{mid}-B{n + 1}"
                 hatlar.append({"id": bid, "ust": ust, "uzunluk_m": round(abs(p[0] - cur[0]) + abs(p[1] - cur[1]), 2),
+                               "kat": "3", "uzunluk_yontemi": "hesaplanan",
                                "kot_farki_m": 0.0, "cap": cap_sec(len(sira) - n),
                                "parcalar": {"te_donus": 1} if n == 0 else {"dirsek_90": 1}})
                 hatlar.append({"id": sid, "ust": bid, "uzunluk_m": 0.2, "kot_farki_m": -0.2, "cap": "25",
+                               "kat": "3", "uzunluk_yontemi": "elle girilen", "konum_yontemi": "hesaplanan",
                                "parcalar": {"te_donus": 1}, "sprinkler": True, "mahal": mid,
                                "konum": [p[0], p[1]]})
                 ust, cur = bid, p
@@ -125,9 +132,11 @@ def main():
     # Yangın dolapları — ıslak sprinkler branşmanından beslenir (md. 94/1-b-2 → 45 m)
     for did, x in [("YD-1", 1.0), ("YD-2", 29.0)]:
         hatlar.append({"id": f"{did}-HAT", "ust": "KAT-VANA", "uzunluk_m": abs(x - KOLON_X) + 1.6,
+                       "kat": "3", "uzunluk_yontemi": "hesaplanan",
                        "kot_farki_m": -(TAVAN - 0.2 - 1.6), "cap": "50",
                        "parcalar": {"te_donus": 1, "dirsek_90": 2, "surgulu_vana": 1}})
         hatlar.append({"id": did, "ust": f"{did}-HAT", "uzunluk_m": 1.0, "kot_farki_m": 0.0, "cap": "25",
+                       "kat": "3", "uzunluk_yontemi": "elle girilen", "konum_yontemi": "elle girilen",
                        "parcalar": {"dirsek_90": 1}, "cikis": "dolap_yari_sert", "kat": "3",
                        "mahal": "KOR", "konum": [x, 9.6], "sprinkler_hattindan": True})
 

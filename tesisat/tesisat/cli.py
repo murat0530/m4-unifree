@@ -63,7 +63,30 @@ def main(argv=None) -> int:
     ok.add_argument("--birim", choices=["mm", "cm", "m"], help="Çizim birimi ($INSUNITS yoksa)")
     ok.add_argument("--kat", help="Kat etiketi (kimlik ön eki), ör. '3'")
     ok.add_argument("-o", "--cikti", help="YAML çıktı (varsayılan: <dxf>_mahaller.yaml)")
+    mt = alt.add_parser("metraj", help="Yangın ağından metraj cetveli (Excel) üret — miktar; fiyat ayrı sayfada")
+    mt.add_argument("proje")
+    mt.add_argument("-o", "--cikti", help="Excel yolu (varsayılan: <proje>_metraj.xlsx)")
+    mt.add_argument("--referans", help="Kontrol edilmiş metraj CSV (kalem_kodu,miktar) — karşılaştırma için")
+    mt.add_argument("--kurallar", help="Ek kural dosyası (YAML)")
     a = ap.parse_args(argv)
+
+    if a.komut == "metraj":
+        from . import metraj, metraj_excel
+        try:
+            proje = proje_yukle(a.proje)
+            m = metraj.metraj_cikar(proje, kurallari_yukle(a.kurallar, proje.get("kurallar_ek")))
+            if a.referans:
+                m.referans = metraj_excel.referans_oku(a.referans)
+        except GirdiHatasi as e:
+            print(f"GİRDİ HATASI: {e}", file=sys.stderr)
+            return 2
+        cikti = Path(a.cikti or Path(a.proje).with_suffix("").as_posix() + "_metraj.xlsx")
+        metraj_excel.yaz(m, cikti)
+        kontrol = sum(1 for s in m.satirlar if s.yontem == metraj.KONTROL)
+        print(f"{len(m.satirlar)} metraj satırı, {kontrol} 'kontrol gerekli', {len(m.belirsizlikler)} belirsizlik → {cikti}")
+        print("Referans: " + ("verildi — Doğrulama sayfasına bakın" if m.referans is not None
+                              else "YOK → sonuç DOĞRULANMADI (yalnız iç tutarlılık)"))
+        return 0
 
     def liste(x):
         return [t.strip() for t in x.split(",") if t.strip()]
